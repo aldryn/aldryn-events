@@ -1,0 +1,29 @@
+{% extends "sidebar_left.html" %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content_secondary %}
+<ul>
+	{% for year in events_by_year %}
+		<li><a href="{% url 'events_list-by-year' year=year.year %}">{{ year.year }}</a>
+			<ul>
+				{% for month in year.months %}
+						<li>
+							{% if month.has_events %}<a href="{% url 'events_list-by-month' year=month.year month=month.month %}">{% endif %}
+								{{ month.date|date:'F' }} ({{ month.event_count }})
+							{% if month.has_events %}</a>{% endif %}
+						</li>
+				{% endfor %}
+			</ul>
+		</li>
+	{% endfor %}
+	<li><a href="{% url 'events_list_archive' %}">{% trans 'archive' %}</a>
+		<ul>
+			{% for year in archived_events_by_year %}
+			<li><a href="{% url 'events_list_archive-by-year' year=year.year %}">{{ year.year }} ({{ year.event_count }})</a></li>
+			{% endfor %}
+		</ul>
+	</li>
+</ul>
+{% endblock content_secondary %}

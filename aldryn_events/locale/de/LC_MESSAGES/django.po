@@ -1,0 +1,363 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-04-11 14:16+0200\n"
+"PO-Revision-Date: 2013-04-11 14:18+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.5\n"
+
+#: admin.py:36 templates/djangocms_events/plugins/detail.html:10
+#: templates/djangocms_events/plugins/list_item.html:12
+msgid "registration"
+msgstr "Registration"
+
+#: admin.py:39
+msgid "publishing"
+msgstr "Veröffentlichung"
+
+#: cms_app.py:10 cms_plugins.py:32 models.py:222
+msgid "Event Listing"
+msgstr "Event Listing"
+
+#: cms_app.py:25
+msgid "Event Detail"
+msgstr "Event Detail"
+
+#: cms_plugins.py:14 models.py:87
+msgid "Events"
+msgstr "Events"
+
+#: cms_plugins.py:15 models.py:197
+msgid "Event Teaser"
+msgstr "Event Teaser"
+
+#: cms_plugins.py:19
+msgid "advanced"
+msgstr ""
+
+#: cms_plugins.py:20
+#, fuzzy
+msgid "manual event selection"
+msgstr "manuelle Auswahl"
+
+#: cms_plugins.py:31 cms_plugins.py:42 cms_plugins.py:65 cms_plugins.py:75
+#, fuzzy
+msgid "[admin] Events"
+msgstr "nächste Events"
+
+#: cms_plugins.py:43 models.py:235
+msgid "Event Navigation"
+msgstr "Event Navigation"
+
+#: cms_plugins.py:66
+msgid "Event Detail Page"
+msgstr ""
+
+#: cms_plugins.py:76
+msgid "Event Detail Page Image"
+msgstr ""
+
+#: conf.py:9 models.py:218
+msgid "default"
+msgstr ""
+
+#: forms.py:17
+msgid "the registration deadline for this event has already passed"
+msgstr "die deadline für dieses Event ist bereits vorbei "
+
+#: models.py:49
+msgid "slug"
+msgstr ""
+
+#: models.py:51
+msgid "image"
+msgstr ""
+
+#: models.py:52
+msgid "flyer"
+msgstr ""
+
+#: models.py:54
+msgid "start date"
+msgstr "Startdatum"
+
+#: models.py:55
+msgid "start time"
+msgstr "Startzeit"
+
+#: models.py:56
+msgid "end date"
+msgstr "Enddatum"
+
+#: models.py:57
+msgid "end time"
+msgstr "Endzeit"
+
+#: models.py:59
+msgid "start at"
+msgstr ""
+
+#: models.py:60
+msgid "end at"
+msgstr ""
+
+#: models.py:62
+msgid "is published"
+msgstr "ist veröffentlicht"
+
+#: models.py:63
+msgid "wether the event should be displayed"
+msgstr "ob das Event angezeigt werden soll"
+
+#: models.py:64
+msgid "publish at"
+msgstr "Veröffentlichungsdatum"
+
+#: models.py:65
+msgid "time at which the event should be published"
+msgstr "Zeitpunkt ab welchem der Event veröffentlicht werden soll"
+
+#: models.py:67
+msgid "external link"
+msgstr "Externer link"
+
+#: models.py:72
+msgid "title"
+msgstr "Titel"
+
+#: models.py:72 models.py:73 models.py:74
+msgid "translated"
+msgstr "übersetzt"
+
+#: models.py:73
+msgid "short description"
+msgstr "Kurzbeschreibung"
+
+#: models.py:74
+msgid "description"
+msgstr "Beschreibung"
+
+#: models.py:77
+msgid "registration link"
+msgstr "Registrationslink"
+
+#: models.py:80
+#, fuzzy
+msgid "enable event registration"
+msgstr "Registration"
+
+#: models.py:81
+#, fuzzy
+msgid "allow registartion until"
+msgstr "Registrationslink"
+
+#: models.py:86
+msgid "Event"
+msgstr "Event"
+
+#: models.py:119
+msgid "start should be before end"
+msgstr "Start sollte vor dem Ende sein"
+
+#: models.py:122
+msgid ""
+"the registration system can't be active if there is an external registration "
+"link. please remove at least one of the two."
+msgstr ""
+
+#: models.py:125
+msgid "please select a registration deadline."
+msgstr ""
+
+#: models.py:152
+msgid "Frau"
+msgstr ""
+
+#: models.py:153
+msgid "Herr"
+msgstr ""
+
+#: models.py:161
+msgid "Anrede"
+msgstr ""
+
+#: models.py:162
+msgid "Company"
+msgstr "Firma"
+
+#: models.py:163
+msgid "Vorname"
+msgstr ""
+
+#: models.py:164
+msgid "Nachname"
+msgstr ""
+
+#: models.py:166 models.py:167
+msgid "Adresse"
+msgstr ""
+
+#: models.py:168
+msgid "PLZ"
+msgstr ""
+
+#: models.py:169
+msgid "Ort"
+msgstr ""
+
+#: models.py:171
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+#: models.py:172
+msgid "Mobile number"
+msgstr "Mobilnummer"
+
+#: models.py:173
+msgid "E-Mail"
+msgstr ""
+
+#: models.py:175
+msgid "Message"
+msgstr ""
+
+#: models.py:180
+msgid "manual selection"
+msgstr "manuelle Auswahl"
+
+#: models.py:181
+msgid "upcoming events"
+msgstr "nächste Events"
+
+#: models.py:182
+msgid "past events"
+msgstr "vergangene Events"
+
+#: models.py:191
+#, fuzzy
+msgid "event item filtering"
+msgstr "Event Listing"
+
+#: models.py:192
+msgid "number of items"
+msgstr "Anzahl elemente"
+
+#: models.py:193
+msgid "speed"
+msgstr "geschwindigkeit"
+
+#: models.py:194
+#, fuzzy
+msgid "only published events will be displayed"
+msgstr "ob das Event angezeigt werden soll"
+
+#: models.py:198
+msgid "Event Teasers"
+msgstr "Event Teaser"
+
+#: models.py:223
+msgid "Event Listings"
+msgstr ""
+
+#: models.py:229
+msgid "by month"
+msgstr "nach Monat sortiert"
+
+#: models.py:231
+msgid "display months without events"
+msgstr ""
+
+#: models.py:232
+msgid "display archive"
+msgstr ""
+
+#: models.py:236
+msgid "Event Navigations"
+msgstr ""
+
+#: templates/djangocms_events/emails/manager_confirmation.body.txt:1
+#, python-format
+msgid ""
+"There is a new registration for \"%(event_name)s\" (%(event_url)s).\n"
+"\n"
+"Details: %(registration_admin_url)s\n"
+msgstr ""
+
+#: templates/djangocms_events/emails/manager_confirmation.subject.txt:1
+#, fuzzy, python-format
+msgid "new registration for \"%(event_name)s\""
+msgstr "Vielen Dank, dass du dich für \"%(event_name)s\" angemeldet hast"
+
+#: templates/djangocms_events/emails/registrant_confirmation.body.txt:1
+#, python-format
+msgid ""
+"Hi %(first_name)s\n"
+"\n"
+"You have registered for \"%(event_name)s\" (%(event_url)s).\n"
+msgstr ""
+"Hi %(first_name)s\n"
+"\n"
+"Du hast dich für \"%(event_name)s\" (%(event_url)s) angemeldet.\n"
+
+#: templates/djangocms_events/emails/registrant_confirmation.subject.txt:1
+#, python-format
+msgid "Thank you for signing up to \"%(event_name)s\""
+msgstr "Vielen Dank, dass du dich für \"%(event_name)s\" angemeldet hast"
+
+#: templates/djangocms_events/plugins/detail.html:9
+#: templates/djangocms_events/plugins/list_item.html:11
+msgid "download flyer"
+msgstr "Flyer herunterladen"
+
+#: templates/djangocms_events/plugins/detail.html:20
+msgid "Thank you for registering!"
+msgstr "Vielen Dank für die Anmeldung!"
+
+#: templates/djangocms_events/plugins/detail.html:21
+msgid "Register for event again"
+msgstr "Nochmals an diesen Event anmelden"
+
+#: templates/djangocms_events/plugins/detail.html:24
+msgid "It's too late to sign up for this event"
+msgstr "Es ist zu spät um sich für diesen Event anzumelden"
+
+#: templates/djangocms_events/plugins/detail.html:26
+msgid "Register for this event"
+msgstr "Eventanmeldung"
+
+#: templates/djangocms_events/plugins/detail.html:31
+msgid "Error messages:"
+msgstr ""
+
+#: templates/djangocms_events/plugins/detail.html:39
+msgid "Submit"
+msgstr ""
+
+#: templates/djangocms_events/plugins/list_item.html:10
+msgid "more"
+msgstr "mehr"
+
+#: templates/djangocms_events/plugins/navigation.html:20
+msgid "archive"
+msgstr "Archiv"
+
+#: templates/tablib/change_list.html:8
+#, python-format
+msgid "Export to %(format)s "
+msgstr ""
+
+#: templates/tablib/change_list.html:13
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
