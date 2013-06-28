@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from django_tablib.admin import TablibAdmin
 from hvad.admin import TranslatableAdmin
-from .models import Event, Registration
+from .models import Event, EventCoordinator, Registration
 
 
 class EventAdmin(TranslatableAdmin, PlaceholderAdmin):
@@ -12,6 +12,7 @@ class EventAdmin(TranslatableAdmin, PlaceholderAdmin):
     list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)
     list_editable = ('is_published',)
     list_filter = ('is_published',)
+    filter_horizontal = ('event_coordinators', )
     date_hierarchy = 'start_at'
     prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
     _prepopulated_fields = {"slug": ("title",)}  # the one we'll actually use via get_prepopulated_fields()
@@ -33,6 +34,7 @@ class EventAdmin(TranslatableAdmin, PlaceholderAdmin):
         )}),
         (_('registration'), {'fields': (
             ('enable_registration', 'registration_deadline_at'),
+            'event_coordinators',
         )}),
         (_('publishing'), {'fields': (
             ('is_published', 'publish_at',)
@@ -47,6 +49,12 @@ class EventAdmin(TranslatableAdmin, PlaceholderAdmin):
         return self._fieldsets
 
 admin.site.register(Event, EventAdmin)
+
+
+class EventCoordinatorAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(EventCoordinator, EventCoordinatorAdmin)
 
 
 class RegistrationAdmin(TablibAdmin):

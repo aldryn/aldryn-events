@@ -1,0 +1,9 @@
+*.pyc
+!.travis.yml
+*.swp
+*.lock
+*.log
+*.pid
+*.DS_Store
+/*.egg-info/
+/*.egg/

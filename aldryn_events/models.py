@@ -88,6 +88,7 @@ class Event(TranslatableModel):
     )
     enable_registration = models.BooleanField(_('enable event registration'), default=False)
     registration_deadline_at = models.DateTimeField(_('allow registartion until'), null=True, blank=True, default=None)
+    event_coordinators = models.ManyToManyField('EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True)
 
     objects = EventManager()
 
@@ -154,6 +155,14 @@ class Event(TranslatableModel):
     @property
     def is_registration_deadline_passed(self):
         return not (self.registration_deadline_at and self.registration_deadline_at > timezone.now())
+
+
+class EventCoordinator(models.Model):
+    name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(max_length=80, unique=True)
+
+    def __unicode__(self):
+        return self.email
 
 
 class Registration(models.Model):

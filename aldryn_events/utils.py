@@ -97,7 +97,7 @@ def send_user_confirmation_email(registration, language):
     body = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.body.txt', dictionary=context)
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list=[registration.email])
 
-def send_manager_confirmation_email(registration, language):
+def send_manager_confirmation_email(registration, language, emails):
     event = registration.event
     context = {
         'event_name': event.title,
@@ -111,4 +111,4 @@ def send_manager_confirmation_email(registration, language):
     subject = render_to_string(template_name='aldryn_events/emails/manager_confirmation.subject.txt', dictionary=context)
     body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=context)
     if settings.ALDRYN_EVENTS_MANAGERS:  # don't try to send if the list is empty
-        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list=[a[1] for a in settings.ALDRYN_EVENTS_MANAGERS])
+        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, emails)
