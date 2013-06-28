@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 from cms.models.fields import PlaceholderField
 from cms.models import CMSPlugin
@@ -100,9 +101,8 @@ class Event(TranslatableModel):
     def __unicode__(self):
         return self.lazy_translation_getter('title', self.pk)
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('events_detail', (), {'slug': self.slug})
+        return reverse('events_detail', kwargs=dict(slug=self.slug))
 
     def clean(self):
         if not self.pk:

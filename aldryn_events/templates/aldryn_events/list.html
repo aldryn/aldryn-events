@@ -1,7 +1,5 @@
 {% extends "aldryn_events/navigation.html" %}
 
-{% load url from future %}
-
 {% block content_primary %}
 {% for event in object_list %}
 	{% include 'aldryn_events/list_item.html' %}
