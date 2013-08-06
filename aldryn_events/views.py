@@ -37,7 +37,7 @@ class NavigationMixin(object):
 
 class EventListView(NavigationMixin, ListView):
     model = Event
-    template_name = 'aldryn_events/list.html'
+    template_name = 'aldryn_events/events_list.html'
     archive = False
 
     def get_queryset(self):
@@ -57,7 +57,7 @@ class EventListView(NavigationMixin, ListView):
 
 class EventDetailView(NavigationMixin, CreateView):
     model = Registration
-    template_name = 'aldryn_events/detail.html'
+    template_name = 'aldryn_events/events_detail.html'
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="plugin-events">
+	{% block content_events %}{% endblock %}
+	{% block sidebar_events %}{% include "aldryn_events/includes/archive_navigation.html" %}{% endblock %}
+</div>
+{% endblock %}

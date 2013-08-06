@@ -1,0 +1,72 @@
+{% extends "aldryn_events/base.html" %}
+{% load thumbnail i18n standard_form placeholder_tags sekizai_tags %}
+{% load url from future %}
+
+{% block content_events %}
+<div class="events-detail">
+
+	{% block events_title %}<h2>{{ event.title }}</h2>{% endblock %}
+	{% if event.image %}<p class="events-visual"><a href="{% url 'events_detail' slug=event.slug %}"><img src="{% thumbnail event.image 700x200 crop %}" alt="" /></a></p>{% endif %}
+	<p class="events-date">
+		{% if event.start_date %}{{ event.start_date|date:"l" }}, {{ event.start_at|date:"DATE_FORMAT" }}{% endif %}{% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
+		{% if event.end_date or event.end_time %} - {% endif %}{% if event.end_date %}{{ event.end_date|date:"l" }}, {{ event.end_at|date:"DATE_FORMAT" }}{% endif %}{% if event.end_time %} {{ event.end_at|date:"H:i" }}{% endif %}
+	</p>
+
+	<div class="events-lead">{{ event.short_description|safe }}</div>
+	<div class="events-content">{% render_placeholder event.description %}</div>
+
+	{% if event.enable_registration %}
+		{% if already_registered %}
+			<h3>{% trans "Thank you for registering!" %}</h3>
+			<form method="post" action="{% url 'events_registration_reset' event.slug %}">
+				{% csrf_token %}
+				<fieldset>
+					<ol>
+						<li><label><input type="submit" value="{% trans 'Register for event again' %}" class="btn"></label></li>
+					</ol>
+				</fieldset>
+			</form>
+		{% else %}
+			{% if event.is_registration_deadline_passed %}
+				<h3>{% trans "It's too late to sign up for this event" %}</h3>
+			{% else %}
+				{% if not form.errors %}<p class="events-register"><a href="#" id="events_trigger">{% trans "Register for this event" %}</a></p>{% endif %}
+
+				<form action="." method="post" class="frm frm-events" id="events_register"{% if not form.errors %} hidden="hidden"{% endif %}>
+				{% csrf_token %}
+					{% if form.errors %}
+					<ul class="error">
+						<li class="title">{% if error_message_title %}{{ error_message_title }}{% else %}{% trans "Error messages:" %}{% endif %}</li>
+						{% for field in form %}{% if field.errors %}{% for error in field.errors %}
+						<li>{{ field.label }}: {{ error }}</li>
+						{% endfor %}{% endif %}{% endfor %}
+					</ul>
+					{% endif %}
+					<fieldset class="align-horizontal">
+						{% standard_form form %}
+						<fieldset>
+							<ol>
+								<li>
+									<label><input type="submit" class="btn" value="{% trans 'Submit' %}" /></label>
+								</li>
+							</ol>
+						</fieldset>
+					</fieldset>
+				</form>
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+	{% addtoblock "js" %}
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			$('#events_trigger').bind('click', function (e) {
+				e.preventDefault();
+				$('#events_register').slideDown();
+				$(this).detach();
+			})
+		});
+	</script>
+	{% endaddtoblock %}
+</div>
+{% endblock %}
