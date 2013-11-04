@@ -1,0 +1,62 @@
+{% load i18n standard_form sekizai_tags stack_tags %}
+
+{% if event.enable_registration %}
+<div class="event-registration">
+	<h3>{% trans "Registration" %}</h3>
+
+	{% if event.is_registration_deadline_passed %}<p>{% trans "The registration deadline for this event has passed, registration is closed." %}</p>{% endif %}
+
+	{% if already_registered and not event.is_registration_deadline_passed %}
+	<p>{% trans "Thank you for your registration!" %}</p>
+	{% block registration_stack %}{% stack "events_registration" %}{% endblock %}
+	<form action="{% url 'events_registration_reset' event.slug %}" method="post" class="form form-eventss" role="form">
+		{% csrf_token %}
+		<fieldset>
+			<ol>
+				<li><label><input type="submit" class="button" value="{% trans 'Reset your registration' %}"></label></li>
+			</ol>
+		</fieldset>
+	</form>
+	{% endif %}
+
+	{% if not already_registered and not event.is_registration_deadline_passed %}
+	<p><a href="#events-registration" id="events-trigger">{% trans "Register for this event" %}</a></p>
+	<form action="." method="post" class="form form-events" id="events-registration" role="form" hidden="hidden">
+		{% csrf_token %}
+		{% if form.errors %}
+		<ul class="error">
+			<li class="title">{% if error_message_title %}{{ error_message_title }}{% else %}{% trans "Error messages:" %}{% endif %}</li>
+			{% for field in form %}{% if field.errors %}{% for error in field.errors %}
+			<li>{{ field.label }}: {{ error }}</li>
+			{% endfor %}{% endif %}{% endfor %}
+		</ul>
+		{% endif %}
+		<fieldset class="align-horizontal">
+			{% standard_form form %}
+			<fieldset>
+				<ol>
+					<li>
+						<label><input type="submit" class="button" value="{% trans 'Submit' %}" /></label>
+					</li>
+				</ol>
+			</fieldset>
+		</fieldset>
+	</form>
+	{% endif %}
+
+</div>
+{% endif %}
+
+{% addtoblock "js" %}
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	var trigger = $('#events-trigger');
+	var container = $('#events-registration');
+
+	trigger.on('click', function () {
+		trigger.parent().hide();
+		container.slideDown(300);
+	});
+});
+</script>
+{% endaddtoblock %}

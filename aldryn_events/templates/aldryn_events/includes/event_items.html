@@ -1,20 +1,24 @@
 {% load i18n thumbnail %}
 {% load url from future %}
 
-<ul class="events-items">
+<ul class="event-items">
 	{% for event in object_list %}
 	<li>
-		{% if event.image %}<p class="events-visual"><a href="{% url 'events_detail' slug=event.slug %}"><img src="{% thumbnail event.image 200x100 crop %}" alt="" /></a></p>{% endif %}
-		<h3><a href="{% url 'events_detail' slug=event.slug %}}">{{ event.title }}</a></h3>
+		{% if event.flyer %}<p class="events-visual"><a href="{% url 'events_detail' slug=event.slug %}"><img src="{% thumbnail event.flyer 180x260 crop %}" alt="" /></a></p>{% endif %}
+		<h3><a href="{% url 'events_detail' slug=event.slug %}">{{ event.title }}</a></h3>
+		{% if event.short_description %}<div class="events-lead">{{ event.short_description|safe }}</div>{% endif %}
+
 		<p class="events-date">
-			{% if event.start_date %}{{ event.start_date|date:"l" }}, {{ event.start_at|date:"DATE_FORMAT" }}{% endif %}{% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
-			{% if event.end_date or event.end_time %} - {% endif %}{% if event.end_date %}{{ event.end_date|date:"l" }}, {{ event.end_at|date:"DATE_FORMAT" }}{% endif %}{% if event.end_time %} {{ event.end_at|date:"H:i" }}{% endif %}
+			<strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
+			{% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+			{% if event.end_date %}
+				<br /><strong>{% trans "End:" %}</strong> {{ event.end_date|date:"l, d.m.y" }}
+				{% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+			{% endif %}
 		</p>
-		<p class="events-lead">{{ event.short_description|safe|striptags|truncatewords:"25" }} <a href="{% url 'events_detail' slug=event.slug %}">{% trans "read more" %}</a></p>
-		{% if event.flyer %}<p class="events-fyler"><a href="{{ event.flyer.url }}">{% trans "download flyer" %}</a></p>{% endif %}
-		{% if event.register_link %}<p class="events-register"><a href="{{ event.register_link }}">{% trans "registration" %}</a></p>{% endif %}
+		{% if event.location %}
+		<div class="events-venue">{{ event.location|safe }}</div>
+		{% endif %}
 	</li>
-	{% empty %}
-	<li><p class="events-empty">{% trans "No entry found." %}</p></li>
 	{% endfor %}
 </ul>
