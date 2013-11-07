@@ -7,8 +7,9 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.datastructures import SortedDict
-from django.utils.translation import get_language
 from django.conf import settings
+
+from cms.utils.i18n import get_current_language as get_language
 
 
 def build_months(year, is_archive_view=False):
