@@ -22,24 +22,17 @@
 	{% if not already_registered and not event.is_registration_deadline_passed %}
 	<p><a href="#events-registration" id="events-trigger">{% trans "Register for this event" %}</a></p>
 	<form action="." method="post" class="form form-events" id="events-registration" role="form" hidden="hidden">
-		{% csrf_token %}
 		{% if form.errors %}
-		<ul class="error">
-			<li class="title">{% if error_message_title %}{{ error_message_title }}{% else %}{% trans "Error messages:" %}{% endif %}</li>
+		<ul class="messages text-error list-reset">
 			{% for field in form %}{% if field.errors %}{% for error in field.errors %}
-			<li>{{ field.label }}: {{ error }}</li>
+			<li><strong>{{ field.label }}</strong>: {{ error }}</li>
 			{% endfor %}{% endif %}{% endfor %}
 		</ul>
 		{% endif %}
 		<fieldset class="align-horizontal">
+			{% csrf_token %}
 			{% standard_form form %}
-			<fieldset>
-				<ol>
-					<li>
-						<label><input type="submit" class="button" value="{% trans 'Submit' %}" /></label>
-					</li>
-				</ol>
-			</fieldset>
+			{% standard_submit %}
 		</fieldset>
 	</form>
 	{% endif %}
@@ -57,6 +50,10 @@ jQuery(document).ready(function($) {
 		trigger.parent().hide();
 		container.slideDown(300);
 	});
+
+	{% if form.errors %}
+	trigger.trigger('click');
+	{% endif %}
 });
 </script>
 {% endaddtoblock %}
