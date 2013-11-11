@@ -18,6 +18,7 @@ setup(
         'django-appconf',
         'django-standard-form',
         'djangocms-text-ckeditor',
+        'aldryn-search>=0.1.3',
     ),
     include_package_data=True,
     zip_safe=False,
