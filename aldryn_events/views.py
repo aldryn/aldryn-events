@@ -78,7 +78,7 @@ class EventDetailView(NavigationMixin, CreateView):
         self.request.session['registered_events'] = registered_events
         if settings.ALDRYN_EVENTS_USER_REGISTRATION_EMAIL:
             send_user_confirmation_email(form.instance, form.language_code)
-        coordinator_emails = self.event.event_coordinators.all().values_list('email', flat=True)
+        coordinator_emails = list(self.event.event_coordinators.all().values_list('email', flat=True))
         coordinator_emails.extend([a[1] for a in settings.ALDRYN_EVENTS_MANAGERS])
         if coordinator_emails:
             send_manager_confirmation_email(form.instance, form.language_code, coordinator_emails)
