@@ -1,21 +1,26 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from cms.admin.placeholderadmin import PlaceholderAdmin
 from django_tablib.admin import TablibAdmin
+
 from hvad.admin import TranslatableAdmin
 from .models import Event, EventCoordinator, Registration
 
+from cms.admin.placeholderadmin import PlaceholderAdmin
+from cms.admin.placeholderadmin import FrontendEditableAdmin
 
-class EventAdmin(TranslatableAdmin, PlaceholderAdmin):
+class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     search_fields = ('translation__title',)
     list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
     date_hierarchy = 'start_at'
+    frontend_editable_fields = ("title", "short_description", "location")
+
     prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
     _prepopulated_fields = {"slug": ("title",)}  # the one we'll actually use via get_prepopulated_fields()
+
     _fieldsets = (
         (None, {'fields': (
             ('title', 'slug'),
