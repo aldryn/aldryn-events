@@ -1,6 +1,7 @@
 {% extends "aldryn_events/base.html" %}
+{% load i18n %}
 
 {% block content_events %}
-<h2>Events</h2>
+<h2>{% trans "Events" %}</h2>
 {% include "aldryn_events/includes/event_items.html" %}
 {% endblock content_events %}
