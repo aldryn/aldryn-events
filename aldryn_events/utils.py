@@ -82,7 +82,8 @@ def build_events_by_year(events, **config):
 def fallback_priority():
     languages = [lang for lang, langtxt in settings.LANGUAGES]
     current_lang = get_language()
-    languages.remove(current_lang)
+    if current_lang in languages:
+        languages.remove(current_lang)
     fallback_languages = [get_language()] + languages
     return fallback_languages
 
