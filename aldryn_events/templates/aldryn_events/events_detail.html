@@ -4,7 +4,7 @@
 
 {% block content_events %}
 <div class="events-detail">
-	<h2>{% show_editable_model event "title" %}</h2>
+	<h2>{{ event.title }}</h2>
 	{% if event.image %}<p class="events-visual"><img src="{% thumbnail event.image 700x200 crop %}" alt="" /></p>{% endif %}
 	<p class="events-date">
 		<strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
@@ -15,14 +15,14 @@
 		{% endif %}
 	</p>
 	{% if event.location %}
-	<div class="events-venue">{% show_editable_model event "location" "location" "" safe %}</div>
+	<div class="events-venue">{{ event.location|safe }}</div>
 	{% endif %}
 
-	{% if event.short_description %}<div class="events-lead">{% show_editable_model event "short_description" "short_description" "" safe %}</div>{% endif %}
+	{% if event.short_description %}<div class="events-lead">{{ event.short_description|safe }}</div>{% endif %}
 	<div class="events-content">{% render_placeholder event.description %}</div>
 
 	{% include "aldryn_events/includes/event_registration.html" %}
 
 	<p class="events-back"><a href="{% url 'events_list' %}">{% trans "Back" %}</a></p>
 </div>
-{% endblock %}
+{% endblock content_events %}
