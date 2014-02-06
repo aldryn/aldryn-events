@@ -100,9 +100,6 @@ class Event(TranslatableModel):
     def __unicode__(self):
         return self.lazy_translation_getter('title', self.pk)
 
-    def get_absolute_url(self):
-        return reverse('events_detail', kwargs=dict(slug=self.slug))
-
     def clean(self):
         if not self.pk:
             # the translations don't exist yet so we can't access title
