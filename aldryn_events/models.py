@@ -54,7 +54,6 @@ class EventManager(TranslationManager):
         return self.published(now=now).filter(end_at__lt=now).order_by('-start_at', 'end_at', 'slug')
 
 
-
 class Event(TranslatableModel):
     slug = models.SlugField(_('slug'), blank=True, max_length=150, unique=True)
 
@@ -100,9 +99,6 @@ class Event(TranslatableModel):
 
     def __unicode__(self):
         return self.lazy_translation_getter('title', self.pk)
-
-    def get_absolute_url(self):
-        return reverse('events_detail', kwargs=dict(slug=self.slug))
 
     def clean(self):
         if not self.pk:
@@ -156,6 +152,9 @@ class Event(TranslatableModel):
     def is_registration_deadline_passed(self):
         return not (self.registration_deadline_at and self.registration_deadline_at > timezone.now())
 
+    def get_absolute_url(self):
+        return reverse('events_detail', kwargs={'slug': self.slug})
+
 
 class EventCoordinator(models.Model):
     name = models.CharField(max_length=200, blank=True)
@@ -191,3 +190,9 @@ class Registration(models.Model):
     email = models.EmailField(_('E-Mail'))
 
     message = models.TextField(_('Message'), blank=True, default='')
+
+
+class UpcomingPluginItem(CMSPlugin):
+
+    latest_entries = models.PositiveSmallIntegerField(
+        _('latest entries'), default=5, help_text=_('The number of latests events to be displayed.'))

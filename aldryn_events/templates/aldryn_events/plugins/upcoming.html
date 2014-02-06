@@ -1,9 +1,15 @@
+{% load i18n %}
+
 <div class="plugin plugin-events">
 	<ul class="events-upcoming">
-		<li><p><a href="#">Dralion - Cirque du Soleil</a> <span class="date">1{{ forloop.counter }}.12.2013</span></p></li>
-		<li><p><a href="#">Mamma Mia</a> <span class="date">1{{ forloop.counter }}.12.2013</span></p></li>
-		<li><p><a href="#">The Phantom of the Opera</a> <span class="date">1{{ forloop.counter }}.12.2013</span></p></li>
-		<li><p><a href="#">The Lion King</a> <span class="date">1{{ forloop.counter }}.12.2013</span></p></li>
-		<li><p><a href="#">Wicked</a> <span class="date">1{{ forloop.counter }}.12.2013</span></p></li>
+		{% for event in events %}
+		<li>
+			<p>
+				<a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start }}</span>
+			</p>
+		</li>
+		{% empty %}
+		<li><p>{% trans "No events yet." %}</p></li>
+		{% endfor %}
 	</ul>
 </div>
