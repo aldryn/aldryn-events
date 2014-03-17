@@ -1,4 +1,4 @@
-{% load i18n standard_form sekizai_tags stack_tags %}
+{% load i18n cms_tags standard_form sekizai_tags %}
 
 {% if event.enable_registration %}
 <div class="event-registration">
@@ -8,7 +8,7 @@
 
 	{% if already_registered and not event.is_registration_deadline_passed %}
 	<p>{% trans "Thank you for your registration!" %}</p>
-	{% block registration_stack %}{% stack "events_registration" %}{% endblock %}
+	{% block event_registration %}{% static_placeholder "events_registration" %}{% endblock %}
 	<form action="{% url 'events_registration_reset' event.slug %}" method="post" class="form form-eventss" role="form">
 		{% csrf_token %}
 		<fieldset>

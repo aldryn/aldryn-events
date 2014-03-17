@@ -5,8 +5,8 @@
 	{% for event in object_list %}
 	<li>
 		{% if event.flyer %}<p class="events-visual"><a href="{% url 'events_detail' slug=event.slug %}"><img src="{% thumbnail event.flyer 180x260 crop %}" alt="" /></a></p>{% endif %}
-		<h3><a href="{% url 'events_detail' slug=event.slug %}">{% show_editable_model event "title" %}</a></h3>
-		{% if event.short_description %}<div class="events-lead">{% show_editable_model event "short_description" "short_description" %}</div>{% endif %}
+		<h3><a href="{% url 'events_detail' slug=event.slug %}">{{ event.title }}</a></h3>
+		{% if event.short_description %}<div class="events-lead">{% render_model event "short_description" "short_description" %}</div>{% endif %}
 
 		<p class="events-date">
 			<strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
@@ -17,7 +17,7 @@
 			{% endif %}
 		</p>
 		{% if event.location %}
-		<div class="events-venue">{% show_editable_model event "location" "location" "" safe %}</div>
+		<div class="events-venue">{{ event.location|safe }}</div>
 		{% endif %}
 	</li>
 	{% endfor %}
