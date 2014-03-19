@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'UpcomingPluginItem'
-        db.create_table(u'cmsplugin_UpcomingPluginItem', (
+        db.create_table(u'cmsplugin_upcomingpluginitem', (
             (u'cmsplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['cms.CMSPlugin'], unique=True, primary_key=True)),
             ('latest_entries', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=5)),
         ))
@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         # Deleting model 'UpcomingPluginItem'
-        db.delete_table(u'cmsplugin_UpcomingPluginItem')
+        db.delete_table(u'cmsplugin_upcomingpluginitem')
 
 
     models = {
