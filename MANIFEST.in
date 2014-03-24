@@ -1,4 +1,4 @@
-include LICENSE
-include README.rst
+include LICENSE.txt
 recursive-include aldryn_events/templates *
-recursive-include aldryn_events/locale *
+recursive-include aldryn_events/migrations *
+recursive-exclude * *.pyc
