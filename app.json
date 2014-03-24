@@ -1,7 +1,7 @@
 {
 	"name": "Events",
 	"description": "An events app for aldryn",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"url": "https://github.com/aldryn/aldryn-events",
 	"package-name": "aldryn-events",
 	"installed-apps": [
