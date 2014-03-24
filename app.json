@@ -11,7 +11,7 @@
         "appconf",
         "standard_form",
         "djangocms_text_ckeditor",
-        "aldryn_search",
+        // "aldryn_search",
         "filer",
         "aldryn_common",
         "easy_thumbnails",
