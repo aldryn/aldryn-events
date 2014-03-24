@@ -22,7 +22,7 @@ from djangocms_text_ckeditor.fields import HTMLField
 
 from hvad.models import TranslatableModel, TranslationManager, TranslatedFields
 
-from .utils import fallback_priority
+from .utils import fallback_priority, get_additional_styles
 from .conf import settings
 
 
@@ -193,6 +193,13 @@ class Registration(models.Model):
 
 
 class UpcomingPluginItem(CMSPlugin):
+    STANDARD = 'standard'
 
+    STYLE_CHOICES = [
+        (STANDARD, _('Standard')),
+    ]
+
+    style = models.CharField(
+        _('Style'), choices=STYLE_CHOICES + get_additional_styles(), default=STANDARD, max_length=50)
     latest_entries = models.PositiveSmallIntegerField(
         _('latest entries'), default=5, help_text=_('The number of latests events to be displayed.'))
