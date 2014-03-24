@@ -9,6 +9,7 @@ from django.views.generic import (
     TemplateView,
 )
 from django.utils.translation import ugettext as _
+from aldryn_events import request_events_event_identifier
 
 from .utils import (
     build_events_by_year,
@@ -62,6 +63,7 @@ class EventDetailView(NavigationMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = Event.objects.published().get(slug=kwargs['slug'])
+        setattr(self.request, request_events_event_identifier, self.event)
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
 
 
