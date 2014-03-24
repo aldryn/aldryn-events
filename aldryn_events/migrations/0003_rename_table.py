@@ -13,7 +13,9 @@ class Migration(SchemaMigration):
             db.rename_table('cmsplugin_upcomingpluginitem', 'aldryn_events_upcomingpluginitem')
 
     def backwards(self, orm):
-        pass
+        table_names = connection.introspection.table_names()
+        if 'aldryn_events_upcomingpluginitem' in table_names:
+            db.rename_table('aldryn_events_upcomingpluginitem', 'cmsplugin_upcomingpluginitem')
 
     models = {
         u'aldryn_events.event': {
