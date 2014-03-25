@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
 from django import forms
+from django.http import Http404
 from django.utils import translation
 from django.views.generic import (
     CreateView,
@@ -62,7 +63,10 @@ class EventDetailView(NavigationMixin, CreateView):
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.published().get(slug=kwargs['slug'])
+        try:
+            self.event = Event.objects.published().get(slug=kwargs['slug'])
+        except Event.DoesNotExist:
+            raise Http404
         setattr(self.request, request_events_event_identifier, self.event)
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
