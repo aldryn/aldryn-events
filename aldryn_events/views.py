@@ -64,8 +64,9 @@ class EventDetailView(NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.event = Event.objects.published().get(slug=kwargs['slug'])
         setattr(self.request, request_events_event_identifier, self.event)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.set_object(self.event)
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
-
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
