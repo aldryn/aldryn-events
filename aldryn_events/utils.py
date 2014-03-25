@@ -79,15 +79,6 @@ def build_events_by_year(events, **config):
     return flattened_events_by_year
 
 
-def fallback_priority():
-    languages = [lang for lang, langtxt in settings.LANGUAGES]
-    current_lang = get_language()
-    if current_lang in languages:
-        languages.remove(current_lang)
-    fallback_languages = [get_language()] + languages
-    return fallback_languages
-
-
 def send_user_confirmation_email(registration, language):
     event = registration.event
     context = {
@@ -98,6 +89,7 @@ def send_user_confirmation_email(registration, language):
     subject = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.subject.txt', dictionary=context)
     body = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.body.txt', dictionary=context)
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list=[registration.email])
+
 
 def send_manager_confirmation_email(registration, language, emails):
     event = registration.event
@@ -114,3 +106,19 @@ def send_manager_confirmation_email(registration, language, emails):
     body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=context)
     if settings.ALDRYN_EVENTS_MANAGERS:  # don't try to send if the list is empty
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, emails)
+
+
+def get_additional_styles():
+    """
+    Get additional styles choices from settings
+    """
+    choices = []
+    raw = getattr(settings, 'ALDRYN_EVENTS_PLUGIN_STYLES', False)
+
+    if raw:
+        if isinstance(raw, str):
+            raw = raw.split(',')
+        for choice in raw:
+            clean = choice.strip()
+            choices.append((clean.lower(), clean.title()))
+    return choices

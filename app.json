@@ -1,0 +1,28 @@
+{
+	"name": "Events",
+	"description": "An events app for aldryn",
+	"version": "0.5.3",
+	"url": "https://github.com/aldryn/aldryn-events",
+	"package-name": "aldryn-events",
+	"installed-apps": [
+        "djangocms_common",
+        "extended_choices",
+        "django_tablib",
+        "appconf",
+        "standard_form",
+        "djangocms_text_ckeditor",
+        "filer",
+        "aldryn_common",
+        "easy_thumbnails",
+        "hvad",
+		"aldryn_events"
+	],
+	"author": {
+		"name": "Divio AG",
+		"url": "divio.ch"
+	},
+	"license": {
+		"name": "BSD",
+		"text": "!literal-include LICENSE.txt"
+	}
+}

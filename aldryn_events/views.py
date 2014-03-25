@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
 from django import forms
+from django.http import Http404
 from django.utils import translation
 from django.views.generic import (
     CreateView,
@@ -9,6 +10,7 @@ from django.views.generic import (
     TemplateView,
 )
 from django.utils.translation import ugettext as _
+from aldryn_events import request_events_event_identifier
 
 from .utils import (
     build_events_by_year,
@@ -61,9 +63,14 @@ class EventDetailView(NavigationMixin, CreateView):
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.published().get(slug=kwargs['slug'])
+        try:
+            self.event = Event.objects.published().get(slug=kwargs['slug'])
+        except Event.DoesNotExist:
+            raise Http404
+        setattr(self.request, request_events_event_identifier, self.event)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.set_object(self.event)
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
-
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)

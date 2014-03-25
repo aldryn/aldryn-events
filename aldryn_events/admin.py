@@ -9,6 +9,7 @@ from .models import Event, EventCoordinator, Registration
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
 
+
 class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     search_fields = ('translation__title',)
     list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)

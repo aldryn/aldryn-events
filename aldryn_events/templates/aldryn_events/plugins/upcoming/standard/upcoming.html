@@ -1,5 +1,7 @@
+{% extends "aldryn_events/plugins/upcoming/base.html" %}
 {% load i18n %}
 
+{% block plugin %}
 <div class="plugin plugin-events">
 	<ul class="events-upcoming">
 		{% for event in events %}
@@ -9,7 +11,8 @@
 			</p>
 		</li>
 		{% empty %}
-		<li><p>{% trans "No events yet." %}</p></li>
+		<li><p>{% trans "No upcoming events." %}</p></li>
 		{% endfor %}
 	</ul>
 </div>
+{% endblock plugin %}
