@@ -79,15 +79,6 @@ def build_events_by_year(events, **config):
     return flattened_events_by_year
 
 
-def fallback_priority():
-    languages = [lang for lang, langtxt in settings.LANGUAGES]
-    current_lang = get_language()
-    if current_lang in languages:
-        languages.remove(current_lang)
-    fallback_languages = [get_language()] + languages
-    return fallback_languages
-
-
 def send_user_confirmation_email(registration, language):
     event = registration.event
     context = {

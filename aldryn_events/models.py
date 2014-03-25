@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from uuid import uuid4
+from cms.utils.i18n import get_current_language
 
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -22,14 +23,14 @@ from djangocms_text_ckeditor.fields import HTMLField
 
 from hvad.models import TranslatableModel, TranslationManager, TranslatedFields
 
-from .utils import fallback_priority, get_additional_styles
+from .utils import get_additional_styles
 from .conf import settings
 
 
 class EventManager(TranslationManager):
     def published(self, now=None):
         now = now or timezone.now()
-        return self.untranslated().use_fallbacks(*fallback_priority()).filter(is_published=True, publish_at__lte=now)
+        return self.language(get_current_language()).filter(is_published=True, publish_at__lte=now)
 
     def upcoming(self, count, now=None):
         now = now or timezone.now()
