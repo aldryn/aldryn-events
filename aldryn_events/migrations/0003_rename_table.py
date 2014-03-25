@@ -11,6 +11,8 @@ class Migration(SchemaMigration):
         table_names = connection.introspection.table_names()
         if 'cmsplugin_upcomingpluginitem' in table_names:
             db.rename_table('cmsplugin_upcomingpluginitem', 'aldryn_events_upcomingpluginitem')
+        elif 'cmsplugin_UpcomingPluginItem' in table_names:
+            db.rename_table('cmsplugin_UpcomingPluginItem', 'aldryn_events_upcomingpluginitem')
 
     def backwards(self, orm):
         table_names = connection.introspection.table_names()
