@@ -116,7 +116,7 @@ def get_additional_styles():
     raw = getattr(settings, 'ALDRYN_EVENTS_PLUGIN_STYLES', False)
 
     if raw:
-        if isinstance(raw, str):
+        if isinstance(raw, str) or isinstance(raw, unicode):
             raw = raw.split(',')
         for choice in raw:
             clean = choice.strip()
