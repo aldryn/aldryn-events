@@ -20,6 +20,7 @@ class EventListAppHook(CMSApp):
             url(r'^$', EventListView.as_view(), name='events_list'),
             url(r'^(?P<year>\d{4})/$', EventListView.as_view(), name='events_list-by-year'),
             url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/$', EventListView.as_view(), name='events_list-by-month'),
+            url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', EventListView.as_view(), name='events_list-by-day'),
             url(r'^archive/$', EventListView.as_view(archive=True), name='events_list_archive'),
             url(r'^archive/(?P<year>\d{4})/$', EventListView.as_view(archive=True), name='events_list_archive-by-year'),
             url(r'^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$', EventListView.as_view(archive=True), name='events_list_archive-by-month'),

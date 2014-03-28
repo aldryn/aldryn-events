@@ -49,10 +49,13 @@ class EventListView(NavigationMixin, ListView):
             qs = self.model.objects.future()
         year = self.kwargs.get('year', None)
         month = self.kwargs.get('month', None)
+        day = self.kwargs.get('day', None)
         if year:
             qs = qs.filter(start_at__year=year)
         if month:
             qs = qs.filter(start_at__month=month)
+        if day:
+            qs = qs.filter(start_at__day=day)
         qs = qs.order_by('start_at', 'end_at')
         return qs
 
