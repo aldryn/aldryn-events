@@ -2,63 +2,35 @@
 
 <div class="plugin plugin-events">
 	<div class="events-calendar">
-		<h3>October 2013</h3>
+		<h3>{{ today|date:'F Y' }}</h3>
+        {% comment %}
 		<p class="controls">
 			<a href="#" class="back">{% trans "Previous month" %}</a>
 			<a href="#" class="next">{% trans "Next month" %}</a>
 		</p>
-
+        {% endcomment %}
 		<table class="table-calendar">
 			<tr>
 				<th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
 				<th class="weekend">S</th>
 				<th class="weekend">S</th>
 			</tr>
-			<tr>
-				<td class="disabled"><span>30</span></td>
-				<td><span>1</span></td>
-				<td class="events"><a href="#october-2">2</a></td>
-				<td><span>3</span></td>
-				<td><span>4</span></td>
-				<td class="weekend"><span>5</span></td>
-				<td class="weekend"><span>6</span></td>
-			</tr>
-			<tr>
-				<td><span>7</span></td>
-				<td class="events"><a href="#october-8">8</a></td>
-				<td class="events"><a href="#october-9">9</a></td>
-				<td class="events"><a href="#october-10">10</a></td>
-				<td><span>11</span></td>
-				<td class="weekend"><span>12</span></td>
-				<td class="weekend events"><a href="#october-13">13</a></td>
-			</tr>
-			<tr>
-				<td><span>14</span></td>
-				<td class="events"><a href="#october-1">15</a></td>
-				<td><span>16</span></td>
-				<td><span>17</span></td>
-				<td class="events"><a href="#october-1">18</a></td>
-				<td class="weekend events"><a href="#october-1">19</a></td>
-				<td class="weekend"><span>20</span></td>
-			</tr>
-			<tr>
-				<td><span>21</span></td>
-				<td><span>22</span></td>
-				<td><span>23</span></td>
-				<td><span>24</span></td>
-				<td><span>25</span></td>
-				<td class="weekend"><span>26</span></td>
-				<td class="weekend events"><a href="#october-1">27</a></td>
-			</tr>
-			<tr>
-				<td class="events"><a href="#october-1">28</a></td>
-				<td class="events"><a href="#october-1">29</a></td>
-				<td><span>30</span></td>
-				<td><span>31</span></td>
-				<td class="disabled"><span>1</span></td>
-				<td class="weekend disabled"><span>2</span></td>
-				<td class="weekend disabled"><span>3</span></td>
-			</tr>
+            <tr>
+            {% for day, events in days %}
+                {% if forloop.counter0|divisibleby:'7' %}
+                    </tr>
+                    <tr>
+                {% endif %}
+                <td class="{% if events %}events{% endif%}{% if day|date:'w' in '06' %} weekend{% endif %}{% spaceless %}
+                           {% endspaceless %}{% if day|date:'n' != current_month %} disabled{% endif %}">
+                    {% if events %}
+                        <a href="{% url 'events_list-by-day' year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
+                    {% else %}
+                        <span>{{ day|date:'d' }}</span>
+                    {% endif %}
+                </td>
+            {% endfor %}
+            </tr>
 		</table>
 	</div>
 </div>

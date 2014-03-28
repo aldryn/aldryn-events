@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import calendar
 
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, mail_managers
@@ -122,3 +123,9 @@ def get_additional_styles():
             clean = choice.strip()
             choices.append((clean.lower(), clean.title()))
     return choices
+
+
+def get_monthdates(month, year):
+    firstweekday = getattr(settings, 'ALDRYN_EVENTS_CALENDAR_FIRST_WEEKDAY', 0)  # 0: Monday, 6: Sunday
+    cal = calendar.Calendar(firstweekday)
+    return cal.itermonthdates(year, month)
