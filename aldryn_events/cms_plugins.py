@@ -2,6 +2,7 @@ import datetime
 from itertools import groupby
 from operator import attrgetter
 
+from django.utils.dates import MONTHS
 from django.utils.translation import ugettext_lazy as _
 
 from cms.plugin_base import CMSPluginBase
@@ -31,11 +32,11 @@ class CalendarPlugin(CMSPluginBase):
     render_template = 'aldryn_events/plugins/calendar.html'
     name = _('Calendar')
     module = _('Events')
+    cache = False
 
-    def build_calendar(self, instance):
-        today = datetime.datetime.today()
+    def build_calendar(self, instance, year, month):
         # Get a list of all dates in this month (with pre/succedding for nice layout)
-        monthdates = [(x, None) for x in get_monthdates(today.month, today.year)]
+        monthdates = [(x, None) for x in get_monthdates(int(month), int(year))]
         # get all upcoming events, ordered by start_date
         events = groupby(Event.objects.published().filter(start_date__gte=monthdates[0][0], start_date__lte=monthdates[-1][0]).order_by('start_date'), attrgetter('start_date'))
         # group events by starting_date
@@ -47,9 +48,21 @@ class CalendarPlugin(CMSPluginBase):
         return monthdates
 
     def render(self, context, instance, placeholder):
-        context['days'] = self.build_calendar(instance)
-        context['today'] = datetime.datetime.today()
-        context['current_month'] = str(datetime.datetime.today().month)
+        year = context['event_year']
+        month = context['event_month']
+
+        if not all([year, month]):
+            year = str(datetime.datetime.today().year)
+            month = str(datetime.datetime.today().month)
+
+        current_date = datetime.date(day=1, month=int(month), year=int(year))
+
+        context['days'] = self.build_calendar(instance, year, month)
+        context['current_date'] = current_date
+        context['last_month'] = current_date + datetime.timedelta(days=-1)
+        context['next_month'] = current_date + datetime.timedelta(days=35)
+        context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
+
         return context
 
 plugin_pool.register_plugin(CalendarPlugin)

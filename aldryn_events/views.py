@@ -34,6 +34,9 @@ class NavigationMixin(object):
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year
+        context['event_year'] = self.kwargs.get('year')
+        context['event_month'] = self.kwargs.get('month')
+        context['event_day'] = self.kwargs.get('day')
         return context
 
 
