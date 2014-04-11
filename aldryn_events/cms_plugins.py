@@ -48,8 +48,8 @@ class CalendarPlugin(CMSPluginBase):
         return monthdates
 
     def render(self, context, instance, placeholder):
-        year = context['event_year']
-        month = context['event_month']
+        year = context.get('event_year')
+        month = context.get('event_month')
 
         if not all([year, month]):
             year = str(datetime.datetime.today().year)
