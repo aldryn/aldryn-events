@@ -135,8 +135,15 @@ def get_monthdates(month, year):
 
 def build_calendar(year, month):
     from .models import Event
-    # Get a list of all dates in this month (with pre/succedding for nice layout)
+    # Get a list of all dates in this month (with pre/succeeding for nice layout)
     monthdates = [(x, None) for x in get_monthdates(int(month), int(year))]
+    if len(monthdates) < 6 * 7:
+        # always display six weeks to keep the table layout consistent
+        if int(month) == 12:
+            month = 0
+            year = int(year) + 1
+        monthdates += [(x, None) for x in get_monthdates(int(month) + 1, int(year))][:6 * 7 - len(monthdates)]
+
     # get all upcoming events, ordered by start_date
     events = groupby(Event.objects.published().filter(
         start_date__gte=monthdates[0][0],
