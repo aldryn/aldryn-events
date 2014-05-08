@@ -128,7 +128,7 @@ class ResetEventRegistration(FormView):
 
 
 class EventDatesView(TemplateView):
-    template_name = 'aldryn_events/includes/calendar_dates.html'
+    template_name = 'aldryn_events/includes/calendar_table.html'
 
     def get_context_data(self, **kwargs):
         ctx = super(EventDatesView, self).get_context_data(**kwargs)

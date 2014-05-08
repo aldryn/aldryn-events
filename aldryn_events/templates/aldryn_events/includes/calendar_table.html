@@ -1,4 +1,10 @@
-<tr class="dates" data-month-numeric="{{ current_date|date:'n' }}" data-month="{{ current_date|date:'F' }}" data-year="{{ current_date|date:'Y' }}">
+<table class="table-calendar" data-month-numeric="{{ current_date|date:'n' }}" data-month="{{ current_date|date:'F' }}" data-year="{{ current_date|date:'Y' }}">
+<tr class="header">
+  <th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
+  <th class="weekend">S</th>
+  <th class="weekend">S</th>
+</tr>
+<tr>
   {% for day, events in days %}
   {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:'7' %}
 </tr>
@@ -14,3 +20,4 @@
   </td>
   {% endfor %}
 </tr>
+</table>
