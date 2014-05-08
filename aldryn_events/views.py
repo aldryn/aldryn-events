@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from django.core.urlresolvers import reverse
 from django import forms
 from django.http import Http404
@@ -11,11 +12,13 @@ from django.views.generic import (
 )
 from django.utils.translation import ugettext as _
 from aldryn_events import request_events_event_identifier
+from django.utils.dates import MONTHS
 
 from .utils import (
     build_events_by_year,
     send_user_confirmation_email,
-    send_manager_confirmation_email
+    send_manager_confirmation_email,
+    build_calendar,
 )
 from .models import Event, Registration
 from .forms import EventRegistrationForm
@@ -123,3 +126,20 @@ class ResetEventRegistration(FormView):
     def get_success_url(self):
         return reverse('events_detail', kwargs={'slug':self.event.slug})
 
+
+class EventDatesView(TemplateView):
+    template_name = 'aldryn_events/includes/calendar_table.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(EventDatesView, self).get_context_data(**kwargs)
+        if not 'year' in ctx or not 'month' in ctx:
+            today = datetime.datetime.today()
+            ctx['month'] = today.month
+            ctx['year'] = today.year
+
+        current_date = datetime.date(day=1, month=int(ctx['month']), year=int(ctx['year']))
+        ctx['days'] = build_calendar(ctx['year'], ctx['month'])
+        ctx['current_date'] = current_date
+        ctx['last_month'] = current_date + datetime.timedelta(days=-1)
+        ctx['next_month'] = current_date + datetime.timedelta(days=35)
+        return ctx

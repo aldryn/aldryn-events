@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 import calendar
+from itertools import groupby
+from operator import attrgetter
 
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail, mail_managers
@@ -129,3 +131,23 @@ def get_monthdates(month, year):
     firstweekday = getattr(settings, 'ALDRYN_EVENTS_CALENDAR_FIRST_WEEKDAY', 0)  # 0: Monday, 6: Sunday
     cal = calendar.Calendar(firstweekday)
     return cal.itermonthdates(year, month)
+
+
+def build_calendar(year, month):
+    from .models import Event
+    # Get a list of all dates in this month (with pre/succedding for nice layout)
+    monthdates = [(x, None) for x in get_monthdates(int(month), int(year))]
+    # get all upcoming events, ordered by start_date
+    events = groupby(Event.objects.published().filter(
+        start_date__gte=monthdates[0][0],
+        start_date__lte=monthdates[-1][0]).order_by('start_date'), attrgetter('start_date')
+    )
+
+    # group events by starting_date
+    grouped_events = [(date, list(event_list)) for date, event_list in events]
+    # merge events into monthdates
+    for date, event_list in grouped_events:
+        index = monthdates.index((date, None))
+        monthdates[index] = (date, event_list)
+    return monthdates
+
