@@ -9,7 +9,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from .utils import get_monthdates
-from .models import UpcomingPluginItem, Event
+from .models import UpcomingPluginItem, Event, EventListPlugin
 from .forms import UpcomingPluginForm
 
 
@@ -26,6 +26,21 @@ class UpcomingPlugin(CMSPluginBase):
         return context
 
 plugin_pool.register_plugin(UpcomingPlugin)
+
+
+class EventListCMSPlugin(CMSPluginBase):
+    render_template = False
+    module = _('Events')
+    name = _('List')
+    model = EventListPlugin
+
+    def render(self, context, instance, placeholder):
+        self.render_template = 'aldryn_events/plugins/list/%s/list.html' % instance.style
+        context['instance'] = instance
+        context['events'] = instance.events.all()
+        return context
+
+plugin_pool.register_plugin(EventListCMSPlugin)
 
 
 class CalendarPlugin(CMSPluginBase):

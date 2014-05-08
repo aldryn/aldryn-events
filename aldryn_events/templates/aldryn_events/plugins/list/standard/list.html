@@ -1,0 +1,12 @@
+{% extends "aldryn_events/plugins/list/base.html" %}
+{% load i18n %}
+
+{% block plugin %}
+<div class="plugin plugin-events">
+	<ul class="events-list">
+		{% for event in events %}
+		<li><a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start }}</span></li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock plugin %}
