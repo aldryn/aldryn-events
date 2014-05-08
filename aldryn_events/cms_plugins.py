@@ -1,14 +1,14 @@
 import datetime
-from itertools import groupby
-from operator import attrgetter
 
+from django.conf.urls import patterns, url
 from django.utils.dates import MONTHS
 from django.utils.translation import ugettext_lazy as _
 
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .utils import get_monthdates
+from .views import EventDatesView
+from .utils import build_calendar
 from .models import UpcomingPluginItem, Event
 from .forms import UpcomingPluginForm
 
@@ -34,19 +34,6 @@ class CalendarPlugin(CMSPluginBase):
     module = _('Events')
     cache = False
 
-    def build_calendar(self, instance, year, month):
-        # Get a list of all dates in this month (with pre/succedding for nice layout)
-        monthdates = [(x, None) for x in get_monthdates(int(month), int(year))]
-        # get all upcoming events, ordered by start_date
-        events = groupby(Event.objects.published().filter(start_date__gte=monthdates[0][0], start_date__lte=monthdates[-1][0]).order_by('start_date'), attrgetter('start_date'))
-        # group events by starting_date
-        grouped_events = [(date, list(event_list)) for date, event_list in events]
-        # merge events into monthdates
-        for date, event_list in grouped_events:
-            index = monthdates.index((date, None))
-            monthdates[index] = (date, event_list)
-        return monthdates
-
     def render(self, context, instance, placeholder):
         year = context.get('event_year')
         month = context.get('event_month')
@@ -57,12 +44,19 @@ class CalendarPlugin(CMSPluginBase):
 
         current_date = datetime.date(day=1, month=int(month), year=int(year))
 
-        context['days'] = self.build_calendar(instance, year, month)
+        context['days'] = build_calendar(year, month)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
         context['next_month'] = current_date + datetime.timedelta(days=35)
         context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
 
         return context
+
+    def get_plugin_urls(self):
+        return patterns('',
+            url(r'^get-dates/$', EventDatesView.as_view(), name='get-calendar-dates'),
+            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$', EventDatesView.as_view(), name='get-calendar-dates'),
+        )
+
 
 plugin_pool.register_plugin(CalendarPlugin)

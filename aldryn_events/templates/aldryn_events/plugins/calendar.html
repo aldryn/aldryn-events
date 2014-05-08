@@ -1,34 +1,19 @@
 {% load i18n %}
 
 <div class="plugin plugin-events">
-	<div class="events-calendar">
-		<h3>{{ calendar_label }}</h3>
-		<p class="controls">
-			<a href="{% url 'events_list-by-month' year=last_month|date:'Y' month=last_month|date:'n' %}" class="back">{% trans "Previous month" %}</a>
-			<a href="{% url 'events_list-by-month' year=next_month|date:'Y' month=next_month|date:'n' %}" class="next">{% trans "Next month" %}</a>
-		</p>
-		<table class="table-calendar">
-			<tr>
-				<th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
-				<th class="weekend">S</th>
-				<th class="weekend">S</th>
-			</tr>
-            <tr>
-            {% for day, events in days %}
-                {% if forloop.counter0|divisibleby:'7' %}
-                    </tr>
-                    <tr>
-                {% endif %}
-                <td class="{% if events %}events{% endif%}{% if day|date:'w' in '06' %} weekend{% endif %}{% spaceless %}
-                           {% endspaceless %}{% if day|date:'n' != current_date|date:'n' or day|date:'Y' != current_date|date:'Y' %} disabled{% endif %}">
-                    {% if events %}
-                        <a href="{% url 'events_list-by-day' year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
-                    {% else %}
-                        <span>{{ day|date:'d' }}</span>
-                    {% endif %}
-                </td>
-            {% endfor %}
-            </tr>
-		</table>
-	</div>
+  <div class="events-calendar">
+    <h3>{{ calendar_label }}</h3>
+    <p class="controls">
+      <a href="" class="back">{% trans "Previous month" %}</a>
+      <a href="" class="next">{% trans "Next month" %}</a>
+    </p>
+    <table class="table-calendar">
+      <tr class="header">
+        <th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
+        <th class="weekend">S</th>
+        <th class="weekend">S</th>
+      </tr>
+      {% include "aldryn_events/includes/calendar_dates.html" %}
+    </table>
+  </div>
 </div>
