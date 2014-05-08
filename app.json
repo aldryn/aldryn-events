@@ -1,7 +1,7 @@
 {
 	"name": "Events",
 	"description": "An events app for aldryn",
-	"version": "0.6.3",
+	"version": "0.6.5",
 	"url": "https://github.com/aldryn/aldryn-events",
 	"package-name": "aldryn-events",
 	"installed-apps": [
@@ -15,6 +15,7 @@
         "aldryn_common",
         "easy_thumbnails",
         "hvad",
+        "sortedm2m",
 		"aldryn_events"
 	],
 	"author": {

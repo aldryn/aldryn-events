@@ -14,6 +14,7 @@ REQUIREMENTS = [
     'aldryn-common>=0.0.3',
     'django-filer',
     'django-hvad',
+    'django-sortedm2m',
 ]
 
 CLASSIFIERS = [

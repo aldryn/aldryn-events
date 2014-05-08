@@ -13,18 +13,18 @@ from cms.models.fields import PlaceholderField
 from cms.models import CMSPlugin
 
 from extended_choices import Choices
-
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
-
 from djangocms_common.slugs import unique_slugify
-
 from djangocms_text_ckeditor.fields import HTMLField
-
 from hvad.models import TranslatableModel, TranslationManager, TranslatedFields
+from sortedm2m.fields import SortedManyToManyField
 
 from .utils import get_additional_styles
 from .conf import settings
+
+
+STANDARD = 'standard'
 
 
 class EventManager(TranslationManager):
@@ -194,8 +194,6 @@ class Registration(models.Model):
 
 
 class UpcomingPluginItem(CMSPlugin):
-    STANDARD = 'standard'
-
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
     ]
@@ -204,3 +202,19 @@ class UpcomingPluginItem(CMSPlugin):
         _('Style'), choices=STYLE_CHOICES + get_additional_styles(), default=STANDARD, max_length=50)
     latest_entries = models.PositiveSmallIntegerField(
         _('latest entries'), default=5, help_text=_('The number of latests events to be displayed.'))
+
+
+class EventListPlugin(CMSPlugin):
+    STYLE_CHOICES = [
+        (STANDARD, _('Standard')),
+    ]
+
+    style = models.CharField(
+        _('Style'), choices=STYLE_CHOICES + get_additional_styles(), default=STANDARD, max_length=50)
+    events = SortedManyToManyField(Event, blank=True, null=True)
+
+    def __unicode__(self):
+        return str(self.pk)
+
+    def copy_relations(self, oldinstance):
+        self.events = oldinstance.events.all()
