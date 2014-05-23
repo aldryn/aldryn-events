@@ -3,11 +3,12 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django_tablib.admin import TablibAdmin
 
-from hvad.admin import TranslatableAdmin
-from .models import Event, EventCoordinator, Registration
-
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
+
+from hvad.admin import TranslatableAdmin
+
+from .models import Event, EventCoordinator, Registration
 
 
 class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
@@ -54,13 +55,9 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     def get_fieldsets(self, request, obj=None):
         return self._fieldsets
 
-admin.site.register(Event, EventAdmin)
-
 
 class EventCoordinatorAdmin(admin.ModelAdmin):
-    pass
-
-admin.site.register(EventCoordinator, EventCoordinatorAdmin)
+    list_display = ['full_name', 'email_address']
 
 
 class RegistrationAdmin(TablibAdmin):
@@ -68,4 +65,8 @@ class RegistrationAdmin(TablibAdmin):
     list_display = ('first_name', 'last_name', 'event',)
     list_filter = ('event',)
     date_hierarchy = 'created_at'
+
+
+admin.site.register(Event, EventAdmin)
+admin.site.register(EventCoordinator, EventCoordinatorAdmin)
 admin.site.register(Registration, RegistrationAdmin)

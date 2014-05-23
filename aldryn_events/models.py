@@ -17,42 +17,15 @@ from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from djangocms_common.slugs import unique_slugify
 from djangocms_text_ckeditor.fields import HTMLField
-from hvad.models import TranslatableModel, TranslationManager, TranslatedFields
+from hvad.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
 
-from .utils import get_additional_styles
 from .conf import settings
+from .managers import EventManager
+from .utils import get_additional_styles
 
 
 STANDARD = 'standard'
-
-
-class EventManager(TranslationManager):
-    def published(self, now=None):
-        now = now or timezone.now()
-        return self.language(get_current_language()).filter(is_published=True, publish_at__lte=now)
-
-    def upcoming(self, count, now=None):
-        now = now or timezone.now()
-        return self.future(now=now)[:count]
-
-    def past(self, count, now=None):
-        now = now or timezone.now()
-        return self.archive(now=now)[:count]
-
-    def future(self, now=None):
-        """
-        includes all events that are not over yet
-        """
-        now = now or timezone.now()
-        return self.published(now=now).filter(end_at__gte=now).order_by('start_at', 'end_at', 'slug')
-
-    def archive(self, now=None):
-        """
-        includes all events that have ended
-        """
-        now = now or timezone.now()
-        return self.published(now=now).filter(end_at__lt=now).order_by('-start_at', 'end_at', 'slug')
 
 
 class Event(TranslatableModel):
@@ -158,11 +131,42 @@ class Event(TranslatableModel):
 
 
 class EventCoordinator(models.Model):
+
     name = models.CharField(max_length=200, blank=True)
-    email = models.EmailField(max_length=80, unique=True)
+    email = models.EmailField(max_length=80, blank=True)
+    user = models.ForeignKey(
+        to=getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
+        verbose_name=_('user'),
+        null=True,
+        blank=True,
+        unique=True
+    )
 
     def __unicode__(self):
-        return self.email
+        return self.full_name or self.email_address
+
+    def clean(self):
+        if not self.email:
+            if not self.user_id or not self.user.email:
+                raise ValidationError(_('Please define an email for the coordinator.'))
+
+    def get_email_address(self):
+        email = self.email
+
+        if not email and self.user_id:
+            email = self.user.email
+        return email
+    get_email_address.short_description = _('email')
+
+    def get_name(self):
+        name = self.name
+        if not name and self.user_id:
+            name = self.user.get_full_name()
+        return name
+    get_name.short_description = _('name')
+
+    email_address = property(get_email_address)
+    full_name = property(get_name)
 
 
 class Registration(models.Model):
@@ -181,7 +185,6 @@ class Registration(models.Model):
     first_name = models.CharField(_('Vorname'), max_length=100)
     last_name = models.CharField(_('Nachname'), max_length=100)
 
-    address_street = models.CharField(_('Adresse'), max_length=100)
     address = models.TextField(_('Adresse'), blank=True, default='')
     address_zip = models.CharField(_('PLZ'), max_length=4)
     address_city = models.CharField(_('Ort'), max_length=100)
@@ -192,6 +195,10 @@ class Registration(models.Model):
 
     message = models.TextField(_('Message'), blank=True, default='')
 
+    @property
+    def address_street(self):
+        return self.address
+
 
 class UpcomingPluginItem(CMSPlugin):
     STYLE_CHOICES = [
@@ -199,9 +206,16 @@ class UpcomingPluginItem(CMSPlugin):
     ]
 
     style = models.CharField(
-        _('Style'), choices=STYLE_CHOICES + get_additional_styles(), default=STANDARD, max_length=50)
+        verbose_name=_('Style'),
+        choices=STYLE_CHOICES + get_additional_styles(),
+        default=STANDARD,
+        max_length=50
+    )
     latest_entries = models.PositiveSmallIntegerField(
-        _('latest entries'), default=5, help_text=_('The number of latests events to be displayed.'))
+        verbose_name=_('latest entries'),
+        default=5,
+        help_text=_('The number of latests events to be displayed.')
+    )
 
 
 class EventListPlugin(CMSPlugin):
@@ -210,7 +224,11 @@ class EventListPlugin(CMSPlugin):
     ]
 
     style = models.CharField(
-        _('Style'), choices=STYLE_CHOICES + get_additional_styles(), default=STANDARD, max_length=50)
+        verbose_name=_('Style'),
+        choices=STYLE_CHOICES + get_additional_styles(),
+        default=STANDARD,
+        max_length=50
+    )
     events = SortedManyToManyField(Event, blank=True, null=True)
 
     def __unicode__(self):

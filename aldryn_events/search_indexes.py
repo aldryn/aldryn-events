@@ -2,19 +2,21 @@
 from django.conf import settings
 from django.template import RequestContext
 
-from aldryn_search.base import AldrynIndexBase
-from aldryn_search.utils import strip_tags
+from aldryn_search.utils import get_index_base, strip_tags
 
 from aldryn_events.models import Event
 
 
-class EventsIndex(AldrynIndexBase):
+class EventsIndex(get_index_base()):
     haystack_use_for_indexing = getattr(settings, "ALDRYN_EVENTS_SEARCH", True)
 
     INDEX_TITLE = True
 
     def prepare_pub_date(self, obj):
         return obj.publish_at
+
+    def get_description(self, obj):
+        return obj.short_description
 
     def get_title(self, obj):
         return obj.title
@@ -29,13 +31,12 @@ class EventsIndex(AldrynIndexBase):
         return Event
 
     def get_search_data(self, obj, language, request):
-        text = strip_tags(obj.short_description)
+        description = self.get_description(obj)
+        text_bits = [strip_tags(description)]
         plugins = obj.description.cmsplugin_set.filter(language=language)
         for base_plugin in plugins:
             instance, plugin_type = base_plugin.get_plugin_instance()
-            if instance is None:
-                # this is an empty plugin
-                continue
-            else:
-                text += strip_tags(instance.render_plugin(context=RequestContext(request))) + u' '
-        return text
+            if not instance is None:
+                content = strip_tags(instance.render_plugin(context=RequestContext(request)))
+                text_bits.append(content)
+        return ' '.join(text_bits)

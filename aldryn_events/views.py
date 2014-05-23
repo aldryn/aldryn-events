@@ -10,19 +10,14 @@ from django.views.generic import (
     ListView,
     TemplateView,
 )
-from django.utils.translation import ugettext as _
 from aldryn_events import request_events_event_identifier
-from django.utils.dates import MONTHS
 
 from .utils import (
     build_events_by_year,
-    send_user_confirmation_email,
-    send_manager_confirmation_email,
     build_calendar,
 )
 from .models import Event, Registration
 from .forms import EventRegistrationForm
-from .conf import settings
 
 
 class NavigationMixin(object):
@@ -88,17 +83,11 @@ class EventDetailView(NavigationMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        r = super(EventDetailView, self).form_valid(form)
+        registration = super(EventDetailView, self).form_valid(form)
         registered_events = set(self.request.session.get('registered_events', set()))
         registered_events.add(self.event.id)
         self.request.session['registered_events'] = registered_events
-        if settings.ALDRYN_EVENTS_USER_REGISTRATION_EMAIL:
-            send_user_confirmation_email(form.instance, form.language_code)
-        coordinator_emails = list(self.event.event_coordinators.all().values_list('email', flat=True))
-        coordinator_emails.extend([a[1] for a in settings.ALDRYN_EVENTS_MANAGERS])
-        if coordinator_emails:
-            send_manager_confirmation_email(form.instance, form.language_code, coordinator_emails)
-        return r
+        return registration
 
     def get_success_url(self):
         return reverse('events_detail', kwargs={'slug': self.kwargs['slug']})

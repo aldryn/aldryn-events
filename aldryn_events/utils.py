@@ -5,14 +5,12 @@ from itertools import groupby
 from operator import attrgetter
 
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail, mail_managers
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.datastructures import SortedDict
 from django.conf import settings
-
-from cms.utils.i18n import get_current_language as get_language
 
 
 def build_months(year, is_archive_view=False):
@@ -107,7 +105,8 @@ def send_manager_confirmation_email(registration, language, emails):
     }
     subject = render_to_string(template_name='aldryn_events/emails/manager_confirmation.subject.txt', dictionary=context)
     body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=context)
-    if settings.ALDRYN_EVENTS_MANAGERS:  # don't try to send if the list is empty
+
+    if emails:  # don't try to send if the list is empty
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, emails)
 
 
