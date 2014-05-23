@@ -72,6 +72,14 @@ class Event(TranslatableModel):
     def __unicode__(self):
         return self.lazy_translation_getter('title', self.pk)
 
+    @property
+    def start_at(self):
+        return self.start()
+
+    @property
+    def end_at(self):
+        return self.end()
+
     def clean(self):
         if not self.pk:
             # the translations don't exist yet so we can't access title
