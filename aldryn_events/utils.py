@@ -31,7 +31,7 @@ def group_events_by_year(events):
     """
     years = SortedDict()
     for event in events:
-        year = event.start_at.year
+        year = event.start_date.year
         if not year in years:
             years[year] = [event]
         else:
@@ -47,14 +47,14 @@ def build_events_by_year(events, **config):
 
     events_by_year = SortedDict()
     for event in events:
-        year = event.start_at.year
+        year = event.start_date.year
         if not year in events_by_year:
             events_by_year[year] = {
                 'year': year,
                 'date': datetime.date(year, 1, 1),
                 'months': build_months(year=year, is_archive_view=is_archive_view)
             }
-        events_by_year[year]['months'][event.start_at.month]['events'].append(event)
+        events_by_year[year]['months'][event.start_date.month]['events'].append(event)
     flattened_events_by_year = events_by_year.values()
     for year in flattened_events_by_year:
         year['months'] = year['months'].values()
@@ -166,3 +166,13 @@ def build_calendar(year, month):
         monthdates[index] = (date, event_list)
     return monthdates
 
+
+def date_or_datetime(d, t):
+    # either a date or a datetime
+    if d and t:
+        # TODO: not timezone aware!
+        return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute)
+    elif d:
+        return d
+    else:
+        return None

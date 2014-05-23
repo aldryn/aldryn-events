@@ -17,7 +17,7 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
-    date_hierarchy = 'start_at'
+    date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
 
     prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
@@ -47,7 +47,6 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
             ('is_published', 'publish_at',)
         )}),
     )
-    exclude = ('start_at', 'end_at')
 
     def get_prepopulated_fields(self, request, obj=None):
         return self._prepopulated_fields

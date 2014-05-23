@@ -52,12 +52,13 @@ class EventListView(NavigationMixin, ListView):
         month = self.kwargs.get('month', None)
         day = self.kwargs.get('day', None)
         if year:
-            qs = qs.filter(start_at__year=year)
+            qs = qs.filter(start_date__year=year)
         if month:
-            qs = qs.filter(start_at__month=month)
+            qs = qs.filter(start_date__month=month)
         if day:
-            qs = qs.filter(start_at__day=day)
-        qs = qs.order_by('start_at', 'end_at')
+            qs = qs.filter(start_date__day=day)
+        print qs
+        qs = qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
         return qs
 
 

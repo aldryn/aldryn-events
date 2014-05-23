@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db.models import Q
 from django.utils.translation import get_language
 from django.utils import timezone
 
@@ -26,14 +27,25 @@ class EventManager(TranslationManager):
 
     def future(self, now=None):
         """
-        includes all events that are not over yet
+        includes all events that are not over yet. If there is an end_date, the event is not over until end_date is
+        over. Otherwise we use start_date.
         """
         now = now or timezone.now()
-        return self.published(now=now).filter(end_at__gte=now).order_by('start_at', 'end_at', 'slug')
+        today = now.date()
+        q_with_end_date = Q(end_date__gte=today)
+        q_without_end_date = Q(end_date__isnull=True, start_date__gte=today)
+        return self.published(now=now)\
+                   .filter(q_with_end_date | q_without_end_date)\
+                   .order_by('start_date', 'start_time', 'end_date', 'end_time', 'slug')
 
     def archive(self, now=None):
         """
         includes all events that have ended
         """
         now = now or timezone.now()
-        return self.published(now=now).filter(end_at__lt=now).order_by('-start_at', 'end_at', 'slug')
+        today = now.date()
+        q_with_end_date = Q(end_date__lt=today)
+        q_without_end_date = Q(end_date__isnull=True, start_date__lt=today)
+        return self.published(now=now)\
+                   .filter(q_with_end_date | q_without_end_date)\
+                   .order_by('-start_date', '-start_time', 'end_date', 'end_time', 'slug')

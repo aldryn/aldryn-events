@@ -22,7 +22,7 @@ from sortedm2m.fields import SortedManyToManyField
 
 from .conf import settings
 from .managers import EventManager
-from .utils import get_additional_styles
+from .utils import get_additional_styles, date_or_datetime
 
 
 STANDARD = 'standard'
@@ -38,9 +38,7 @@ class Event(TranslatableModel):
     start_time = models.TimeField(_('start time'), null=True, blank=True)
     end_date = models.DateField(_('end date'), null=True, blank=True)
     end_time = models.TimeField(_('end time'), null=True, blank=True)
-
-    start_at = models.DateTimeField(_('start at'), db_index=True)
-    end_at = models.DateTimeField(_('end at'), blank=True)
+    # TODO: add timezone (optional and purely for display purposes)
 
     is_published = models.BooleanField(_('is published'), default=True,
         help_text=_('wether the event should be displayed'))
@@ -69,7 +67,7 @@ class Event(TranslatableModel):
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
-        ordering = ('start_at', 'end_at',)
+        ordering = ('start_date', 'start_time', 'end_date', 'end_time')
 
     def __unicode__(self):
         return self.lazy_translation_getter('title', self.pk)
@@ -79,23 +77,10 @@ class Event(TranslatableModel):
             # the translations don't exist yet so we can't access title
             unique_slugify(self, self.slug or uuid4().hex[:8])
 
-        if self.start_date and self.start_time:
-            d, t = self.start_date, self.start_time
-            self.start_at = datetime.datetime(d.year, d.month, d.day, t.hour, t.minute, t.second)
-        elif self.start_date:
-            d = self.start_date
-            self.start_at = datetime.datetime(d.year, d.month, d.day)
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValidationError(_('start should be before end'))
 
-        if self.end_time:
-            d, t = self.end_date or self.start_date, self.end_time
-            self.end_at = datetime.datetime(d.year, d.month, d.day, t.hour, t.minute, t.second)
-        elif self.end_date:
-            d = self.end_date
-            self.end_at = datetime.datetime(d.year, d.month, d.day, 23, 59, 59)
-        elif self.start_at:  # because start_at might not be set at validation phase
-            self.end_at = self.start_at.replace(hour=23, minute=59, second=59)
-
-        if self.start_at and self.end_at and self.end_at < self.start_at:
+        if self.start_date == self.end_date and self.end_time < self.start_time:
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
@@ -105,22 +90,10 @@ class Event(TranslatableModel):
             raise ValidationError(_("please select a registration deadline."))
 
     def start(self):
-        # either a date or a datetime
-        if self.start_date and self.start_time:
-            return self.start_at
-        elif self.start_date:
-            return self.start_date
-        else:
-            return None
+        return date_or_datetime(self.start_date, self.start_time)
 
     def end(self):
-        # either a date or a datetime
-        if self.end_date and self.end_time:
-            return self.end_at
-        elif self.end_date:
-            return self.end_date
-        else:
-            return None
+        return date_or_datetime(self.end_date, self.end_time)
 
     @property
     def is_registration_deadline_passed(self):
