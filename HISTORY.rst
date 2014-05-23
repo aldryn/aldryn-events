@@ -1,6 +1,14 @@
 aldryn-events
 ================
 
+
+0.7.5 (2014-05-23)
+------------------
+
+* fixes bug with timezones
+* fixes bug with events without end_date not being displayed in list view
+
+
 0.3 (2013-04-26)
 ----------------
 
