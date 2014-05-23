@@ -12,7 +12,7 @@ from .models import Event, EventCoordinator, Registration
 
 
 class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
-    search_fields = ('translation__title',)
+    search_fields = ('translations__title',)
     list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)
     list_editable = ('is_published',)
     list_filter = ('is_published',)
