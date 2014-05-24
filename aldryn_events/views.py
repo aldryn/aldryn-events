@@ -57,7 +57,6 @@ class EventListView(NavigationMixin, ListView):
             qs = qs.filter(start_date__month=month)
         if day:
             qs = qs.filter(start_date__day=day)
-        print qs
         qs = qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
         return qs
 
