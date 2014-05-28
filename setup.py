@@ -10,7 +10,6 @@ REQUIREMENTS = [
     'django-appconf',
     'django-standard-form',
     'djangocms-text-ckeditor',
-    'aldryn-search>=0.1.9',
     'aldryn-common>=0.0.3',
     'django-filer',
     'django-hvad',
