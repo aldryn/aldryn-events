@@ -2,13 +2,30 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.forms import DateTimeField, TimeField, DateField
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.template import TemplateDoesNotExist
 from django.template.loader import select_template
 
+from hvad.forms import TranslatableModelForm
+
 from .utils import send_user_confirmation_email, send_manager_confirmation_email
 
-from .models import Registration, UpcomingPluginItem
+from .models import Registration, UpcomingPluginItem, Event
+
+
+class EventAdminForm(TranslatableModelForm):
+    class Meta:
+        model = Event
+
+    def __init__(self, *args, **kwargs):
+        super(EventAdminForm, self).__init__(*args, **kwargs)
+        now = timezone.now()
+        for key, field in self.fields.items():
+            if isinstance(field, DateField) or isinstance(field, TimeField) or isinstance(field, DateTimeField):
+                self.fields[key].help_text = _('Acceptable Formats: %(format_list)s') % (
+                    {'format_list': ', '.join([now.strftime(f) for f in field.input_formats])})
 
 
 class EventRegistrationForm(forms.ModelForm):
