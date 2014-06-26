@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-23 01:23-0400\n"
+"POT-Creation-Date: 2014-06-26 11:55+0200\n"
 "PO-Revision-Date: 2013-04-11 14:18+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,16 +18,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.5.5\n"
 
-#: admin.py:42
+#: admin.py:44
 msgid "registration"
 msgstr "Registration"
 
-#: admin.py:46
+#: admin.py:48
 msgid "publishing"
 msgstr "Veröffentlichung"
 
 #: cms_app.py:16 cms_plugins.py:19 cms_plugins.py:33 cms_plugins.py:49
-#: cms_toolbar.py:22 cms_toolbar.py:28 cms_toolbar.py:33 models.py:71
+#: cms_toolbar.py:22 cms_toolbar.py:28 cms_toolbar.py:33 models.py:69
 #: templates/aldryn_events/events_list.html:5
 msgid "Events"
 msgstr "Events"
@@ -64,7 +64,12 @@ msgstr "Eventanmeldung"
 msgid "default"
 msgstr ""
 
-#: forms.py:24
+#: forms.py:27
+#, python-format
+msgid "Acceptable Formats: %(format_list)s"
+msgstr "Akzeptierte Formate: %(format_list)s"
+
+#: forms.py:41
 msgid "the registration deadline for this event has already passed"
 msgstr "die deadline für dieses Event ist bereits vorbei "
 
@@ -96,172 +101,164 @@ msgstr "Enddatum"
 msgid "end time"
 msgstr "Endzeit"
 
-#: models.py:42
-msgid "start at"
-msgstr ""
-
 #: models.py:43
-msgid "end at"
-msgstr ""
-
-#: models.py:45
 msgid "is published"
 msgstr "ist veröffentlicht"
 
-#: models.py:46
+#: models.py:44
 msgid "wether the event should be displayed"
 msgstr "ob das Event angezeigt werden soll"
 
-#: models.py:47
+#: models.py:45
 msgid "publish at"
 msgstr "Veröffentlichungsdatum"
 
-#: models.py:48
+#: models.py:46
 msgid "time at which the event should be published"
 msgstr "Zeitpunkt ab welchem der Event veröffentlicht werden soll"
 
-#: models.py:50
+#: models.py:48
 msgid "external link"
 msgstr "Externer link"
 
-#: models.py:55
+#: models.py:53
 msgid "title"
 msgstr "Titel"
 
-#: models.py:55 models.py:56
+#: models.py:53 models.py:54
 msgid "translated"
 msgstr "übersetzt"
 
-#: models.py:56
+#: models.py:54
 msgid "short description"
 msgstr "Kurzbeschreibung"
 
-#: models.py:57
+#: models.py:55
 msgid "location"
 msgstr ""
 
-#: models.py:59
+#: models.py:57
 msgid "description"
 msgstr "Beschreibung"
 
-#: models.py:60
+#: models.py:58
 msgid "registration link"
 msgstr "Registrationslink"
 
-#: models.py:63
+#: models.py:61
 #, fuzzy
 msgid "enable event registration"
 msgstr "Registration"
 
-#: models.py:64
+#: models.py:62
 #, fuzzy
 msgid "allow registartion until"
 msgstr "Registrationslink"
 
-#: models.py:65
+#: models.py:63
 msgid "event coordinators"
 msgstr ""
 
-#: models.py:70
+#: models.py:68
 msgid "Event"
 msgstr "Event"
 
-#: models.py:99
+#: models.py:89 models.py:92
 msgid "start should be before end"
 msgstr "Start sollte vor dem Ende sein"
 
-#: models.py:102
+#: models.py:95
 msgid ""
 "the registration system can't be active if there is an external registration "
 "link. please remove at least one of the two."
 msgstr ""
 
-#: models.py:105
+#: models.py:98
 msgid "please select a registration deadline."
 msgstr ""
 
-#: models.py:139
+#: models.py:120
 msgid "user"
 msgstr ""
 
-#: models.py:151
+#: models.py:132
 msgid "Please define an email for the coordinator."
 msgstr ""
 
-#: models.py:159
+#: models.py:140
 msgid "email"
 msgstr ""
 
-#: models.py:166
+#: models.py:147
 msgid "name"
 msgstr ""
 
-#: models.py:174
+#: models.py:155
 msgid "Frau"
 msgstr ""
 
-#: models.py:175
+#: models.py:156
 msgid "Herr"
 msgstr ""
 
-#: models.py:183
+#: models.py:164
 msgid "Anrede"
 msgstr ""
 
-#: models.py:184
+#: models.py:165
 msgid "Company"
 msgstr "Firma"
 
-#: models.py:185
+#: models.py:166
 msgid "Vorname"
 msgstr ""
 
-#: models.py:186
+#: models.py:167
 msgid "Nachname"
 msgstr ""
 
-#: models.py:188
+#: models.py:169
 msgid "Adresse"
 msgstr ""
 
-#: models.py:189
+#: models.py:170
 msgid "PLZ"
 msgstr ""
 
-#: models.py:190
+#: models.py:171
 msgid "Ort"
 msgstr ""
 
-#: models.py:192
+#: models.py:173
 msgid "Phone number"
 msgstr "Telefonnummer"
 
-#: models.py:193
+#: models.py:174
 msgid "Mobile number"
 msgstr "Mobilnummer"
 
-#: models.py:194
+#: models.py:175
 msgid "E-Mail"
 msgstr ""
 
-#: models.py:196
+#: models.py:177
 msgid "Message"
 msgstr ""
 
-#: models.py:205 models.py:223
+#: models.py:186 models.py:204
 msgid "Standard"
 msgstr ""
 
-#: models.py:209 models.py:227
+#: models.py:190 models.py:208
 msgid "Style"
 msgstr ""
 
-#: models.py:215
+#: models.py:196
 #, fuzzy
 msgid "latest entries"
 msgstr "vergangene Events"
 
-#: models.py:217
+#: models.py:198
 #, fuzzy
 msgid "The number of latests events to be displayed."
 msgstr "ob das Event angezeigt werden soll"

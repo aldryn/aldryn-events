@@ -9,9 +9,11 @@ from cms.admin.placeholderadmin import FrontendEditableAdmin
 from hvad.admin import TranslatableAdmin
 
 from .models import Event, EventCoordinator, Registration
+from .forms import EventAdminForm
 
 
 class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
+    form = EventAdminForm
     search_fields = ('translations__title',)
     list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)
     list_editable = ('is_published',)
