@@ -22,11 +22,11 @@
     var month = $(table).data('month-numeric');
     var year = $(table).data('year');
 
-    if (direction == 'next' || direction == 'previous') {
+    if (direction == 'next' || direction == 'back') {
       if (direction == 'next') {
         if (month == 12) { month = 1; year += 1; } else { month += 1; }
 
-      } else if (direction == 'previous') {
+      } else if (direction == 'back') {
         if (month == 1) { month = 12; year -= 1; } else { month -= 1; }
       }
 
