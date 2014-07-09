@@ -31,7 +31,7 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
             'short_description',
             'image',
             'flyer',
-            'location',
+            ('location', 'location_lat', 'location_lng'),
         )}),
         (None, {'fields': (
             ('start_date', 'start_time',),

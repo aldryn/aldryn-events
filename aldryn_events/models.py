@@ -52,7 +52,9 @@ class Event(TranslatableModel):
     translations = TranslatedFields(
         title = models.CharField(_('title'), max_length=150, help_text=_('translated')),
         short_description = HTMLField(_('short description'), blank=True, default='', help_text=_('translated')),
-        location = models.TextField(_('location'), blank=True, default='')
+        location = models.TextField(_('location'), blank=True, default=''),
+        location_lat = models.FloatField(_('location latitude'), blank=True, null=True),
+        location_lng = models.FloatField(_('location longitude'), blank=True, null=True),
     )
     description = PlaceholderField('aldryn_events_event_description', verbose_name=_('description'))
     register_link = models.URLField(_('registration link'), blank=True, default='',
