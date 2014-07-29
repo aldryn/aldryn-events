@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-26 11:55+0200\n"
-"PO-Revision-Date: 2013-04-11 14:18+0100\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-07-29 17:20+0200\n"
+"PO-Revision-Date: 2014-07-29 17:46+0100\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.5\n"
+"X-Generator: Poedit 1.6.4\n"
 
 #: admin.py:44
 msgid "registration"
@@ -27,42 +27,38 @@ msgid "publishing"
 msgstr "Veröffentlichung"
 
 #: cms_app.py:16 cms_plugins.py:19 cms_plugins.py:33 cms_plugins.py:49
-#: cms_toolbar.py:22 cms_toolbar.py:28 cms_toolbar.py:33 models.py:69
+#: cms_toolbar.py:22 cms_toolbar.py:28 cms_toolbar.py:33 models.py:71
 #: templates/aldryn_events/events_list.html:5
 msgid "Events"
 msgstr "Events"
 
 #: cms_plugins.py:18
-#, fuzzy
 msgid "Upcoming"
 msgstr "nächste Events"
 
 #: cms_plugins.py:34
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 #: cms_plugins.py:48
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 #: cms_toolbar.py:23
-#, fuzzy
 msgid "Add Event"
-msgstr "Event"
+msgstr "Einen Event hinzufügen"
 
 #: cms_toolbar.py:30
-#, fuzzy
 msgid "Edit this event"
-msgstr "Eventanmeldung"
+msgstr "Diesen Event bearbeiten"
 
 #: cms_toolbar.py:35
-#, fuzzy
 msgid "Delete this event"
-msgstr "Eventanmeldung"
+msgstr "Diesen Event löschen"
 
 #: conf.py:9
 msgid "default"
-msgstr ""
+msgstr "standart"
 
 #: forms.py:27
 #, python-format
@@ -75,15 +71,15 @@ msgstr "die deadline für dieses Event ist bereits vorbei "
 
 #: models.py:32
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: models.py:34
 msgid "image"
-msgstr ""
+msgstr "Bild"
 
 #: models.py:35
 msgid "flyer"
-msgstr ""
+msgstr "Flyer"
 
 #: models.py:37
 msgid "start date"
@@ -135,154 +131,160 @@ msgstr "Kurzbeschreibung"
 
 #: models.py:55
 msgid "location"
-msgstr ""
+msgstr "Ort"
+
+#: models.py:56
+msgid "location latitude"
+msgstr "Ort Latitude"
 
 #: models.py:57
+msgid "location longitude"
+msgstr "Ort Longitude"
+
+#: models.py:59
 msgid "description"
 msgstr "Beschreibung"
 
-#: models.py:58
+#: models.py:60
 msgid "registration link"
 msgstr "Registrationslink"
 
-#: models.py:61
-#, fuzzy
-msgid "enable event registration"
-msgstr "Registration"
-
-#: models.py:62
-#, fuzzy
-msgid "allow registartion until"
-msgstr "Registrationslink"
-
 #: models.py:63
-msgid "event coordinators"
-msgstr ""
+msgid "enable event registration"
+msgstr "Registration erlauben"
 
-#: models.py:68
+#: models.py:64
+msgid "allow registartion until"
+msgstr "Registration erlauben bis"
+
+#: models.py:65
+msgid "event coordinators"
+msgstr "Event Koordinaten"
+
+#: models.py:70
 msgid "Event"
 msgstr "Event"
 
-#: models.py:89 models.py:92
+#: models.py:91 models.py:94
 msgid "start should be before end"
 msgstr "Start sollte vor dem Ende sein"
 
-#: models.py:95
+#: models.py:97
 msgid ""
 "the registration system can't be active if there is an external registration "
 "link. please remove at least one of the two."
 msgstr ""
+"Das Registrationssystem kann nicht aktiv sein wenn ein externer "
+"Registrationslink vorhanden ist. Bitte entfernen Sie diesen Link."
 
-#: models.py:98
+#: models.py:100
 msgid "please select a registration deadline."
-msgstr ""
+msgstr "Bitte wählen Sie eine Registrations-Deadline"
 
-#: models.py:120
+#: models.py:122
 msgid "user"
-msgstr ""
+msgstr "Benutzer"
 
-#: models.py:132
+#: models.py:134
 msgid "Please define an email for the coordinator."
-msgstr ""
+msgstr "Bitte geben sie für diesen Koordinator eine Email-Adresse an."
 
-#: models.py:140
+#: models.py:142
 msgid "email"
-msgstr ""
+msgstr "Email"
 
-#: models.py:147
+#: models.py:149
 msgid "name"
-msgstr ""
+msgstr "Name"
 
-#: models.py:155
+#: models.py:157
 msgid "Frau"
-msgstr ""
+msgstr "Frau"
 
-#: models.py:156
+#: models.py:158
 msgid "Herr"
-msgstr ""
+msgstr "Herr"
 
-#: models.py:164
+#: models.py:166
 msgid "Anrede"
-msgstr ""
+msgstr "Anrede"
 
-#: models.py:165
+#: models.py:167
 msgid "Company"
 msgstr "Firma"
 
-#: models.py:166
+#: models.py:168
 msgid "Vorname"
-msgstr ""
-
-#: models.py:167
-msgid "Nachname"
-msgstr ""
+msgstr "Vorname"
 
 #: models.py:169
-msgid "Adresse"
-msgstr ""
-
-#: models.py:170
-msgid "PLZ"
-msgstr ""
+msgid "Nachname"
+msgstr "Nachname"
 
 #: models.py:171
-msgid "Ort"
-msgstr ""
+msgid "Adresse"
+msgstr "Adresse"
+
+#: models.py:172
+msgid "PLZ"
+msgstr "PLZ"
 
 #: models.py:173
+msgid "Ort"
+msgstr "Ort"
+
+#: models.py:175
 msgid "Phone number"
 msgstr "Telefonnummer"
 
-#: models.py:174
+#: models.py:176
 msgid "Mobile number"
 msgstr "Mobilnummer"
 
-#: models.py:175
-msgid "E-Mail"
-msgstr ""
-
 #: models.py:177
+msgid "E-Mail"
+msgstr "E-Mail"
+
+#: models.py:179
 msgid "Message"
-msgstr ""
+msgstr "Nachricht"
 
-#: models.py:186 models.py:204
+#: models.py:188 models.py:206
 msgid "Standard"
-msgstr ""
+msgstr "Standart"
 
-#: models.py:190 models.py:208
+#: models.py:192 models.py:210
 msgid "Style"
-msgstr ""
-
-#: models.py:196
-#, fuzzy
-msgid "latest entries"
-msgstr "vergangene Events"
+msgstr "Stil"
 
 #: models.py:198
-#, fuzzy
+msgid "latest entries"
+msgstr "neueste Einträge"
+
+#: models.py:200
 msgid "The number of latests events to be displayed."
-msgstr "ob das Event angezeigt werden soll"
+msgstr "Anzahl Events die angezeigt werden soll."
 
 #: templates/aldryn_events/events_detail.html:10
 #: templates/aldryn_events/includes/event_items.html:12
 msgid "Start:"
-msgstr ""
+msgstr "Start:"
 
 #: templates/aldryn_events/events_detail.html:11
 #: templates/aldryn_events/events_detail.html:14
 #: templates/aldryn_events/includes/event_items.html:13
 #: templates/aldryn_events/includes/event_items.html:16
 msgid "at"
-msgstr ""
+msgstr "um"
 
 #: templates/aldryn_events/events_detail.html:13
 #: templates/aldryn_events/includes/event_items.html:15
 msgid "End:"
-msgstr ""
+msgstr "Ende:"
 
 #: templates/aldryn_events/events_detail.html:26
 msgid "Back"
-msgstr ""
+msgstr "Zurück"
 
 #: templates/aldryn_events/emails/manager_confirmation.body.txt:1
 #, python-format
@@ -291,11 +293,14 @@ msgid ""
 "\n"
 "Details: %(registration_admin_url)s\n"
 msgstr ""
+"Eine neue Registration für \"%(event_name)s\" (%(event_url)s).\n"
+"\n"
+"Details: %(registration_admin_url)s\n"
 
 #: templates/aldryn_events/emails/manager_confirmation.subject.txt:1
-#, fuzzy, python-format
+#, python-format
 msgid "new registration for \"%(event_name)s\""
-msgstr "Vielen Dank, dass du dich für \"%(event_name)s\" angemeldet hast"
+msgstr "Neue Registration für \"%(event_name)s\""
 
 #: templates/aldryn_events/emails/registrant_confirmation.body.txt:1
 #, python-format
@@ -314,25 +319,23 @@ msgid "Thank you for signing up to \"%(event_name)s\""
 msgstr "Vielen Dank, dass du dich für \"%(event_name)s\" angemeldet hast"
 
 #: templates/aldryn_events/includes/event_registration.html:5
-#, fuzzy
 msgid "Registration"
 msgstr "Registration"
 
 #: templates/aldryn_events/includes/event_registration.html:7
-#, fuzzy
 msgid ""
 "The registration deadline for this event has passed, registration is closed."
-msgstr "die deadline für dieses Event ist bereits vorbei "
+msgstr ""
+"Die deadline für diesen Event ist bereits vorbei. Die Registration ist "
+"geschlossen."
 
 #: templates/aldryn_events/includes/event_registration.html:10
-#, fuzzy
 msgid "Thank you for your registration!"
 msgstr "Vielen Dank für die Anmeldung!"
 
 #: templates/aldryn_events/includes/event_registration.html:16
-#, fuzzy
 msgid "Reset your registration"
-msgstr "Registration"
+msgstr "Ihre Registration zurücksetzen"
 
 #: templates/aldryn_events/includes/event_registration.html:23
 msgid "Register for this event"
@@ -340,17 +343,15 @@ msgstr "Eventanmeldung"
 
 #: templates/aldryn_events/plugins/calendar.html:7
 msgid "Previous month"
-msgstr ""
+msgstr "letzter Monat"
 
 #: templates/aldryn_events/plugins/calendar.html:8
-#, fuzzy
 msgid "Next month"
-msgstr "nach Monat sortiert"
+msgstr "nächsten Monat"
 
 #: templates/aldryn_events/plugins/upcoming/standard/upcoming.html:14
-#, fuzzy
 msgid "No upcoming events."
-msgstr "nächste Events"
+msgstr "Keine Events in der Zukunft."
 
 #~ msgid "Event Listing"
 #~ msgstr "Event Listing"
