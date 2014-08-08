@@ -72,7 +72,7 @@ class Event(TranslatableModel):
         ordering = ('start_date', 'start_time', 'end_date', 'end_time')
 
     def __unicode__(self):
-        return self.lazy_translation_getter('title', self.pk)
+        return self.lazy_translation_getter('title', str(self.pk))
 
     @property
     def start_at(self):
