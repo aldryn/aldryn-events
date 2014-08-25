@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from appconf import AppConf
 from django.utils.translation import ugettext_lazy as _
+
+from appconf import AppConf
 
 
 class EventsAppConf(AppConf):
+
     TEASER_TEMPLATE_CHOICES = (
         ('default', _('default')),
     )

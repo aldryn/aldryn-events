@@ -10,12 +10,12 @@ from django.template.loader import select_template
 
 from hvad.forms import TranslatableModelForm
 
-from .utils import send_user_confirmation_email, send_manager_confirmation_email
-
 from .models import Registration, UpcomingPluginItem, Event
+from .utils import send_user_confirmation_email, send_manager_confirmation_email
 
 
 class EventAdminForm(TranslatableModelForm):
+
     class Meta:
         model = Event
 
@@ -34,7 +34,9 @@ class EventRegistrationForm(forms.ModelForm):
         self.event = kwargs.pop('event')
         self.language_code = kwargs.pop('language_code')
         super(EventRegistrationForm, self).__init__(*args, **kwargs)
-        self.fields['address'].widget = forms.Textarea(attrs={'rows': 2})
+
+        if 'address' in self.fields:
+            self.fields['address'].widget = forms.Textarea(attrs={'rows': 2})
 
     def clean(self):
         if self.event.is_registration_deadline_passed:

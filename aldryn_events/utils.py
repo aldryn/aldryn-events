@@ -16,11 +16,17 @@ from django.conf import settings
 def build_months(year, is_archive_view=False):
     months = SortedDict()
     month_numbers = range(1,12+1)
+
     if is_archive_view:
         month_numbers = list(reversed(month_numbers))
 
     for month in month_numbers:
-        months[month] = {'year': year, 'month': month, 'date': datetime.date(year, month, 1), 'events':[]}
+        months[month] = {
+            'year': year,
+            'month': month,
+            'date': datetime.date(year, month, 1),
+            'events':[]
+        }
     return months
 
 
@@ -30,6 +36,7 @@ def group_events_by_year(events):
     returns a sorted dictionary mapping years to event objects.
     """
     years = SortedDict()
+
     for event in events:
         year = event.start_date.year
         if not year in years:

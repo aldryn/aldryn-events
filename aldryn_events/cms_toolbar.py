@@ -10,6 +10,7 @@ from aldryn_events import request_events_event_identifier
 
 @toolbar_pool.register
 class EventsToolbar(CMSToolbar):
+
     def populate(self):
         if not self.is_current_app:
             return
@@ -23,6 +24,7 @@ class EventsToolbar(CMSToolbar):
             menu.add_modal_item(_('Add Event'), reverse('admin:aldryn_events_event_add'))
 
         current = getattr(self.request, request_events_event_identifier, None)
+
         if current:
             if can('change', 'event'):
                 menu = self.toolbar.get_or_create_menu('events-app', _('Events'))

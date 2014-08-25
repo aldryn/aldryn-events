@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
+
 from django.core.urlresolvers import reverse
 from django import forms
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.utils import translation
 from django.views.generic import (
     CreateView,
@@ -21,6 +23,7 @@ from .forms import EventRegistrationForm
 
 
 class NavigationMixin(object):
+
     def get_context_data(self, **kwargs):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
         events_by_year = build_events_by_year(
@@ -48,9 +51,11 @@ class EventListView(NavigationMixin, ListView):
             qs = self.model.objects.archive()
         else:
             qs = self.model.objects.future()
-        year = self.kwargs.get('year', None)
-        month = self.kwargs.get('month', None)
-        day = self.kwargs.get('day', None)
+
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        day = self.kwargs.get('day')
+
         if year:
             qs = qs.filter(start_date__year=year)
         if month:
@@ -67,11 +72,12 @@ class EventDetailView(NavigationMixin, CreateView):
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.event = Event.objects.published().get(slug=kwargs['slug'])
-        except Event.DoesNotExist:
-            raise Http404
+        events = self.get_available_events()
+
+        self.event = get_object_or_404(events, slug=kwargs['slug'])
+
         setattr(self.request, request_events_event_identifier, self.event)
+
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
@@ -97,6 +103,12 @@ class EventDetailView(NavigationMixin, CreateView):
         kwargs['event'] = self.event
         kwargs['language_code'] = translation.get_language()
         return kwargs
+
+    def get_available_events(self):
+        """
+        Called as first step in dispatch.
+        """
+        return Event.objects.published()
 
 
 class ResetEventRegistration(FormView):
