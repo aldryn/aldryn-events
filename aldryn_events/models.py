@@ -188,6 +188,18 @@ class UpcomingPluginItem(CMSPlugin):
         (STANDARD, _('Standard')),
     ]
 
+    FUTURE_EVENTS = _(u'future events')
+    PAST_EVENTS = _(u'past events')
+    BOOL_CHOICES = (
+        (False, FUTURE_EVENTS),
+        (True, PAST_EVENTS),
+    )
+
+    past_events = models.BooleanField(
+        verbose_name=_('selection'),
+        choices=BOOL_CHOICES,
+        default=False,
+    )
     style = models.CharField(
         verbose_name=_('Style'),
         choices=STYLE_CHOICES + get_additional_styles(),
@@ -199,6 +211,9 @@ class UpcomingPluginItem(CMSPlugin):
         default=5,
         help_text=_('The number of latests events to be displayed.')
     )
+
+    def __unicode__(self):
+        return self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
 
 
 class EventListPlugin(CMSPlugin):

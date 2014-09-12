@@ -15,13 +15,17 @@ from .forms import UpcomingPluginForm
 
 class UpcomingPlugin(CMSPluginBase):
     render_template = False
-    name = _('Upcoming')
+    name = _('Upcoming or Past Events')
     module = _('Events')
     model = UpcomingPluginItem
     form = UpcomingPluginForm
 
     def render(self, context, instance, placeholder):
-        context['events'] = Event.objects.upcoming(count=instance.latest_entries)
+        if instance.past_events:
+            events = Event.objects.past(count=instance.latest_entries)
+        else:
+            events = Event.objects.upcoming(count=instance.latest_entries)
+        context['events'] = events
         self.render_template = 'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
         return context
 
