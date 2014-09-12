@@ -26,6 +26,7 @@ class UpcomingPlugin(CMSPluginBase):
         else:
             events = Event.objects.upcoming(count=instance.latest_entries)
         context['events'] = events
+        context['instance'] = instance
         self.render_template = 'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
         return context
 

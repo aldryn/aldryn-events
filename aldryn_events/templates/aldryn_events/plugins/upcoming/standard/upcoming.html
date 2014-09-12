@@ -4,6 +4,7 @@
 {% block plugin %}
 <div class="plugin plugin-events">
 	<ul class="events-upcoming">
+        {% if instance.past_events %}{% trans "Past events" %}{% else %}{% trans "Upcoming events" %}{% endif %}
 		{% for event in events %}
 		<li>
 			<p>
