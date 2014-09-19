@@ -4,6 +4,7 @@ from aldryn_events import __version__
 
 REQUIREMENTS = [
     'Django>=1.3',
+    'djangocms-common',
     'django-extended-choices',
     'django-tablib',
     'django-appconf',
