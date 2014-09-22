@@ -4,7 +4,6 @@
 	"url": "https://github.com/aldryn/aldryn-events",
 	"package-name": "aldryn-events",
 	"installed-apps": [
-        "djangocms_common",
         "extended_choices",
         "django_tablib",
         "appconf",

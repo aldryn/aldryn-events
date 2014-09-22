@@ -15,7 +15,7 @@ from cms.models import CMSPlugin
 from extended_choices import Choices
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
-from djangocms_common.slugs import unique_slugify
+from aldryn_common.slugs import unique_slugify
 from djangocms_text_ckeditor.fields import HTMLField
 from hvad.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
