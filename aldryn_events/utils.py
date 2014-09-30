@@ -15,7 +15,7 @@ from django.conf import settings
 
 def build_months(year, is_archive_view=False):
     months = SortedDict()
-    month_numbers = range(1,12+1)
+    month_numbers = range(1, 12+1)
 
     if is_archive_view:
         month_numbers = list(reversed(month_numbers))
@@ -25,7 +25,7 @@ def build_months(year, is_archive_view=False):
             'year': year,
             'month': month,
             'date': datetime.date(year, month, 1),
-            'events':[]
+            'events': []
         }
     return months
 
@@ -39,7 +39,7 @@ def group_events_by_year(events):
 
     for event in events:
         year = event.start_date.year
-        if not year in years:
+        if year not in years:
             years[year] = [event]
         else:
             years[year].append(event)
@@ -55,7 +55,7 @@ def build_events_by_year(events, **config):
     events_by_year = SortedDict()
     for event in events:
         year = event.start_date.year
-        if not year in events_by_year:
+        if year not in events_by_year:
             events_by_year[year] = {
                 'year': year,
                 'date': datetime.date(year, 1, 1),
@@ -70,8 +70,8 @@ def build_events_by_year(events, **config):
             month['event_count'] = len(month['events'])
             year['event_count'] += month['event_count']
             month['has_events'] = bool(month['event_count'])
-            month['display_in_navigation'] = (not display_months_without_events and month['has_events']) or \
-                                             display_months_without_events
+            month['display_in_navigation'] = \
+                (not display_months_without_events and month['has_events']) or display_months_without_events
         # if this is the current year, hide months before this month (or after this month if we're in archive view)
         if year['year'] == now.year:
             if is_archive_view:
@@ -89,19 +89,19 @@ def build_events_by_year(events, **config):
 
 def send_user_confirmation_email(registration, language):
     event = registration.event
-    context = {
+    ctx = {
         'event_name': event.title,
         'first_name': registration.first_name,
         'event_url': u"http://%s%s" % (Site.objects.get_current(), event.get_absolute_url()),
     }
-    subject = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.subject.txt', dictionary=context)
-    body = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.body.txt', dictionary=context)
+    subject = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.subject.txt', dictionary=ctx)
+    body = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.body.txt', dictionary=ctx)
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list=[registration.email])
 
 
 def send_manager_confirmation_email(registration, language, emails):
     event = registration.event
-    context = {
+    ctx = {
         'event_name': event.title,
         'first_name': registration.first_name,
         'event_url': u"http://%s%s" % (Site.objects.get_current(), event.get_absolute_url()),
@@ -110,8 +110,8 @@ def send_manager_confirmation_email(registration, language, emails):
             reverse('admin:aldryn_events_registration_change', args=[str(registration.pk)])
         ),
     }
-    subject = render_to_string(template_name='aldryn_events/emails/manager_confirmation.subject.txt', dictionary=context)
-    body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=context)
+    subject = render_to_string(template_name='aldryn_events/emails/manager_confirmation.subject.txt', dictionary=ctx)
+    body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=ctx)
 
     if emails:  # don't try to send if the list is empty
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, emails)

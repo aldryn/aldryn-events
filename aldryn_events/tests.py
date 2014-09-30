@@ -33,7 +33,6 @@ class EventAddTest(TestCase):
         after_count = Event.objects.count()
         self.assertEqual(before_count + 1, after_count)
 
-
     def test_add_event_app(self):
         """
         We add an event to the app
@@ -45,7 +44,6 @@ class EventAddTest(TestCase):
         url = event.get_absolute_url()
         response = self.client.get(url)
         self.assertContains(response, event.title)
-
 
     def test_add_location_to_event(self):
         """
@@ -78,7 +76,6 @@ class EventAddTest(TestCase):
         Event.objects.create(title=title, start_date=self.event.start_date, slug='open-delete')
         Event.objects.using_translations().get(title='Delete Event').delete()
         self.assertFalse(Event.objects.using_translations().filter(title='Delete Event'))
-
 
     def test_email_to_coordinator_event(self):
         """

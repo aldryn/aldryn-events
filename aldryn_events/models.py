@@ -31,8 +31,12 @@ STANDARD = 'standard'
 class Event(TranslatableModel):
     slug = models.SlugField(_('slug'), blank=True, max_length=150, unique=True)
 
-    image = FilerImageField(verbose_name=_('image'), null=True, blank=True, related_name='event_images', on_delete=models.SET_NULL)
-    flyer = FilerFileField(verbose_name=_('flyer'), null=True, blank=True, related_name='event_flyers', on_delete=models.SET_NULL)
+    image = FilerImageField(
+        verbose_name=_('image'), null=True, blank=True, related_name='event_images', on_delete=models.SET_NULL
+    )
+    flyer = FilerFileField(
+        verbose_name=_('flyer'), null=True, blank=True, related_name='event_flyers', on_delete=models.SET_NULL
+    )
 
     start_date = models.DateField(_('start date'))
     start_time = models.TimeField(_('start time'), null=True, blank=True)
@@ -40,29 +44,32 @@ class Event(TranslatableModel):
     end_time = models.TimeField(_('end time'), null=True, blank=True)
     # TODO: add timezone (optional and purely for display purposes)
 
-    is_published = models.BooleanField(_('is published'), default=True,
-        help_text=_('wether the event should be displayed'))
-    publish_at = models.DateTimeField(_('publish at'), default=timezone.now,
-        help_text=_('time at which the event should be published'))
-
-    detail_link = models.URLField(_('external link'), blank=True, default='',
-        help_text=('external link to details about this event')
+    is_published = models.BooleanField(
+        _('is published'), default=True, help_text=_('wether the event should be displayed')
+    )
+    publish_at = models.DateTimeField(
+        _('publish at'), default=timezone.now, help_text=_('time at which the event should be published')
+    )
+    detail_link = models.URLField(
+        _('external link'), blank=True, default='', help_text=_('external link to details about this event')
     )
 
     translations = TranslatedFields(
-        title = models.CharField(_('title'), max_length=150, help_text=_('translated')),
-        short_description = HTMLField(_('short description'), blank=True, default='', help_text=_('translated')),
-        location = models.TextField(_('location'), blank=True, default=''),
-        location_lat = models.FloatField(_('location latitude'), blank=True, null=True),
-        location_lng = models.FloatField(_('location longitude'), blank=True, null=True),
+        title=models.CharField(_('title'), max_length=150, help_text=_('translated')),
+        short_description=HTMLField(_('short description'), blank=True, default='', help_text=_('translated')),
+        location=models.TextField(_('location'), blank=True, default=''),
+        location_lat=models.FloatField(_('location latitude'), blank=True, null=True),
+        location_lng=models.FloatField(_('location longitude'), blank=True, null=True),
     )
     description = PlaceholderField('aldryn_events_event_description', verbose_name=_('description'))
-    register_link = models.URLField(_('registration link'), blank=True, default='',
-        help_text=('link to an external registration system')
+    register_link = models.URLField(
+        _('registration link'), blank=True, default='', help_text='link to an external registration system'
     )
     enable_registration = models.BooleanField(_('enable event registration'), default=False)
     registration_deadline_at = models.DateTimeField(_('allow registartion until'), null=True, blank=True, default=None)
-    event_coordinators = models.ManyToManyField('EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True)
+    event_coordinators = models.ManyToManyField(
+        'EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True
+    )
 
     objects = EventManager()
 
@@ -94,7 +101,8 @@ class Event(TranslatableModel):
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
-            raise ValidationError(_("the registration system can't be active if there is an external registration link. please remove at least one of the two."))
+            raise ValidationError(_("the registration system can't be active if there is an external "
+                                    "registration link. please remove at least one of the two."))
 
         if self.enable_registration and not self.registration_deadline_at:
             raise ValidationError(_("please select a registration deadline."))
@@ -157,13 +165,16 @@ class Registration(models.Model):
         ('SALUTATION_FEMALE', 'mrs', _('Frau')),
         ('SALUTATION_MALE', 'mr', _('Herr')),
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     language_code = models.CharField(choices=settings.LANGUAGES, default=settings.LANGUAGES[0][0], max_length=32)
 
     event = models.ForeignKey(Event)
-    salutation = models.CharField(_('Anrede'), max_length=5, choices=SALUTATIONS.CHOICES, default=SALUTATIONS.SALUTATION_FEMALE)
+    salutation = models.CharField(
+        _('Anrede'), max_length=5, choices=SALUTATIONS.CHOICES, default=SALUTATIONS.SALUTATION_FEMALE
+    )
     company = models.CharField(_('Company'), max_length=100, blank=True, default='')
     first_name = models.CharField(_('Vorname'), max_length=100)
     last_name = models.CharField(_('Nachname'), max_length=100)

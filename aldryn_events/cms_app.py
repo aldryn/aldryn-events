@@ -14,19 +14,20 @@ from .views import (
 
 class EventListAppHook(CMSApp):
     name = _('Events')
-    #app_name = 'aldryn_events'
+    # app_name = 'aldryn_events'
     urls = [
-        patterns('',
+        patterns('',  # NOQA
             url(r'^$', EventListView.as_view(), name='events_list'),
             url(r'^(?P<year>\d{4})/$', EventListView.as_view(), name='events_list-by-year'),
             url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/$', EventListView.as_view(), name='events_list-by-month'),
-            url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', EventListView.as_view(), name='events_list-by-day'),
+            url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
+                EventListView.as_view(), name='events_list-by-day'),
             url(r'^archive/$', EventListView.as_view(archive=True), name='events_list_archive'),
             url(r'^archive/(?P<year>\d{4})/$', EventListView.as_view(archive=True), name='events_list_archive-by-year'),
-            url(r'^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$', EventListView.as_view(archive=True), name='events_list_archive-by-month'),
+            url(r'^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$',
+                EventListView.as_view(archive=True), name='events_list_archive-by-month'),
             url(r'^(?P<slug>[\w_-]+)/$', EventDetailView.as_view(), name='events_detail'),
             url(r'^(?P<slug>[\w_-]+)/reset/$', ResetEventRegistration.as_view(), name='events_registration_reset'),
         )
     ]
 apphook_pool.register(EventListAppHook)
-

@@ -125,7 +125,7 @@ class ResetEventRegistration(FormView):
         return super(ResetEventRegistration, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('events_detail', kwargs={'slug':self.event.slug})
+        return reverse('events_detail', kwargs={'slug': self.event.slug})
 
 
 class EventDatesView(TemplateView):
@@ -133,7 +133,7 @@ class EventDatesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(EventDatesView, self).get_context_data(**kwargs)
-        if not 'year' in ctx or not 'month' in ctx:
+        if 'year' not in ctx or 'month' not in ctx:
             today = datetime.datetime.today()
             ctx['month'] = today.month
             ctx['year'] = today.year

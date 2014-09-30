@@ -36,7 +36,7 @@ class EventsIndex(get_index_base()):
         plugins = obj.description.cmsplugin_set.filter(language=language)
         for base_plugin in plugins:
             instance, plugin_type = base_plugin.get_plugin_instance()
-            if not instance is None:
+            if instance is not None:
                 content = strip_tags(instance.render_plugin(context=RequestContext(request)))
                 text_bits.append(content)
         return ' '.join(text_bits)
