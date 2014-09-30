@@ -73,9 +73,10 @@ class CalendarPlugin(CMSPluginBase):
         return context
 
     def get_plugin_urls(self):
-        return patterns('',
+        return patterns('',  # NOQA
             url(r'^get-dates/$', EventDatesView.as_view(), name='get-calendar-dates'),
-            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$', EventDatesView.as_view(), name='get-calendar-dates'),
+            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$', EventDatesView.as_view(),
+                name='get-calendar-dates'),
         )
 
 

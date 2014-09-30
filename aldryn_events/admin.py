@@ -15,8 +15,10 @@ from .forms import EventAdminForm
 
 class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     form = EventAdminForm
-    search_fields = ('translations__title',)
-    list_display = ('__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug',)
+    search_fields = ('translations__title', )
+    list_display = (
+        '__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug'
+    )
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
@@ -63,9 +65,9 @@ class EventCoordinatorAdmin(admin.ModelAdmin):
 
 
 class RegistrationAdmin(TablibAdmin):
-    formats = ['xls', 'csv', 'html',]
-    list_display = ('first_name', 'last_name', 'event',)
-    list_filter = ('event',)
+    formats = ['xls', 'csv', 'html']
+    list_display = ('first_name', 'last_name', 'event')
+    list_filter = ('event', )
     date_hierarchy = 'created_at'
 
 
