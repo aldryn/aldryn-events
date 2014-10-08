@@ -10,3 +10,5 @@
 .idea
 .tox
 env
+.coverage
+htmlcov/
