@@ -1,8 +1,8 @@
 aldryn-events
 ================
 
-.. image:: https://travis-ci.org/aldryn/aldryn-events.svg?branch=master
-    :target: https://travis-ci.org/aldryn/aldryn-events
+.. image:: https://magnum.travis-ci.com/aldryn/aldryn-events.svg?token=2aLiyxMhwop2hnmajHuq&branch=master
+    :target: https://magnum.travis-ci.com/aldryn/aldryn-events
 
 .. image:: https://img.shields.io/coveralls/aldryn/aldryn-events.svg
   :target: https://coveralls.io/r/aldryn/aldryn-events
