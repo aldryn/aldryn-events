@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -22,7 +23,9 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
-    date_hierarchy = 'start_date'
+    if not django.VERSION >= (1, 6):
+        # Django >= 1.6 calls aggregate on queryset, which is currently not implemented in django-hvad
+        date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
 
     prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
