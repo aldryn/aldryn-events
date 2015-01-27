@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 HELPER_SETTINGS = {
     'TIME_ZONE': 'Europe/Zurich',
     'INSTALLED_APPS': [
@@ -12,3 +15,10 @@ HELPER_SETTINGS = {
     ),
     'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
 }
+
+def run():
+    from djangocms_helper import runner
+    runner.cms('aldryn_events')
+
+if __name__ == "__main__":
+    run()
