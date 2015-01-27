@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from aldryn_events import __version__
 
 REQUIREMENTS = [
-    'Django>=1.3',
+    'Django<1.8,>=1.3',
     'django-extended-choices',
     'django-tablib',
     'django-appconf',
@@ -13,6 +13,7 @@ REQUIREMENTS = [
     'django-filer',
     'django-hvad',
     'django-sortedm2m',
+    'django-parler'
 ]
 
 CLASSIFIERS = [
