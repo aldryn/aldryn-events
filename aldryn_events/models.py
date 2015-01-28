@@ -1,42 +1,30 @@
 # -*- coding: utf-8 -*-
-import datetime
-from uuid import uuid4
-from cms.utils.i18n import get_current_language
-
-from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
-from cms.models.fields import PlaceholderField
 from cms.models import CMSPlugin
+from cms.models.fields import PlaceholderField
 
+from aldryn_common.slugs import unique_slugify
+from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
 from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
-from aldryn_common.slugs import unique_slugify
-from djangocms_text_ckeditor.fields import HTMLField
-from hvad.models import TranslatableModel, TranslatedFields
+from parler.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
+from uuid import uuid4
 
 from .conf import settings
 from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
 
-
 STANDARD = 'standard'
 
 
 class Event(TranslatableModel):
-    slug = models.SlugField(_('slug'), blank=True, max_length=150, unique=True)
-
-    image = FilerImageField(
-        verbose_name=_('image'), null=True, blank=True, related_name='event_images', on_delete=models.SET_NULL
-    )
-    flyer = FilerFileField(
-        verbose_name=_('flyer'), null=True, blank=True, related_name='event_flyers', on_delete=models.SET_NULL
-    )
 
     start_date = models.DateField(_('start date'))
     start_time = models.TimeField(_('start time'), null=True, blank=True)
@@ -53,22 +41,30 @@ class Event(TranslatableModel):
     detail_link = models.URLField(
         _('external link'), blank=True, default='', help_text=_('external link to details about this event')
     )
+    register_link = models.URLField(
+        _('registration link'), blank=True, default='', help_text=_('link to an external registration system')
+    )
+    enable_registration = models.BooleanField(_('enable event registration'), default=False)
+    registration_deadline_at = models.DateTimeField(_('allow registration until'), null=True, blank=True, default=None)
+    event_coordinators = models.ManyToManyField(
+        'EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True
+    )
 
     translations = TranslatedFields(
         title=models.CharField(_('title'), max_length=150, help_text=_('translated')),
+        slug=models.SlugField(_('slug'), null=False, blank=True, max_length=150),
         short_description=HTMLField(_('short description'), blank=True, default='', help_text=_('translated')),
+        description=PlaceholderField('aldryn_events_event_description', verbose_name=_('description')),
         location=models.TextField(_('location'), blank=True, default=''),
         location_lat=models.FloatField(_('location latitude'), blank=True, null=True),
         location_lng=models.FloatField(_('location longitude'), blank=True, null=True),
-    )
-    description = PlaceholderField('aldryn_events_event_description', verbose_name=_('description'))
-    register_link = models.URLField(
-        _('registration link'), blank=True, default='', help_text='link to an external registration system'
-    )
-    enable_registration = models.BooleanField(_('enable event registration'), default=False)
-    registration_deadline_at = models.DateTimeField(_('allow registartion until'), null=True, blank=True, default=None)
-    event_coordinators = models.ManyToManyField(
-        'EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True
+        image=FilerImageField(
+            verbose_name=_('image'), null=True, blank=True, related_name='event_images', on_delete=models.SET_NULL
+        ),
+        flyer=FilerFileField(
+            verbose_name=_('flyer'), null=True, blank=True, related_name='event_flyers', on_delete=models.SET_NULL
+        ),
+        meta={'unique_together': (('language_code', 'slug'),)}
     )
 
     objects = EventManager()
@@ -79,7 +75,7 @@ class Event(TranslatableModel):
         ordering = ('start_date', 'start_time', 'end_date', 'end_time')
 
     def __unicode__(self):
-        return self.lazy_translation_getter('title', str(self.pk))
+        return self.title
 
     @property
     def start_at(self):
@@ -173,15 +169,15 @@ class Registration(models.Model):
 
     event = models.ForeignKey(Event)
     salutation = models.CharField(
-        _('Anrede'), max_length=5, choices=SALUTATIONS.CHOICES, default=SALUTATIONS.SALUTATION_FEMALE
+        _('Salutation'), max_length=5, choices=SALUTATIONS.CHOICES, default=SALUTATIONS.SALUTATION_FEMALE
     )
     company = models.CharField(_('Company'), max_length=100, blank=True, default='')
-    first_name = models.CharField(_('Vorname'), max_length=100)
-    last_name = models.CharField(_('Nachname'), max_length=100)
+    first_name = models.CharField(_('First name'), max_length=100)
+    last_name = models.CharField(_('Last name'), max_length=100)
 
-    address = models.TextField(_('Adresse'), blank=True, default='')
-    address_zip = models.CharField(_('PLZ'), max_length=4)
-    address_city = models.CharField(_('Ort'), max_length=100)
+    address = models.TextField(_('Address'), blank=True, default='')
+    address_zip = models.CharField(_('ZIP CODE'), max_length=4)
+    address_city = models.CharField(_('City'), max_length=100)
 
     phone = models.CharField(_('Phone number'), blank=True, default='', max_length=20)
     mobile = models.CharField(_('Mobile number'), blank=True, default='', max_length=20)

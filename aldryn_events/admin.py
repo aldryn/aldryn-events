@@ -8,7 +8,7 @@ from django_tablib.admin import TablibAdmin
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
 
-from hvad.admin import TranslatableAdmin
+from parler.admin import TranslatableAdmin
 
 from .models import Event, EventCoordinator, Registration
 from .forms import EventAdminForm
@@ -18,7 +18,7 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
-        '__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug'
+        'title', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'slug', 'location'
     )
     list_editable = ('is_published',)
     list_filter = ('is_published',)
@@ -28,7 +28,7 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
         date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
 
-    prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
+    # prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
     _prepopulated_fields = {"slug": ("title",)}  # the one we'll actually use via get_prepopulated_fields()
 
     _fieldsets = (
@@ -67,7 +67,7 @@ class EventCoordinatorAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 
-class RegistrationAdmin(TablibAdmin):
+class RegistrationAdmin(admin.ModelAdmin):
     formats = ['xls', 'csv', 'html']
     list_display = ('first_name', 'last_name', 'event')
     list_filter = ('event', )

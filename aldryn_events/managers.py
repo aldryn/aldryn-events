@@ -5,10 +5,10 @@ from django.utils import timezone
 
 from cms.utils.i18n import get_language_code
 
-from hvad.models import TranslationManager
+from parler.models import TranslatableManager
 
 
-class EventManager(TranslationManager):
+class EventManager(TranslatableManager):
 
     def published(self, now=None):
         now = now or timezone.now()

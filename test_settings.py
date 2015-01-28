@@ -6,7 +6,23 @@ HELPER_SETTINGS = {
     'INSTALLED_APPS': [
         'filer',
         'easy_thumbnails',
+        'hvad',
+        'parler',
+        'aldryn_events'
     ],
+    'LANGUAGES': (
+        ('en', 'English'),
+        ('de', 'German'),
+    ),
+    'PARLER_LANGUAGES': {
+        1: (
+            {'code': 'en',},
+            {'code': 'de',},
+        ),
+        'default': {
+            'hide_untranslated': False,
+        }
+    },
     'THUMBNAIL_PROCESSORS': (
         'easy_thumbnails.processors.colorspace',
         'easy_thumbnails.processors.autocrop',

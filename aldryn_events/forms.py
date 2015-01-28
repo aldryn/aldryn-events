@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.template import TemplateDoesNotExist
 from django.template.loader import select_template
 
-from hvad.forms import TranslatableModelForm
+from parler.forms import TranslatableModelForm
 
 from .models import Registration, UpcomingPluginItem, Event
 from .utils import send_user_confirmation_email, send_manager_confirmation_email
