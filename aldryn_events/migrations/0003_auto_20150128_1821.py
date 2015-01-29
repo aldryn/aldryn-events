@@ -7,7 +7,6 @@ from django.db import models, migrations
 
 def forwards_func(apps, schema_editor):
     Event = apps.get_model('aldryn_events', 'Event')
-    EventTranslation = apps.get_model('aldryn_events', 'EventTranslation')
 
     for obj in Event.objects.all():
 
