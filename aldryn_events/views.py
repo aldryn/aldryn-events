@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.translation import get_language
+from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
     FormView,
@@ -72,14 +72,13 @@ class EventDetailView(NavigationMixin, CreateView):
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
-        events = self.get_available_events()
-
-        self.event = Event.objects.language(get_language()).translated(slug=kwargs['slug']).get()
+        language = get_language_from_request(request, check_path=True)
+        self.event = Event.objects.published().language(language).translated(slug=kwargs['slug']).get()
 
         setattr(self.request, request_events_event_identifier, self.event)
-
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
+
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -92,7 +91,8 @@ class EventDetailView(NavigationMixin, CreateView):
         registration = super(EventDetailView, self).form_valid(form)
         registered_events = set(self.request.session.get('registered_events', set()))
         registered_events.add(self.event.id)
-        self.request.session['registered_events'] = registered_events
+        # set's are not json serializable
+        self.request.session['registered_events'] = list(registered_events)
         return registration
 
     def get_success_url(self):
@@ -101,21 +101,16 @@ class EventDetailView(NavigationMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super(EventDetailView, self).get_form_kwargs()
         kwargs['event'] = self.event
-        kwargs['language_code'] = get_language()
+        kwargs['language_code'] = get_language_from_request(self.request, check_path=True)
         return kwargs
 
-    def get_available_events(self):
-        """
-        Called as first step in dispatch.
-        """
-        return Event.objects.published()
 
 
 class ResetEventRegistration(FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.language(get_language()).translated(slug=kwargs['slug']).get()
+        self.event = Event.objects.language().translated(slug=kwargs['slug']).get()
         return super(ResetEventRegistration, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):

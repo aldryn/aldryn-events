@@ -14,7 +14,7 @@ from .views import (
 
 class EventListAppHook(CMSApp):
     name = _('Events')
-    # app_name = 'aldryn_events'
+    app_name = 'aldryn_events'
     urls = [
         patterns('',  # NOQA
             url(r'^$', EventListView.as_view(), name='events_list'),
