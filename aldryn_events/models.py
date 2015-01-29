@@ -195,8 +195,8 @@ class UpcomingPluginItem(CMSPlugin):
         (STANDARD, _('Standard')),
     ]
 
-    FUTURE_EVENTS = _(u'future events')
-    PAST_EVENTS = _(u'past events')
+    FUTURE_EVENTS = _('future events')
+    PAST_EVENTS = _('past events')
     BOOL_CHOICES = (
         (False, FUTURE_EVENTS),
         (True, PAST_EVENTS),
@@ -220,7 +220,7 @@ class UpcomingPluginItem(CMSPlugin):
     )
 
     def __unicode__(self):
-        return self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
+        return unicode(self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS)
 
 
 class EventListPlugin(CMSPlugin):
