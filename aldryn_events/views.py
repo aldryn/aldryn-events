@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils import translation
+from django.utils.translation import get_language
 from django.views.generic import (
     CreateView,
     FormView,
@@ -74,7 +74,7 @@ class EventDetailView(NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         events = self.get_available_events()
 
-        self.event = get_object_or_404(events, slug=kwargs['slug'])
+        self.event = Event.objects.language(get_language()).translated(slug=kwargs['slug']).get()
 
         setattr(self.request, request_events_event_identifier, self.event)
 
@@ -101,7 +101,7 @@ class EventDetailView(NavigationMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super(EventDetailView, self).get_form_kwargs()
         kwargs['event'] = self.event
-        kwargs['language_code'] = translation.get_language()
+        kwargs['language_code'] = get_language()
         return kwargs
 
     def get_available_events(self):
@@ -115,7 +115,7 @@ class ResetEventRegistration(FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.get(slug=kwargs['slug'])
+        self.event = Event.objects.language(get_language()).translated(slug=kwargs['slug']).get()
         return super(ResetEventRegistration, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):

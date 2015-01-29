@@ -74,8 +74,8 @@ class EventAddTest(TestCase):
         """
         title = 'Delete Event'
         Event.objects.create(title=title, start_date=self.event.start_date, slug='open-delete')
-        Event.objects.using_translations().get(title='Delete Event').delete()
-        self.assertFalse(Event.objects.using_translations().filter(title='Delete Event'))
+        Event.objects.translated(title='Delete Event').delete()
+        self.assertFalse(Event.objects.translated(title='Delete Event'))
 
     def test_email_to_coordinator_event(self):
         """

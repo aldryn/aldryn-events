@@ -36,7 +36,7 @@ class EventManager(TranslatableManager):
         q_without_end_date = Q(end_date__isnull=True, start_date__gte=today)
         return self.published(now=now)\
                    .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('start_date', 'start_time', 'end_date', 'end_time', 'slug')
+                   .order_by('start_date', 'start_time', 'end_date', 'end_time', 'translations__slug')
 
     def archive(self, now=None):
         """
@@ -48,4 +48,4 @@ class EventManager(TranslatableManager):
         q_without_end_date = Q(end_date__isnull=True, start_date__lt=today)
         return self.published(now=now)\
                    .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('-start_date', '-start_time', 'end_date', 'end_time', 'slug')
+                   .order_by('-start_date', '-start_time', 'end_date', 'end_time', 'translations__slug')

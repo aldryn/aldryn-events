@@ -75,7 +75,7 @@ class Event(TranslatableModel):
         ordering = ('start_date', 'start_time', 'end_date', 'end_time')
 
     def __unicode__(self):
-        return self.title
+        return self.safe_translation_getter('title', any_language=True)
 
     @property
     def start_at(self):
