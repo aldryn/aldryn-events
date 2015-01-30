@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import sys
 
 HELPER_SETTINGS = {
     'TIME_ZONE': 'Europe/Zurich',

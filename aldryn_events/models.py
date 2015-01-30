@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from cms.utils.i18n import get_current_language
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, override
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
@@ -118,7 +119,9 @@ class Event(TranslatableModel):
         return not (self.registration_deadline_at and self.registration_deadline_at > timezone.now())
 
     def get_absolute_url(self):
-        return reverse('events_detail', kwargs={'slug': self.slug})
+        slug = self.safe_translation_getter('slug')
+        with override(self.get_current_language()):
+            return reverse('events_detail', kwargs={'slug': slug})
 
 
 class EventCoordinator(models.Model):

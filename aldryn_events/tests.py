@@ -19,31 +19,65 @@ class EventAddTest(TestCase):
     def setUp(self):
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
-        self.page = api.create_page('page', self.template, self.language, published=True)
+        self.page = api.create_page('page', self.template, self.language)
+        self.page.publish('en')
         self.placeholder = self.page.placeholders.all()[0]
-        self.event = Event.objects.create(title='Event2014', start_date='2014-09-10', slug='open-air')
+        self.event = self.create_events()
+
+    def create_events(self):
+        event = Event.objects.create(title='Event2014', start_date='2014-09-10', slug='open-air')
+        event.set_current_language('de')
+        event.title = 'Ereignis'
+        event.slug = 'im-freien'
+        event.save()
+        event.set_current_language('en')
+        return event
 
     def test_create_event(self):
         """
         We can create an event with a name
         """
-        title = 'Concert'
-        before_count = Event.objects.count()
-        Event.objects.create(title=title, start_date=self.event.start_date, slug='open-concert')
-        after_count = Event.objects.count()
-        self.assertEqual(before_count + 1, after_count)
+        self.assertEqual(Event.objects.count(), 1)
+        event = Event.objects.create(title='Concert', start_date=self.event.start_date, slug='open-concert')
+        self.assertEqual(Event.objects.translated('en').count(), 2)
+        self.assertEqual(Event.objects.translated('de').count(), 0)
+        self.assertEqual(event.get_current_language(), 'en')
+
+        event.set_current_language('de')
+        event.title = 'Konzert'
+        event.slug = 'offene-konzert'
+        event.save()
+
+        self.assertEqual(Event.objects.translated('en').count(), 2)
+        self.assertEqual(Event.objects.translated('de').count(), 1)
+
+    def test_event_get_absolute_url(self):
+        page = api.create_page('events en', 'fullwidth.html', language='en',
+                               apphook='EventListAppHook', apphook_namespace='aldryn_events')
+        page.publish('en')
+        api.create_title('de', 'events de', page)
+        page.publish('de')
+        self.assertEqual(self.event.get_absolute_url(), '/en/events-en/open-air/')
+        self.event.set_current_language('de')
+        self.assertEqual(self.event.get_absolute_url(), '/de/events-de/im-freien/')
 
     def test_add_event_app(self):
         """
         We add an event to the app
         """
+        pass
         self.page.application_urls = 'EventListAppHook'
-        self.page.publish(self.language)
-        event = Event.objects.create(title=self.event.title, location='Luzern', start_date=self.event.start_date,
-                                     slug='open-event')
-        url = event.get_absolute_url()
-        response = self.client.get(url)
-        self.assertContains(response, event.title)
+        self.page.publish('en')
+        self.page.publish('de')
+
+        en_url = self.event.get_absolute_url()
+        response = self.client.get(en_url)
+        self.assertContains(response, self.event.title)
+
+        self.event.set_current_language('de')
+        de_url = self.event.get_absolute_url()
+        response = self.client.get(de_url)
+        self.assertContains(response, self.event.title)
 
     def test_add_location_to_event(self):
         """
