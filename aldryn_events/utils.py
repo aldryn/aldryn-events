@@ -139,7 +139,7 @@ def get_monthdates(month, year):
     return cal.itermonthdates(year, month)
 
 
-def build_calendar(year, month):
+def build_calendar(year, month, language):
     from .models import Event
 
     month = int(month)
@@ -160,7 +160,7 @@ def build_calendar(year, month):
             monthdates += next_month[7:14]
 
     # get all upcoming events, ordered by start_date
-    events = groupby(Event.objects.published().filter(
+    events = groupby(Event.objects.published().translated(language).filter(
         start_date__gte=monthdates[0][0],
         start_date__lte=monthdates[-1][0]).order_by('start_date'), attrgetter('start_date')
     )

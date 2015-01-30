@@ -23,13 +23,10 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
-    if not django.VERSION >= (1, 6):
-        # Django >= 1.6 calls aggregate on queryset, which is currently not implemented in django-hvad
-        date_hierarchy = 'start_date'
+    date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
 
-    # prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
-    _prepopulated_fields = {"slug": ("title",)}  # the one we'll actually use via get_prepopulated_fields()
+    _prepopulated_fields = {"slug": ("title",)}
 
     _fieldsets = (
         (None, {'fields': (
@@ -67,7 +64,10 @@ class EventCoordinatorAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 
-class RegistrationAdmin(admin.ModelAdmin):
+class RegistrationAdmin(TablibAdmin):
+    # html is giving me Unicode Error when using accentuated characters, related issue create
+    # on django-tablib:
+    # https://github.com/joshourisman/django-tablib/issues/43
     formats = ['xls', 'csv', 'html']
     list_display = ('first_name', 'last_name', 'event')
     list_filter = ('event', )

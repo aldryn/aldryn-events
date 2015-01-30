@@ -26,12 +26,13 @@ class NavigationMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
+        language = get_language_from_request(self.request, check_path=True)
         events_by_year = build_events_by_year(
-            events=Event.objects.future()
+            events=Event.objects.future().translated(language)
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
-            events=Event.objects.archive(),
+            events=Event.objects.archive().translated(language),
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year
@@ -62,7 +63,9 @@ class EventListView(NavigationMixin, ListView):
             qs = qs.filter(start_date__month=month)
         if day:
             qs = qs.filter(start_date__day=day)
-        qs = qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
+
+        language = get_language_from_request(self.request, check_path=True)
+        qs = qs.translated(language).order_by('start_date', 'start_time', 'end_date', 'end_time')
         return qs
 
 
@@ -73,7 +76,7 @@ class EventDetailView(NavigationMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         language = get_language_from_request(request, check_path=True)
-        self.event = Event.objects.published().language(language).translated(slug=kwargs['slug']).get()
+        self.event = Event.objects.published().translated(language, slug=kwargs['slug']).get()
 
         setattr(self.request, request_events_event_identifier, self.event)
         if hasattr(request, 'toolbar'):
@@ -110,7 +113,8 @@ class ResetEventRegistration(FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
-        self.event = Event.objects.language().translated(slug=kwargs['slug']).get()
+        language = get_language_from_request(request, check_path=True)
+        self.event = Event.objects.translated(language, slug=kwargs['slug']).get()
         return super(ResetEventRegistration, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -134,7 +138,8 @@ class EventDatesView(TemplateView):
             ctx['year'] = today.year
 
         current_date = datetime.date(day=1, month=int(ctx['month']), year=int(ctx['year']))
-        ctx['days'] = build_calendar(ctx['year'], ctx['month'])
+        language = get_language_from_request(self.request, check_path=True)
+        ctx['days'] = build_calendar(ctx['year'], ctx['month'], language)
         ctx['current_date'] = current_date
         ctx['last_month'] = current_date + datetime.timedelta(days=-1)
         ctx['next_month'] = current_date + datetime.timedelta(days=35)

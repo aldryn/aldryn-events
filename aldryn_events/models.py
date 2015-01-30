@@ -88,7 +88,11 @@ class Event(TranslatableModel):
     def clean(self):
         if not self.pk:
             # the translations don't exist yet so we can't access title
-            unique_slugify(self, self.slug or uuid4().hex[:8])
+            unique_slugify(
+                instance=self.get_translation(self.get_current_language()),
+                value=self.slug or uuid4().hex[:8],
+                queryset=self.translations.filter(language_code=self.get_current_language())
+            )
 
         if self.start_date and self.end_date and self.end_date < self.start_date:
             raise ValidationError(_('start should be before end'))

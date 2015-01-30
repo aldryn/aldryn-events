@@ -2,7 +2,7 @@ import datetime
 
 from django.conf.urls import patterns, url
 from django.utils.dates import MONTHS
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language_from_request
 
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -21,10 +21,11 @@ class UpcomingPlugin(CMSPluginBase):
     form = UpcomingPluginForm
 
     def render(self, context, instance, placeholder):
+        language = get_language_from_request(context['request'], check_path=True)
         if instance.past_events:
-            events = Event.objects.past(count=instance.latest_entries)
+            events = Event.objects.translated(language).past(count=instance.latest_entries)
         else:
-            events = Event.objects.upcoming(count=instance.latest_entries)
+            events = Event.objects.translated(language).upcoming(count=instance.latest_entries)
         context['events'] = events
         context['instance'] = instance
         self.render_template = 'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
@@ -41,8 +42,9 @@ class EventListCMSPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         self.render_template = 'aldryn_events/plugins/list/%s/list.html' % instance.style
+        language = get_language_from_request(context['request'], check_path=True)
         context['instance'] = instance
-        context['events'] = instance.events.all()
+        context['events'] = instance.events.translated(language)
         return context
 
 plugin_pool.register_plugin(EventListCMSPlugin)
@@ -63,8 +65,8 @@ class CalendarPlugin(CMSPluginBase):
             month = str(datetime.datetime.today().month)
 
         current_date = datetime.date(day=1, month=int(month), year=int(year))
-
-        context['days'] = build_calendar(year, month)
+        language = get_language_from_request(context['request'], check_path=True)
+        context['days'] = build_calendar(year, month, language)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
         context['next_month'] = current_date + datetime.timedelta(days=35)
