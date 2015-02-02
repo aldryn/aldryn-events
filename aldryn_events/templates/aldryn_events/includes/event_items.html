@@ -1,11 +1,10 @@
 {% load i18n thumbnail cms_tags %}
-{% load url from future %}
-
 <ul class="event-items">
 	{% for event in object_list %}
+    <li>{{ event }}c</li>
 	<li>
-		{% if event.flyer %}<p class="events-visual"><a href="{% url 'events_detail' slug=event.slug %}"><img src="{% thumbnail event.flyer 180x260 crop %}" alt="" /></a></p>{% endif %}
-		<h3><a href="{% url 'events_detail' slug=event.slug %}">{{ event.title }}</a></h3>
+		{% if event.flyer %}<p class="events-visual"><a href="{{ event.get_absolute_url }}"><img src="{% thumbnail event.flyer 180x260 crop %}" alt="" /></a></p>{% endif %}
+		<h3><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h3>
 		{% if event.short_description %}<div class="events-lead">{% render_model event "short_description" "short_description" %}</div>{% endif %}
 
 		<p class="events-date">
@@ -20,5 +19,7 @@
 		<div class="events-venue">{{ event.location|safe }}</div>
 		{% endif %}
 	</li>
+    {% empty %}
+    <li>{% trans "No events found." %}</li>
 	{% endfor %}
 </ul>

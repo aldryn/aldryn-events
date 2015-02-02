@@ -9,7 +9,7 @@
 	{% if already_registered and not event.is_registration_deadline_passed %}
 	<p>{% trans "Thank you for your registration!" %}</p>
 	{% block event_registration %}{% static_placeholder "events_registration" %}{% endblock %}
-	<form action="{% url 'events_registration_reset' event.slug %}" method="post" class="form form-eventss" role="form">
+	<form action="{% url 'aldryn_events:events_registration_reset' event.slug %}" method="post" class="form form-eventss" role="form">
 		{% csrf_token %}
 		<fieldset>
 			<ol>

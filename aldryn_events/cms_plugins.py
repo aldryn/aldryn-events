@@ -21,11 +21,15 @@ class UpcomingPlugin(CMSPluginBase):
     form = UpcomingPluginForm
 
     def render(self, context, instance, placeholder):
+        # translated filter the events, language set current language
         language = get_language_from_request(context['request'], check_path=True)
+        events = Event.objects.translated(language).language(language)
+
         if instance.past_events:
-            events = Event.objects.translated(language).past(count=instance.latest_entries)
+            events = events.past(count=instance.latest_entries)
         else:
-            events = Event.objects.translated(language).upcoming(count=instance.latest_entries)
+            events = events.upcoming(count=instance.latest_entries)
+
         context['events'] = events
         context['instance'] = instance
         self.render_template = 'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
@@ -44,7 +48,7 @@ class EventListCMSPlugin(CMSPluginBase):
         self.render_template = 'aldryn_events/plugins/list/%s/list.html' % instance.style
         language = get_language_from_request(context['request'], check_path=True)
         context['instance'] = instance
-        context['events'] = instance.events.translated(language)
+        context['events'] = instance.events.translated(language).language(language)
         return context
 
 plugin_pool.register_plugin(EventListCMSPlugin)

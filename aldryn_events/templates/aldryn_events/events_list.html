@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block content_events %}
-<h2>{% trans "Events" %}</h2>
+<h2>{% trans "Events" %}</h2>{{ object_list }}
 {% include "aldryn_events/includes/event_items.html" %}
+{% debug %}
 {% endblock content_events %}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms.utils.i18n import get_current_language
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, override
@@ -121,7 +121,7 @@ class Event(TranslatableModel):
     def get_absolute_url(self):
         slug = self.safe_translation_getter('slug')
         with override(self.get_current_language()):
-            return reverse('events_detail', kwargs={'slug': slug})
+            return reverse('aldryn_events:events_detail', kwargs={'slug': slug})
 
 
 class EventCoordinator(models.Model):
