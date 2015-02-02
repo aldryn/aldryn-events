@@ -101,7 +101,7 @@ class EventDetailView(NavigationMixin, CreateView):
         return registration
 
     def get_success_url(self):
-        return reverse('events_detail', kwargs={'slug': self.kwargs['slug']})
+        return self.event.get_absolute_url()
 
     def get_form_kwargs(self):
         kwargs = super(EventDetailView, self).get_form_kwargs()

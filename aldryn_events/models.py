@@ -98,7 +98,7 @@ class Event(TranslatableModel):
         if self.start_date and self.end_date and self.end_date < self.start_date:
             raise ValidationError(_('start should be before end'))
 
-        if self.start_date == self.end_date and self.end_time < self.start_time:
+        if self.end_date and self.start_date == self.end_date and self.end_time < self.start_time:
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
@@ -183,7 +183,7 @@ class Registration(models.Model):
     last_name = models.CharField(_('Last name'), max_length=100)
 
     address = models.TextField(_('Address'), blank=True, default='')
-    address_zip = models.CharField(_('ZIP CODE'), max_length=4)
+    address_zip = models.CharField(_('ZIP CODE'), max_length=20)
     address_city = models.CharField(_('City'), max_length=100)
 
     phone = models.CharField(_('Phone number'), blank=True, default='', max_length=20)

@@ -60,13 +60,14 @@ HELPER_SETTINGS = {
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     ),
-    'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
+    # 'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
     'MIGRATION_MODULES ': {
         'filer': 'filer.migrations_django',
     },
     'SOUTH_TESTS_MIGRATE': False,
-    'DEBUG': True,
-    'TEMPLATE_DEBUG': True
+    # 'DEBUG': True,
+    # 'TEMPLATE_DEBUG': True,
+    'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True
 }
 
 

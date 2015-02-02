@@ -62,6 +62,7 @@ class EventRegistrationForm(forms.ModelForm):
 
         if commit:
             registration.save()
+
         self.send_user_notification()
         self.send_admin_notification()
 

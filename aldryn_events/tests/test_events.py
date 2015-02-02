@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 import mock
 import random
@@ -339,3 +341,64 @@ class EventTestCase(TransactionTestCase):
                       'Expected html `{}` not found on rendered plugin for language "{}"'.format(
                           html.format('en'), 'EN'
                       ))
+
+class RegistrationTestCase(TransactionTestCase):
+
+    @mock.patch('aldryn_events.models.timezone')
+    def test_submit_registration(self, timezone_mock):
+        timezone_mock.now.return_value = datetime(
+            2015, 2, 5, 9, 0, tzinfo=get_current_timezone()
+        )
+        event = Event.objects.language('en').create(
+            title='Event2014', slug='open-air', start_date='2015-02-07',
+            publish_at='2015-02-02 09:00', enable_registration=True,
+            registration_deadline_at='2015-02-07 00:00'
+        )
+        event.event_coordinators.create(name='The big boss',
+                                        email='theboss@gmail.com')
+        event.set_current_language('de')
+        event.title = 'Ereignis'
+        event.slug = 'im-freien'
+        event.save()
+        event.set_current_language('en')
+
+        data = {
+            'salutation': 'mrs',
+            'company': 'any',
+            'first_name': 'Felipe',
+            'last_name': 'Somename',
+            'address': 'My Street, 77, Brazil, Earth, Solar system',
+            'address_zip': '00000-000',
+            'address_city': u'São Paulo',
+            'phone': '+55 (11) 1234-5678',
+            'mobile': '+55 (11) 1234-5678',
+            'email': 'myemail@gmail.com',
+            'message': "I'm testing you"
+        }
+        response = self.client.post(event.get_absolute_url(), data, follow=True)
+        form = response.context_data.get('form')
+        # fail, show form error
+        self.assertFalse(
+            bool(form.errors),
+            "Registration form has errors:\n{}".format(
+                form.errors.as_text()
+            )
+        )
+
+        # test if emails was sent
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'Thank you for signing up to "{}"'.format(event.title)
+        )
+        self.assertEqual(['myemail@gmail.com'], mail.outbox[0].recipients())
+        self.assertEqual(
+            mail.outbox[1].subject,
+            'new registration for "{}"'.format(event.title)
+        )
+        self.assertEqual(['theboss@gmail.com'], mail.outbox[1].recipients())
+
+        # test if registration is really on db
+        registration = event.registration_set.get()
+        for k, v in data.items():
+            self.assertEqual(getattr(registration, k), v)
