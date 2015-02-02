@@ -1,7 +1,6 @@
 from datetime import datetime
 import mock
 import random
-from unittest import TestCase
 from django.contrib.auth.models import AnonymousUser
 
 from django.core import mail
@@ -16,7 +15,6 @@ from cms.utils import get_cms_setting
 import string
 from django.utils.timezone import get_current_timezone
 
-from aldryn_events.cms_plugins import EventListCMSPlugin
 from aldryn_events.models import Event, EventCoordinator
 
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -40,125 +38,6 @@ def get_page_request(page, user=None, path=None, edit=False, language='en'):
     mid.process_request(request)
     return request
 
-#
-# class EventAddTest(TestCase):
-#     su_username = 'user'
-#     su_password = 'pass'
-#
-#     def setUp(self):
-#         self.template = get_cms_setting('TEMPLATES')[0][0]
-#         self.language = settings.LANGUAGES[0][0]
-#         self.root_page = api.create_page('root page', self.template, self.language, published=True)
-#         self.page = api.create_page('page', self.template, self.language, parent=self.root_page, published=True)
-#         for page in self.root_page, self.page:
-#             for language, _ in settings.LANGUAGES[1:]:
-#                 api.create_title(language, '{}-{}'.format(page.get_slug(), language), page)
-#                 page.publish(language)
-#         self.placeholder = self.page.placeholders.all()[0]
-#         # self.event = self.create_event()
-#
-#     def create_event(self):
-#         event = Event.objects.create(title='Event2014', start_date='2014-09-10', slug='open-air')
-#         event.set_current_language('de')
-#         event.title = 'Ereignis'
-#         event.slug = 'im-freien'
-#         event.save()
-#         return Event.objects.get(pk=event.pk)
-#
-#     def test_create_event(self):
-#         """
-#         We can create an event with a name
-#         """
-#         self.assertEqual(Event.objects.count(), 0)
-#         event = Event.objects.create(title='Concert', start_date='2014-09-10', slug='open-concert')
-#         self.assertEqual(Event.objects.translated('en').count(), 1)
-#         self.assertEqual(Event.objects.translated('de').count(), 0)
-#         self.assertEqual(event.get_current_language(), 'en')
-#
-#         event.set_current_language('de')
-#         event.title = 'Konzert'
-#         event.slug = 'offene-konzert'
-#         event.save()
-#
-#         self.assertEqual(Event.objects.translated('en').count(), 1)
-#         self.assertEqual(Event.objects.translated('de').count(), 1)
-#
-#     def test_event_get_absolute_url(self):
-#         self.page.application_urls = 'EventListAppHook'
-#         self.page.publish('en')
-#         self.page.publish('de')
-#         event = self.create_event()
-#
-#         self.assertEqual(event.get_absolute_url(), '/en/events-en/open-air/')
-#         event.set_current_language('de')
-#         self.assertEqual(event.get_absolute_url(), '/de/events-de/im-freien/')
-#
-#     def test_add_event_app(self):
-#         """
-#         We add an event to the app
-#         """
-#         self.page.application_urls = 'EventListAppHook'
-#         self.page.publish('en')
-#         self.page.publish('de')
-#         event = self.create_event()
-#
-#         response = self.client.get(event.get_absolute_url())
-#         self.assertContains(response, event.title)
-#
-#         self.event.set_current_language('de')
-#         response = self.client.get(event.get_absolute_url())
-#         self.assertContains(response, event.title)
-#
-#     # def test_add_location_to_event(self):
-#     #     """
-#     #     We create a coordinator and add him to the created event
-#     #     """
-#     #     loc = 'Basel'
-#     #     title = 'Greenfield'
-#     #     event = Event.objects.create(title=title, location=loc,  start_date=self.event.start_date, slug='open-green')
-#     #     self.assertEqual(loc, event.location)
-#     #     event.set_current_language('de')
-#     #     self.assertEqual(loc, event.location)
-#     #
-#     # def test_add_event_plugin_api(self):
-#     #     """
-#     #     We add an event to the Event Plugin and look it up
-#     #     """
-#     #     title = 'Newone'
-#     #     event = Event.objects.create(title=title, start_date=self.event.start_date, slug='open-new')
-#     #     plugin = api.add_plugin(self.placeholder, EventListCMSPlugin, self.language)
-#     #     plugin.events.add(event)
-#     #     plugin.save()
-#     #     self.page.publish(self.language)
-#     #     url = event.get_absolute_url()
-#     #     response = self.client.get(url)
-#     #     self.assertContains(response, event.title)
-#     #
-#     # def test_delete_event(self):
-#     #     """
-#     #     We can delete an event
-#     #     """
-#     #     title = 'Delete Event'
-#     #     Event.objects.create(title=title, start_date=self.event.start_date, slug='open-delete')
-#     #     Event.objects.translated(title='Delete Event').delete()
-#     #     self.assertFalse(Event.objects.translated(title='Delete Event'))
-#     #
-#     # def test_email_to_coordinator_event(self):
-#     #     """
-#     #     We can send an email to the coordinator
-#     #     """
-#     #     title = 'St.Galle'
-#     #     event = Event.objects.create(title=title,  start_date=self.event.start_date, slug='open-email')
-#     #     name = 'Carl'
-#     #     email = 'bla@bla.bla'
-#     #     coord = EventCoordinator.objects.create(name=name, email=email)
-#     #     coord.event = event
-#     #     coord.save()
-#     #     send_mail('Subject here', 'Here is the content of the mail.', 'from@test.com', [coord.email],
-#     #               fail_silently=False)
-#     #     self.assertEqual(len(mail.outbox), 1)
-#     #     self.assertEqual(mail.outbox[0].subject, 'Subject here')
-
 def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
     return prefix + u''.join(random.choice(chars) for _ in range(length))
 
@@ -171,16 +50,6 @@ class EventTestCase(TransactionTestCase):
         self.language = settings.LANGUAGES[0][0]
         self.root_page = api.create_page('root page', self.template, self.language, published=True)
         api.create_title('de', 'root page de', self.root_page)
-        # self.page = api.create_page(
-        #     'page', self.template, self.language, published=True,
-        #     parent=self.root_page
-        # )
-        #
-        # for page in self.root_page, self.page:
-        #     for language, _ in settings.LANGUAGES[1:]:
-        #         api.create_title(language, page.get_slug(), page)
-        #         page.publish(langucage)
-        # self.placeholder = self.page.placeholders.all()[0]
 
     def create_event(self):
         event = Event.objects.language('en').create(
@@ -342,18 +211,6 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # # EN: test that is is empty
-        # request = get_page_request(None, path='/en/home/', language='en')
-        # context = RequestContext(request, {})
-        # rendered = plugin_en.render_plugin(context, ph)
-        # self.assertIn('<li>No upcoming events.</li>', rendered)
-        #
-        # # DE: test that is is empty
-        # request = get_page_request(None, path='/de/home/', language='de')
-        # context = RequestContext(request, {})
-        # rendered = plugin_de.render_plugin(context, ph)
-        # self.assertIn('<li>Keine Events in der Zukunft.</li>', rendered)
-
         # add events
         def new_event(num, lang):
             text = 'event' if lang == 'en' else 'ereignis'
@@ -403,18 +260,6 @@ class EventTestCase(TransactionTestCase):
         plugin_de.save()
         page.publish('en')
         page.publish('de')
-
-        # # EN: test that is is empty
-        # request = get_page_request(None, path='/en/home/', language='en')
-        # context = RequestContext(request, {})
-        # rendered = plugin_en.render_plugin(context, ph)
-        # self.assertIn('<li>No upcoming events.</li>', rendered)
-        #
-        # # DE: test that is is empty
-        # request = get_page_request(None, path='/de/home/', language='de')
-        # context = RequestContext(request, {})
-        # rendered = plugin_de.render_plugin(context, ph)
-        # self.assertIn('<li>Keine Events in der Zukunft.</li>', rendered)
 
         # add events
         def new_event(num, lang):
