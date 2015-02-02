@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from django_tablib.admin import TablibAdmin
-
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
-
+from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 
 from .models import Event, EventCoordinator, Registration
@@ -18,7 +15,8 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
-        'title', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'slug', 'location'
+        'title', 'start_date', 'start_time', 'end_date', 'end_time',
+        'is_published', 'slug', 'location'
     )
     list_editable = ('is_published',)
     list_filter = ('is_published',)
@@ -65,8 +63,8 @@ class EventCoordinatorAdmin(admin.ModelAdmin):
 
 
 class RegistrationAdmin(TablibAdmin):
-    # html is giving me Unicode Error when using accentuated characters, related issue create
-    # on django-tablib:
+    # html is giving me Unicode Error when using accentuated characters,
+    # related issue create on django-tablib:
     # https://github.com/joshourisman/django-tablib/issues/43
     formats = ['xls', 'csv', 'html']
     list_display = ('first_name', 'last_name', 'event')

@@ -2,7 +2,9 @@ import datetime
 
 from django.conf.urls import patterns, url
 from django.utils.dates import MONTHS
-from django.utils.translation import ugettext_lazy as _, get_language_from_request
+from django.utils.translation import (
+    ugettext_lazy as _, get_language_from_request
+)
 
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -22,7 +24,8 @@ class UpcomingPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         # translated filter the events, language set current language
-        language = get_language_from_request(context['request'], check_path=True)
+        language = get_language_from_request(context['request'],
+                                             check_path=True)
         events = Event.objects.translated(language).language(language)
 
         if instance.past_events:
@@ -32,7 +35,8 @@ class UpcomingPlugin(CMSPluginBase):
 
         context['events'] = events
         context['instance'] = instance
-        self.render_template = 'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
+        self.render_template = \
+            'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
         return context
 
 plugin_pool.register_plugin(UpcomingPlugin)
@@ -45,10 +49,13 @@ class EventListCMSPlugin(CMSPluginBase):
     model = EventListPlugin
 
     def render(self, context, instance, placeholder):
-        self.render_template = 'aldryn_events/plugins/list/%s/list.html' % instance.style
-        language = get_language_from_request(context['request'], check_path=True)
+        self.render_template = \
+            'aldryn_events/plugins/list/%s/list.html' % instance.style
+        language = get_language_from_request(context['request'],
+                                             check_path=True)
         context['instance'] = instance
-        context['events'] = instance.events.translated(language).language(language)
+        context['events'] = \
+            instance.events.translated(language).language(language)
         return context
 
 plugin_pool.register_plugin(EventListCMSPlugin)
@@ -68,8 +75,12 @@ class CalendarPlugin(CMSPluginBase):
             year = str(datetime.datetime.today().year)
             month = str(datetime.datetime.today().month)
 
-        current_date = datetime.date(day=1, month=int(month), year=int(year))
-        language = get_language_from_request(context['request'], check_path=True)
+        current_date = datetime.date(
+            day=1, month=int(month), year=int(year)
+        )
+        language = get_language_from_request(
+            context['request'], check_path=True
+        )
         context['days'] = build_calendar(year, month, language)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
@@ -80,9 +91,10 @@ class CalendarPlugin(CMSPluginBase):
 
     def get_plugin_urls(self):
         return patterns('',  # NOQA
-            url(r'^get-dates/$', EventDatesView.as_view(), name='get-calendar-dates'),
-            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$', EventDatesView.as_view(),
+            url(r'^get-dates/$', EventDatesView.as_view(),
                 name='get-calendar-dates'),
+            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
+                EventDatesView.as_view(), name='get-calendar-dates'),
         )
 
 

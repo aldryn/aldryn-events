@@ -6,10 +6,9 @@ import random
 from django.contrib.auth.models import AnonymousUser
 
 from django.core import mail
-from django.core.mail import send_mail
 from django.conf import settings
 from django.template import RequestContext
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory
 from django.test import TransactionTestCase
 
 from cms import api
@@ -17,10 +16,10 @@ from cms.utils import get_cms_setting
 import string
 from django.utils.timezone import get_current_timezone
 
-from aldryn_events.models import Event, EventCoordinator
+from aldryn_events.models import Event
 
 from cms.middleware.toolbar import ToolbarMiddleware
-from django.utils.translation import override
+
 
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
 
@@ -50,12 +49,15 @@ class EventTestCase(TransactionTestCase):
     def setUp(self):
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
-        self.root_page = api.create_page('root page', self.template, self.language, published=True)
+        self.root_page = api.create_page(
+            'root page', self.template, self.language, published=True
+        )
         api.create_title('de', 'root page de', self.root_page)
 
     def create_event(self):
         event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2014-09-10', publish_at='2014-01-01 12:00'
+            title='Event2014', slug='open-air', start_date='2014-09-10',
+            publish_at='2014-01-01 12:00'
         )
         event.set_current_language('de')
         event.title = 'Ereignis'
@@ -68,7 +70,9 @@ class EventTestCase(TransactionTestCase):
         We can create an event with a name in two languages
         """
         self.assertEqual(Event.objects.count(), 0)
-        event = Event.objects.language('en').create(title='Concert', start_date='2014-09-10', slug='open-concert')
+        event = Event.objects.language('en').create(
+            title='Concert', start_date='2014-09-10', slug='open-concert'
+        )
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 0)
         self.assertEqual(event.get_current_language(), 'en')
@@ -101,16 +105,24 @@ class EventTestCase(TransactionTestCase):
         """
         We add an event to the app
         """
-        timezone_mock.now.return_value = datetime(2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone())
-        page = api.create_page('Events en', self.template, 'en', slug="eventsapp",
-                               published=True, apphook='EventListAppHook', apphook_namespace='aldryn_events')
+        timezone_mock.now.return_value = datetime(
+            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
+        )
+        page = api.create_page(
+            'Events en', self.template, 'en', slug="eventsapp", published=True,
+            apphook='EventListAppHook', apphook_namespace='aldryn_events'
+        )
         api.create_title('de', 'Events de', page)
         page.publish('en')
         page.publish('de')
 
         # Test page empty
-        self.assertContains(self.client.get('/en/eventsapp/'), '<li>No events found.</li>')
-        self.assertContains(self.client.get('/de/eventsapp/'), '<li>No events found.</li>')
+        self.assertContains(
+            self.client.get('/en/eventsapp/'), '<li>No events found.</li>'
+        )
+        self.assertContains(
+            self.client.get('/de/eventsapp/'), '<li>No events found.</li>'
+        )
 
         # create events
         event1 = self.create_event()
@@ -139,7 +151,9 @@ class EventTestCase(TransactionTestCase):
         We add an event to the Event Plugin and look it up
         """
 
-        page = api.create_page('Events en', self.template, 'en', published=True)
+        page = api.create_page(
+            'Events en', self.template, 'en', published=True
+        )
         api.create_title('de', 'Events de', page)
         ph = page.placeholders.get(slot='content')
         plugin_en = api.add_plugin(ph, 'EventListCMSPlugin', 'en')
@@ -161,7 +175,10 @@ class EventTestCase(TransactionTestCase):
 
         # add events
         event1 = self.create_event()
-        event2 = Event.objects.language('en').create(title='Event2015 only english', start_date='2015-01-29', slug='event2015-only-english')
+        event2 = Event.objects.language('en').create(
+            title='Event2015 only english', start_date='2015-01-29',
+            slug='event2015-only-english'
+        )
         plugin_en.events = [event1, event2]
         plugin_en.save()
         plugin_de.events = [event1, event2]
@@ -172,30 +189,46 @@ class EventTestCase(TransactionTestCase):
         context = RequestContext(request, {})
         rendered = plugin_en.render_plugin(context, ph)
         event1.set_current_language('en')
-        self.assertIn(event1.title, rendered,
-                      'Title "{}" for event1 in "EN" not found.'.format(event1.title))
-        self.assertIn(event1.get_absolute_url(), rendered,
-                      'URL "{}" for event in "EN" not found.'.format(event1.title))
+        self.assertIn(
+            event1.title, rendered,
+            'Title "{}" for event1 in "EN" not found.'.format(event1.title)
+        )
+        self.assertIn(
+            event1.get_absolute_url(), rendered,
+            'URL "{}" for event in "EN" not found.'.format(event1.title)
+        )
         event2.set_current_language('en')
-        self.assertIn(event2.title, rendered,
-                      'Title "{}" for event2 in "EN" not found.'.format(event2.title))
-        self.assertIn(event2.get_absolute_url(), rendered,
-                      'URL "{}" for event2 in "EN" not found.'.format(event2.title))
+        self.assertIn(
+            event2.title, rendered,
+            'Title "{}" for event2 in "EN" not found.'.format(event2.title)
+        )
+        self.assertIn(
+            event2.get_absolute_url(), rendered,
+            'URL "{}" for event2 in "EN" not found.'.format(event2.title)
+        )
 
         # DE: test plugin rendering
         request = get_page_request(None, path='/de/events-de/', language='de')
         context = RequestContext(request, {})
         rendered = plugin_de.render_plugin(context, ph)
         event1.set_current_language('de')
-        self.assertIn(event1.title, rendered,
-                      'Title "{}" for event1 in "DE" not found.'.format(event1.title))
-        self.assertIn(event1.get_absolute_url(), rendered,
-                      'URL "{}" for event in "DE" not found.'.format(event1.title))
+        self.assertIn(
+            event1.title, rendered,
+            'Title "{}" for event1 in "DE" not found.'.format(event1.title)
+        )
+        self.assertIn(
+            event1.get_absolute_url(), rendered,
+            'URL "{}" for event in "DE" not found.'.format(event1.title)
+        )
         # event 2 does not exist in German, so we assert that it is not in list
-        self.assertNotIn(event2.title, rendered,
-                         'Title "{}" for event2 in "EN" found in "DE".'.format(event2.title))
-        self.assertNotIn(event2.get_absolute_url(), rendered,
-                         'URL "{}" for event2 in "EN" found in "DE".'.format(event2.title))
+        self.assertNotIn(
+            event2.title, rendered,
+            'Title "{}" for event2 in "EN" found in "DE".'.format(event2.title)
+        )
+        self.assertNotIn(
+            event2.get_absolute_url(), rendered,
+            'URL "{}" for event2 in "EN" found in "DE".'.format(event2.title)
+        )
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_future(self, timezone_mock):
@@ -203,9 +236,13 @@ class EventTestCase(TransactionTestCase):
         Test the upcoming events plugin
         """
 
-        timezone_mock.now.return_value = datetime(2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone())
+        timezone_mock.now.return_value = datetime(
+            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
+        )
 
-        page = api.create_page('Home en', self.template, 'en', published=True, slug='home')
+        page = api.create_page(
+            'Home en', self.template, 'en', published=True, slug='home'
+        )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
         plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en')
@@ -217,16 +254,18 @@ class EventTestCase(TransactionTestCase):
         def new_event(num, lang):
             text = 'event' if lang == 'en' else 'ereignis'
             event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang), slug="{}-{}-{}".format(text, num, lang),
-                start_date='2015-01-29', end_date='2015-02-05', publish_at='2014-01-01 12:00'
+                title="{} {} {}".format(text, num, lang),
+                slug="{}-{}-{}".format(text, num, lang),
+                start_date='2015-01-29', end_date='2015-02-05',
+                publish_at='2014-01-01 12:00'
             )
             return event
         for i in range(1, 7):
             for lang in ['en', 'de']:
                 new_event(i, lang)
 
-        # Test plugin rendering for both languages in a forloop. I don't like it but save lot of
-        # text space since we test for 5 entries
+        # Test plugin rendering for both languages in a forloop. I don't
+        # like it but save lot of text space since we test for 5 entries
         rendered = {}
         request = get_page_request(None, path='/en/home/', language='en')
         context = RequestContext(request, {})
@@ -240,19 +279,46 @@ class EventTestCase(TransactionTestCase):
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{} {} {}'.format(text, i, lang)
                 url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(name, rendered[lang], 'Title "{}" not found in rendered plugin for language "{}".'.format(name, lang))
-                self.assertIn(url, rendered[lang], 'URL "{}" not found in rendered plugin for language "{}".'.format(url, lang))
+                self.assertIn(
+                    name, rendered[lang],
+                    'Title "{}" not found in rendered plugin for '
+                    'language "{}".'.format(name, lang)
+                )
+                self.assertIn(
+                    url, rendered[lang],
+                    'URL "{}" not found in rendered plugin for '
+                    'language "{}".'.format(url, lang)
+                )
 
-        self.assertNotIn('event 6 en', rendered, 'Title "event 6 en" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event-6-en', rendered, 'URL "event-6-en" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event 6 de', rendered, 'Title "event 6 de" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event-6-de', rendered, 'URL "event-6-de" found in rendered plugin, but limit is 5 entries.')
+        self.assertNotIn(
+            'event 6 en', rendered,
+            'Title "event 6 en" found in rendered plugin, but limit is '
+            '5 entries.'
+        )
+        self.assertNotIn(
+            'event-6-en', rendered,
+            'URL "event-6-en" found in rendered plugin, but limit is '
+            '5 entries.'
+        )
+        self.assertNotIn(
+            'event 6 de', rendered,
+            'Title "event 6 de" found in rendered plugin, but limit '
+            'is 5 entries.'
+        )
+        self.assertNotIn(
+            'event-6-de', rendered,
+            'URL "event-6-de" found in rendered plugin, but limit '
+            'is 5 entries.'
+
+        )
 
     def test_upcoming_plugin_for_past(self):
         """
         Test the upcoming events plugin for past entries
         """
-        page = api.create_page('Home en', self.template, 'en', published=True, slug='home')
+        page = api.create_page(
+            'Home en', self.template, 'en', published=True, slug='home'
+        )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
         plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en')
@@ -267,16 +333,18 @@ class EventTestCase(TransactionTestCase):
         def new_event(num, lang):
             text = 'event' if lang == 'en' else 'ereignis'
             event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang), slug="{}-{}-{}".format(text, num, lang),
-                start_date='2014-06-29', end_date='2014-07-05', publish_at='2014-06-20 12:00'
+                title="{} {} {}".format(text, num, lang),
+                slug="{}-{}-{}".format(text, num, lang),
+                start_date='2014-06-29', end_date='2014-07-05',
+                publish_at='2014-06-20 12:00'
             )
             return event
         for i in range(1, 7):
             for lang in ['en', 'de']:
                 new_event(i, lang)
 
-        # Test plugin rendering for both languages in a forloop. I don't like it but save lot of
-        # text space since we test for 5 entries
+        # Test plugin rendering for both languages in a forloop. I don't
+        # like it but save lot of text space since we test for 5 entries
         rendered = {}
         request = get_page_request(None, path='/en/home/', language='en')
         context = RequestContext(request, {})
@@ -290,26 +358,54 @@ class EventTestCase(TransactionTestCase):
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{} {} {}'.format(text, i, lang)
                 url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(name, rendered[lang], 'Title "{}" not found in rendered plugin for language "{}".'.format(name, lang))
-                self.assertIn(url, rendered[lang], 'URL "{}" not found in rendered plugin for language "{}".'.format(url, lang))
+                self.assertIn(
+                    name, rendered[lang],
+                    'Title "{}" not found in rendered plugin for '
+                    'language "{}".'.format(name, lang)
+                )
+                self.assertIn(
+                    url, rendered[lang],
+                    'URL "{}" not found in rendered plugin for '
+                    'language "{}".'.format(url, lang)
+                )
 
-        self.assertNotIn('event 6 en', rendered, 'Title "event 6 en" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event-6-en', rendered, 'URL "event-6-en" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event 6 de', rendered, 'Title "event 6 de" found in rendered plugin, but limit is 5 entries.')
-        self.assertNotIn('event-6-de', rendered, 'URL "event-6-de" found in rendered plugin, but limit is 5 entries.')
+        self.assertNotIn(
+            'event 6 en', rendered,
+            'Title "event 6 en" found in rendered plugin, but limit is 5 '
+            'entries.'
+        )
+        self.assertNotIn(
+            'event-6-en', rendered,
+            'URL "event-6-en" found in rendered plugin, but limit is 5 '
+            'entries.'
+        )
+        self.assertNotIn(
+            'event 6 de', rendered,
+            'Title "event 6 de" found in rendered plugin, but limit is 5 '
+            'entries.'
+        )
+        self.assertNotIn(
+            'event-6-de', rendered,
+            'URL "event-6-de" found in rendered plugin, but limit is 5 '
+            'entries.'
+        )
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_calendar_plugin(self, timezone_mock):
         """
         This plugin should show a link to event list page on days that has events
         """
-        timezone_mock.now.return_value = datetime(2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone())
+        timezone_mock.now.return_value = datetime(
+            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
+        )
 
-        page = api.create_page('Home en', self.template, 'en', published=True, slug='home')
+        page = api.create_page(
+            'Home en', self.template, 'en', published=True, slug='home'
+        )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'CalendarPlugin', 'en')
-        plugin_de = api.add_plugin(ph, 'CalendarPlugin', 'de')
+        api.add_plugin(ph, 'CalendarPlugin', 'en')
+        api.add_plugin(ph, 'CalendarPlugin', 'de')
         page.publish('en')
         page.publish('de')
 
@@ -317,8 +413,10 @@ class EventTestCase(TransactionTestCase):
         def new_event(num, lang):
             text = 'event' if lang == 'en' else 'ereignis'
             event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang), slug="{}-{}-{}".format(text, num, lang),
-                start_date='2015-01-29', end_date='2015-02-05', publish_at='2014-01-01 12:00'
+                title="{} {} {}".format(text, num, lang),
+                slug="{}-{}-{}".format(text, num, lang),
+                start_date='2015-01-29', end_date='2015-02-05',
+                publish_at='2014-01-01 12:00'
             )
             return event
 
@@ -326,21 +424,24 @@ class EventTestCase(TransactionTestCase):
             for lang in ['en', 'de']:
                 new_event(i, lang)
 
-        # Test plugin rendering for both languages in a forloop. I don't like it but save lot of
-        # text space since we test for 5 entries
+        # Test plugin rendering for both languages in a forloop. I don't
+        # like it but save lot of text space since we test for 5 entries
         rendered = {}
         rendered['en'] = self.client.get('/en/home/').content
         rendered['de'] = self.client.get('/de/home/').content
 
-        html = '<td class="events disabled"><a href="/{}/events/2015/1/29/">29</a></td>'
-        self.assertIn(html.format('de'), rendered['de'],
-                      'Expected html `{}` not found on rendered plugin for language "{}"'.format(
-                          html.format('de'), 'DE'
-                      ))
-        self.assertIn(html.format('en'), rendered['en'],
-                      'Expected html `{}` not found on rendered plugin for language "{}"'.format(
-                          html.format('en'), 'EN'
-                      ))
+        html = '<td class="events disabled"><a href="/{}/events/2015/1/29/">'\
+               '29</a></td>'
+        self.assertIn(
+            html.format('de'), rendered['de'],
+            'Expected html `{}` not found on rendered plugin for '
+            'language "{}"'.format(html.format('de'), 'DE')
+        )
+        self.assertIn(
+            html.format('en'), rendered['en'],
+            'Expected html `{}` not found on rendered plugin for '
+            'language "{}"'.format(html.format('en'), 'EN')
+        )
 
 class RegistrationTestCase(TransactionTestCase):
 
@@ -375,7 +476,9 @@ class RegistrationTestCase(TransactionTestCase):
             'email': 'myemail@gmail.com',
             'message': "I'm testing you"
         }
-        response = self.client.post(event.get_absolute_url(), data, follow=True)
+        response = self.client.post(
+            event.get_absolute_url(), data, follow=True
+        )
         form = response.context_data.get('form')
         # fail, show form error
         self.assertFalse(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from cms.utils.i18n import get_current_language
+
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, override
@@ -34,36 +34,60 @@ class Event(TranslatableModel):
     # TODO: add timezone (optional and purely for display purposes)
 
     is_published = models.BooleanField(
-        _('is published'), default=True, help_text=_('wether the event should be displayed')
+        _('is published'), default=True,
+        help_text=_('wether the event should be displayed')
     )
     publish_at = models.DateTimeField(
-        _('publish at'), default=timezone.now, help_text=_('time at which the event should be published')
+        _('publish at'), default=timezone.now,
+        help_text=_('time at which the event should be published')
     )
     detail_link = models.URLField(
-        _('external link'), blank=True, default='', help_text=_('external link to details about this event')
+        _('external link'), blank=True, default='',
+        help_text=_('external link to details about this event')
     )
     register_link = models.URLField(
-        _('registration link'), blank=True, default='', help_text=_('link to an external registration system')
+        _('registration link'), blank=True, default='',
+        help_text=_('link to an external registration system')
     )
-    enable_registration = models.BooleanField(_('enable event registration'), default=False)
-    registration_deadline_at = models.DateTimeField(_('allow registration until'), null=True, blank=True, default=None)
+    enable_registration = models.BooleanField(
+        _('enable event registration'), default=False
+    )
+    registration_deadline_at = models.DateTimeField(
+        _('allow registration until'), null=True, blank=True, default=None
+    )
     event_coordinators = models.ManyToManyField(
-        'EventCoordinator', verbose_name=_('event coordinators'), null=True, blank=True
+        'EventCoordinator', verbose_name=_('event coordinators'),
+        null=True, blank=True
     )
 
     translations = TranslatedFields(
-        title=models.CharField(_('title'), max_length=150, help_text=_('translated')),
-        slug=models.SlugField(_('slug'), null=False, blank=True, max_length=150),
-        short_description=HTMLField(_('short description'), blank=True, default='', help_text=_('translated')),
-        description=PlaceholderField('aldryn_events_event_description', verbose_name=_('description')),
+        title=models.CharField(
+            _('title'), max_length=150, help_text=_('translated')
+        ),
+        slug=models.SlugField(
+            _('slug'), null=False, blank=True, max_length=150
+        ),
+        short_description=HTMLField(
+            _('short description'), blank=True, default='',
+            help_text=_('translated')
+        ),
+        description=PlaceholderField(
+            'aldryn_events_event_description', verbose_name=_('description')
+        ),
         location=models.TextField(_('location'), blank=True, default=''),
-        location_lat=models.FloatField(_('location latitude'), blank=True, null=True),
-        location_lng=models.FloatField(_('location longitude'), blank=True, null=True),
+        location_lat=models.FloatField(
+            _('location latitude'), blank=True, null=True
+        ),
+        location_lng=models.FloatField(
+            _('location longitude'), blank=True, null=True
+        ),
         image=FilerImageField(
-            verbose_name=_('image'), null=True, blank=True, related_name='event_images', on_delete=models.SET_NULL
+            verbose_name=_('image'), null=True, blank=True,
+            related_name='event_images', on_delete=models.SET_NULL
         ),
         flyer=FilerFileField(
-            verbose_name=_('flyer'), null=True, blank=True, related_name='event_flyers', on_delete=models.SET_NULL
+            verbose_name=_('flyer'), null=True, blank=True,
+            related_name='event_flyers', on_delete=models.SET_NULL
         ),
         meta={'unique_together': (('language_code', 'slug'),)}
     )
@@ -92,18 +116,25 @@ class Event(TranslatableModel):
             unique_slugify(
                 instance=self.get_translation(self.get_current_language()),
                 value=self.slug or uuid4().hex[:8],
-                queryset=self.translations.filter(language_code=self.get_current_language())
+                queryset=self.translations.filter(
+                    language_code=self.get_current_language()
+                )
             )
 
-        if self.start_date and self.end_date and self.end_date < self.start_date:
+        if self.start_date and self.end_date \
+                and self.end_date < self.start_date:
             raise ValidationError(_('start should be before end'))
 
-        if self.end_date and self.start_date == self.end_date and self.end_time < self.start_time:
+        if self.end_date and self.start_date == self.end_date \
+                and self.end_time < self.start_time:
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
-            raise ValidationError(_("the registration system can't be active if there is an external "
-                                    "registration link. please remove at least one of the two."))
+            raise ValidationError(
+                _("the registration system can't be active if there is "
+                  "an external registration link. please remove at least one "
+                  "of the two.")
+            )
 
         if self.enable_registration and not self.registration_deadline_at:
             raise ValidationError(_("please select a registration deadline."))
@@ -116,12 +147,15 @@ class Event(TranslatableModel):
 
     @property
     def is_registration_deadline_passed(self):
-        return not (self.registration_deadline_at and self.registration_deadline_at > timezone.now())
+        return not (self.registration_deadline_at
+                    and self.registration_deadline_at > timezone.now())
 
     def get_absolute_url(self):
         slug = self.safe_translation_getter('slug')
         with override(self.get_current_language()):
-            return reverse('aldryn_events:events_detail', kwargs={'slug': slug})
+            return reverse(
+                'aldryn_events:events_detail', kwargs={'slug': slug}
+            )
 
 
 class EventCoordinator(models.Model):
@@ -142,7 +176,9 @@ class EventCoordinator(models.Model):
     def clean(self):
         if not self.email:
             if not self.user_id or not self.user.email:
-                raise ValidationError(_('Please define an email for the coordinator.'))
+                raise ValidationError(
+                    _('Please define an email for the coordinator.')
+                )
 
     def get_email_address(self):
         email = self.email
@@ -172,13 +208,19 @@ class Registration(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
-    language_code = models.CharField(choices=settings.LANGUAGES, default=settings.LANGUAGES[0][0], max_length=32)
+    language_code = models.CharField(
+        choices=settings.LANGUAGES, default=settings.LANGUAGES[0][0],
+        max_length=32
+    )
 
     event = models.ForeignKey(Event)
     salutation = models.CharField(
-        _('Salutation'), max_length=5, choices=SALUTATIONS.CHOICES, default=SALUTATIONS.SALUTATION_FEMALE
+        _('Salutation'), max_length=5, choices=SALUTATIONS.CHOICES,
+        default=SALUTATIONS.SALUTATION_FEMALE
     )
-    company = models.CharField(_('Company'), max_length=100, blank=True, default='')
+    company = models.CharField(
+        _('Company'), max_length=100, blank=True, default=''
+    )
     first_name = models.CharField(_('First name'), max_length=100)
     last_name = models.CharField(_('Last name'), max_length=100)
 
@@ -186,8 +228,12 @@ class Registration(models.Model):
     address_zip = models.CharField(_('ZIP CODE'), max_length=20)
     address_city = models.CharField(_('City'), max_length=100)
 
-    phone = models.CharField(_('Phone number'), blank=True, default='', max_length=20)
-    mobile = models.CharField(_('Mobile number'), blank=True, default='', max_length=20)
+    phone = models.CharField(
+        _('Phone number'), blank=True, default='', max_length=20
+    )
+    mobile = models.CharField(
+        _('Mobile number'), blank=True, default='', max_length=20
+    )
     email = models.EmailField(_('E-Mail'))
 
     message = models.TextField(_('Message'), blank=True, default='')
@@ -227,7 +273,9 @@ class UpcomingPluginItem(CMSPlugin):
     )
 
     def __unicode__(self):
-        return unicode(self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS)
+        return unicode(
+            self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
+        )
 
 
 class EventListPlugin(CMSPlugin):
