@@ -1,7 +1,6 @@
 {% load i18n thumbnail cms_tags %}
 <ul class="event-items">
 	{% for event in object_list %}
-    <li>{{ event }}c</li>
 	<li>
 		{% if event.flyer %}<p class="events-visual"><a href="{{ event.get_absolute_url }}"><img src="{% thumbnail event.flyer 180x260 crop %}" alt="" /></a></p>{% endif %}
 		<h3><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h3>
