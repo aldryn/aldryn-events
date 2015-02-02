@@ -327,15 +327,8 @@ class EventTestCase(TransactionTestCase):
         # Test plugin rendering for both languages in a forloop. I don't like it but save lot of
         # text space since we test for 5 entries
         rendered = {}
-        with override('en'):
-            request = get_page_request(None, path='/en/home/', language='en')
-            context = RequestContext(request, {})
-            rendered['en'] = plugin_en.render_plugin(context, ph)
-
-        with override('de'):
-            request = get_page_request(None, path='/de/home/', language='de')
-            context = RequestContext(request, {})
-            rendered['de'] = plugin_de.render_plugin(context, ph)
+        rendered['en'] = self.client.get('/en/home/').content
+        rendered['de'] = self.client.get('/de/home/').content
 
         html = '<td class="events disabled"><a href="/{}/events/2015/1/29/">29</a></td>'
         self.assertIn(html.format('de'), rendered['de'],
