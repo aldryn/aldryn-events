@@ -403,8 +403,8 @@ class EventTestCase(TransactionTestCase):
         rendered['en'] = self.client.get('/en/home/').content
         rendered['de'] = self.client.get('/de/home/').content
 
-        html = '<td class="events disabled"><a href="/{}/events/2015/1/29/">'\
-               '29</a></td>'
+        html = ('<td class="events disabled"><a href="/{}/events/2015/1/29/">'
+                '29</a></td>')
         self.assertIn(
             html.format('de'), rendered['de'],
             'Expected html `{}` not found on rendered plugin for '

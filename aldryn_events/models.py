@@ -130,12 +130,12 @@ class Event(TranslatableModel):
                 )
             )
 
-        if self.start_date and self.end_date \
-                and self.end_date < self.start_date:
+        if (self.start_date and self.end_date
+                and self.end_date < self.start_date):
             raise ValidationError(_('start should be before end'))
 
-        if self.end_date and self.start_date == self.end_date \
-                and self.end_time < self.start_time:
+        if (self.end_date and self.start_date == self.end_date
+                and self.end_time < self.start_time):
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:

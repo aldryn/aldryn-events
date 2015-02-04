@@ -12,8 +12,9 @@ from cms.plugin_pool import plugin_pool
 
 from .views import EventDatesView
 from .utils import build_calendar
-from .models import UpcomingPluginItem, Event, EventListPlugin, \
-    EventCalendarPlugin
+from .models import (
+    UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
+)
 from .forms import UpcomingPluginForm
 
 

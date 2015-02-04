@@ -29,10 +29,10 @@ class EventQuerySet(TranslatableQuerySet):
         today = now.date()
         q_with_end_date = Q(end_date__lt=today)
         q_without_end_date = Q(end_date__isnull=True, start_date__lt=today)
-        return self.published(now=now)\
-                   .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('-start_date', '-start_time', 'end_date',
-                             'end_time', 'translations__slug')
+        return (self.published(now=now)
+                    .filter(q_with_end_date | q_without_end_date)
+                    .order_by('-start_date', '-start_time', 'end_date',
+                              'end_time', 'translations__slug'))
 
     def future(self, now=None):
         """
@@ -44,10 +44,10 @@ class EventQuerySet(TranslatableQuerySet):
         today = now.date()
         q_with_end_date = Q(end_date__gte=today)
         q_without_end_date = Q(end_date__isnull=True, start_date__gte=today)
-        return self.published(now=now)\
-                   .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('start_date', 'start_time', 'end_date',
-                             'end_time', 'translations__slug')
+        return (self.published(now=now)
+                    .filter(q_with_end_date | q_without_end_date)
+                    .order_by('start_date', 'start_time', 'end_date',
+                              'end_time', 'translations__slug'))
 
     def published(self, now=None):
         now = now or timezone.now()

@@ -47,8 +47,9 @@ def group_events_by_year(events):
 
 
 def build_events_by_year(events, **config):
-    display_months_without_events = \
+    display_months_without_events = (
         config.get('display_months_without_events', True)
+    )
 
     # archive view means time runs in reverse. of the current year in a
     # other order
@@ -74,9 +75,10 @@ def build_events_by_year(events, **config):
             month['event_count'] = len(month['events'])
             year['event_count'] += month['event_count']
             month['has_events'] = bool(month['event_count'])
-            month['display_in_navigation'] = \
-                (not display_months_without_events and month['has_events']) \
+            month['display_in_navigation'] = (
+                (not display_months_without_events and month['has_events'])
                 or display_months_without_events
+            )
 
         # if this is the current year, hide months before this month (or after
         # this month if we're in archive view)

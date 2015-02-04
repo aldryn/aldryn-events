@@ -86,7 +86,7 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        self.event = (Event.objects.namespace(self.namespace)\
+        self.event = (Event.objects.namespace(self.namespace)
                                    .published()
                                    .translated(language, slug=kwargs['slug'])
                                    .language(language).get())
