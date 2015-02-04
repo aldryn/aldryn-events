@@ -6,6 +6,8 @@
 	<ul class="events-list">
 		{% for event in events %}
 		<li><a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start }}</span></li>
+        {% empty %}
+        <li>{% trans "No events found." %}</li>
 		{% endfor %}
 	</ul>
 </div>

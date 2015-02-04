@@ -16,12 +16,16 @@ class EventsToolbar(CMSToolbar):
             return
 
         def can(action, model):
-            perm = 'aldryn_events.%(action)s_%(model)s' % {'action': action, 'model': model}
+            perm = 'aldryn_events.%(action)s_%(model)s' % {
+                'action': action, 'model': model
+            }
             return self.request.user.has_perm(perm)
 
         if can('add', 'event'):
             menu = self.toolbar.get_or_create_menu('events-app', _('Events'))
-            menu.add_modal_item(_('Add Event'), reverse('admin:aldryn_events_event_add'))
+            menu.add_modal_item(
+                _('Add Event'), reverse('admin:aldryn_events_event_add')
+            )
 
         current = getattr(self.request, request_events_event_identifier, None)
 
@@ -29,9 +33,15 @@ class EventsToolbar(CMSToolbar):
             if can('change', 'event'):
                 menu = self.toolbar.get_or_create_menu('events-app', _('Events'))
                 menu.add_modal_item(
-                    _('Edit this event'), reverse('admin:aldryn_events_event_change', args=(current.pk, )))
+                    _('Edit this event'),
+                    reverse(
+                        'admin:aldryn_events_event_change', args=(current.pk, )
+                    ))
 
             if can('delete', 'event'):
                 menu = self.toolbar.get_or_create_menu('events-app', _('Events'))
                 menu.add_modal_item(
-                    _('Delete this event'), reverse('admin:aldryn_events_event_delete', args=(current.pk, )))
+                    _('Delete this event'),
+                    reverse(
+                        'admin:aldryn_events_event_delete', args=(current.pk, )
+                    ))

@@ -1,21 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Q
-from django.utils.translation import get_language
 from django.utils import timezone
 
-from cms.utils.i18n import get_language_code
-
-from hvad.models import TranslationManager
+from parler.managers import TranslatableManager, TranslatableQuerySet
 
 
-class EventManager(TranslationManager):
-
-    def published(self, now=None):
-        now = now or timezone.now()
-        # we call get_language_code to make sure that the current language
-        # is in the settings.py. This is a known django bug.
-        language = get_language_code(language_code=get_language())
-        return self.language(language).filter(is_published=True, publish_at__lte=now)
+class EventQuerySet(TranslatableQuerySet):
 
     def upcoming(self, count, now=None):
         now = now or timezone.now()
@@ -24,19 +14,6 @@ class EventManager(TranslationManager):
     def past(self, count, now=None):
         now = now or timezone.now()
         return self.archive(now=now)[:count]
-
-    def future(self, now=None):
-        """
-        includes all events that are not over yet. If there is an end_date, the event is not over until end_date is
-        over. Otherwise we use start_date.
-        """
-        now = now or timezone.now()
-        today = now.date()
-        q_with_end_date = Q(end_date__gte=today)
-        q_without_end_date = Q(end_date__isnull=True, start_date__gte=today)
-        return self.published(now=now)\
-                   .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('start_date', 'start_time', 'end_date', 'end_time', 'slug')
 
     def archive(self, now=None):
         """
@@ -48,4 +25,43 @@ class EventManager(TranslationManager):
         q_without_end_date = Q(end_date__isnull=True, start_date__lt=today)
         return self.published(now=now)\
                    .filter(q_with_end_date | q_without_end_date)\
-                   .order_by('-start_date', '-start_time', 'end_date', 'end_time', 'slug')
+                   .order_by('-start_date', '-start_time', 'end_date',
+                             'end_time', 'translations__slug')
+
+    def future(self, now=None):
+        """
+        includes all events that are not over yet. If there is an end_date,
+        the event is not over until end_date is over. Otherwise we use
+        start_date.
+        """
+        now = now or timezone.now()
+        today = now.date()
+        q_with_end_date = Q(end_date__gte=today)
+        q_without_end_date = Q(end_date__isnull=True, start_date__gte=today)
+        return self.published(now=now)\
+                   .filter(q_with_end_date | q_without_end_date)\
+                   .order_by('start_date', 'start_time', 'end_date',
+                             'end_time', 'translations__slug')
+
+    def published(self, now=None):
+        now = now or timezone.now()
+        return self.filter(is_published=True, publish_at__lte=now)
+
+
+class EventManager(TranslatableManager):
+    queryset_class = EventQuerySet
+
+    def upcoming(self, count, now=None):
+        return self.get_queryset().upcoming(count, now=now)
+
+    def past(self, count, now=None):
+        return self.get_queryset().past(count, now=now)
+
+    def archive(self, now=None):
+        return self.get_queryset().archive(now=now)
+
+    def future(self, now=None):
+        return self.get_queryset().future(now=now)
+
+    def published(self, now=None):
+        return self.get_queryset().published(now=now)

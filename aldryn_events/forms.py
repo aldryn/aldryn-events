@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.template import TemplateDoesNotExist
 from django.template.loader import select_template
 
-from hvad.forms import TranslatableModelForm
+from parler.forms import TranslatableModelForm
 
 from .models import Registration, UpcomingPluginItem, Event
 from .utils import send_user_confirmation_email, send_manager_confirmation_email
@@ -22,10 +22,16 @@ class EventAdminForm(TranslatableModelForm):
     def __init__(self, *args, **kwargs):
         super(EventAdminForm, self).__init__(*args, **kwargs)
         now = timezone.now()
+        help_text = _('Acceptable Formats: %(format_list)s')
+
         for key, field in self.fields.items():
-            if isinstance(field, DateField) or isinstance(field, TimeField) or isinstance(field, DateTimeField):
-                self.fields[key].help_text = _('Acceptable Formats: %(format_list)s') % (
-                    {'format_list': ', '.join([now.strftime(f) for f in field.input_formats])})
+            format_list = ', '.join([now.strftime(f) \
+                                        for f in field.input_formats])
+
+            if isinstance(field, DateField) or isinstance(field, TimeField) \
+                    or isinstance(field, DateTimeField):
+                self.fields[key].help_text = \
+                    help_text % ({'format_list': format_list})
 
 
 class EventRegistrationForm(forms.ModelForm):
@@ -40,7 +46,10 @@ class EventRegistrationForm(forms.ModelForm):
 
     def clean(self):
         if self.event.is_registration_deadline_passed:
-            raise ValidationError(_('the registration deadline for this event has already passed'))
+            raise ValidationError(
+                _('the registration deadline for this event has already '
+                  'passed')
+            )
         return self.cleaned_data
 
     def send_user_notification(self):
@@ -49,11 +58,16 @@ class EventRegistrationForm(forms.ModelForm):
 
     def send_admin_notification(self):
         coordinators = self.event.event_coordinators.select_related('user')
-        coordinator_emails = [coordinator.email_address for coordinator in coordinators]
-        coordinator_emails.extend([a[1] for a in settings.ALDRYN_EVENTS_MANAGERS])
+        coordinator_emails = \
+            [coordinator.email_address for coordinator in coordinators]
+        coordinator_emails.extend(
+            [a[1] for a in settings.ALDRYN_EVENTS_MANAGERS]
+        )
 
         if coordinator_emails:
-            send_manager_confirmation_email(self.instance, self.language_code, coordinator_emails)
+            send_manager_confirmation_email(
+                self.instance, self.language_code, coordinator_emails
+            )
 
     def save(self, commit=True):
         registration = super(EventRegistrationForm, self).save(commit=False)
@@ -62,6 +76,7 @@ class EventRegistrationForm(forms.ModelForm):
 
         if commit:
             registration.save()
+
         self.send_user_notification()
         self.send_admin_notification()
 
@@ -91,7 +106,11 @@ class UpcomingPluginForm(forms.ModelForm):
         style = self.cleaned_data.get('style')
         # Check if template for style exists:
         try:
-            select_template(['aldryn_events/plugins/upcoming/%s/upcoming.html' % style])
+            select_template(
+                ['aldryn_events/plugins/upcoming/%s/upcoming.html' % style]
+            )
         except TemplateDoesNotExist:
-            raise forms.ValidationError("Not a valid style (Template does not exist)")
+            raise forms.ValidationError(
+                "Not a valid style (Template does not exist)"
+            )
         return style

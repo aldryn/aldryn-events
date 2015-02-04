@@ -4,7 +4,7 @@ from django.template import RequestContext
 
 from aldryn_search.utils import get_index_base, strip_tags
 
-from aldryn_events.models import Event
+from .models import Event
 
 
 class EventsIndex(get_index_base()):
@@ -25,7 +25,8 @@ class EventsIndex(get_index_base()):
         return {'translations__language_code': language}
 
     def get_index_queryset(self, language):
-        return self.get_model().objects.published().all()
+        return self.get_model().objects.published()\
+            .translated(language).language(language)
 
     def get_model(self):
         return Event

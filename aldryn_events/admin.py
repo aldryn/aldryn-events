@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from django_tablib.admin import TablibAdmin
-
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
-
-from hvad.admin import TranslatableAdmin
+from django_tablib.admin import TablibAdmin
+from parler.admin import TranslatableAdmin
 
 from .models import Event, EventCoordinator, Registration
 from .forms import EventAdminForm
@@ -18,18 +15,16 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
-        '__unicode__', 'start_date', 'start_time', 'end_date', 'end_time', 'is_published', 'all_translations', 'slug'
+        'title', 'start_date', 'start_time', 'end_date', 'end_time',
+        'is_published', 'slug', 'location'
     )
     list_editable = ('is_published',)
     list_filter = ('is_published',)
     filter_horizontal = ('event_coordinators', )
-    if not django.VERSION >= (1, 6):
-        # Django >= 1.6 calls aggregate on queryset, which is currently not implemented in django-hvad
-        date_hierarchy = 'start_date'
+    date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
 
-    prepopulated_fields = {"slug": ("slug",)}  # needed so that django loads the needed JS
-    _prepopulated_fields = {"slug": ("title",)}  # the one we'll actually use via get_prepopulated_fields()
+    _prepopulated_fields = {"slug": ("title",)}
 
     _fieldsets = (
         (None, {'fields': (
@@ -68,6 +63,9 @@ class EventCoordinatorAdmin(admin.ModelAdmin):
 
 
 class RegistrationAdmin(TablibAdmin):
+    # html is giving me Unicode Error when using accentuated characters,
+    # related issue create on django-tablib:
+    # https://github.com/joshourisman/django-tablib/issues/43
     formats = ['xls', 'csv', 'html']
     list_display = ('first_name', 'last_name', 'event')
     list_filter = ('event', )

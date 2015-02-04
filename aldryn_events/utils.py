@@ -47,8 +47,11 @@ def group_events_by_year(events):
 
 
 def build_events_by_year(events, **config):
-    display_months_without_events = config.get('display_months_without_events', True)
-    # archive view means time runs in reverse. of the current year in a other order
+    display_months_without_events = \
+        config.get('display_months_without_events', True)
+
+    # archive view means time runs in reverse. of the current year in a
+    # other order
     is_archive_view = config.get('is_archive_view', False)
     now = timezone.now()
 
@@ -59,7 +62,8 @@ def build_events_by_year(events, **config):
             events_by_year[year] = {
                 'year': year,
                 'date': datetime.date(year, 1, 1),
-                'months': build_months(year=year, is_archive_view=is_archive_view)
+                'months': build_months(year=year,
+                                       is_archive_view=is_archive_view)
             }
         events_by_year[year]['months'][event.start_date.month]['events'].append(event)
     flattened_events_by_year = events_by_year.values()
@@ -71,8 +75,11 @@ def build_events_by_year(events, **config):
             year['event_count'] += month['event_count']
             month['has_events'] = bool(month['event_count'])
             month['display_in_navigation'] = \
-                (not display_months_without_events and month['has_events']) or display_months_without_events
-        # if this is the current year, hide months before this month (or after this month if we're in archive view)
+                (not display_months_without_events and month['has_events']) \
+                or display_months_without_events
+
+        # if this is the current year, hide months before this month (or after
+        # this month if we're in archive view)
         if year['year'] == now.year:
             if is_archive_view:
                 # don't display any months after the current month
@@ -92,11 +99,20 @@ def send_user_confirmation_email(registration, language):
     ctx = {
         'event_name': event.title,
         'first_name': registration.first_name,
-        'event_url': u"http://%s%s" % (Site.objects.get_current(), event.get_absolute_url()),
+        'event_url': u"http://%s%s" % (
+            Site.objects.get_current(), event.get_absolute_url()
+        ),
     }
-    subject = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.subject.txt', dictionary=ctx)
-    body = render_to_string(template_name='aldryn_events/emails/registrant_confirmation.body.txt', dictionary=ctx)
-    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, recipient_list=[registration.email])
+    subject = render_to_string(
+        template_name='aldryn_events/emails/registrant_confirmation.subject.txt',
+        dictionary=ctx
+    )
+    body = render_to_string(
+        template_name='aldryn_events/emails/registrant_confirmation.body.txt',
+        dictionary=ctx
+    )
+    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
+              recipient_list=[registration.email])
 
 
 def send_manager_confirmation_email(registration, language, emails):
@@ -104,14 +120,23 @@ def send_manager_confirmation_email(registration, language, emails):
     ctx = {
         'event_name': event.title,
         'first_name': registration.first_name,
-        'event_url': u"http://%s%s" % (Site.objects.get_current(), event.get_absolute_url()),
+        'event_url': u"http://%s%s" % (
+            Site.objects.get_current(), event.get_absolute_url()
+        ),
         'registration_admin_url': u"http://%s%s" % (
             Site.objects.get_current(),
-            reverse('admin:aldryn_events_registration_change', args=[str(registration.pk)])
+            reverse('admin:aldryn_events_registration_change',
+                    args=[str(registration.pk)])
         ),
     }
-    subject = render_to_string(template_name='aldryn_events/emails/manager_confirmation.subject.txt', dictionary=ctx)
-    body = render_to_string(template_name='aldryn_events/emails/manager_confirmation.body.txt', dictionary=ctx)
+    subject = render_to_string(
+        template_name='aldryn_events/emails/manager_confirmation.subject.txt',
+        dictionary=ctx
+    )
+    body = render_to_string(
+        template_name='aldryn_events/emails/manager_confirmation.body.txt',
+        dictionary=ctx
+    )
 
     if emails:  # don't try to send if the list is empty
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, emails)
@@ -134,18 +159,20 @@ def get_additional_styles():
 
 
 def get_monthdates(month, year):
-    firstweekday = getattr(settings, 'ALDRYN_EVENTS_CALENDAR_FIRST_WEEKDAY', 0)  # 0: Monday, 6: Sunday
+    # 0: Monday, 6: Sunday (not using isoweekdays)
+    firstweekday = getattr(settings, 'ALDRYN_EVENTS_CALENDAR_FIRST_WEEKDAY', 0)
     cal = calendar.Calendar(firstweekday)
     return cal.itermonthdates(year, month)
 
 
-def build_calendar(year, month):
+def build_calendar(year, month, language):
     from .models import Event
 
     month = int(month)
     year = int(year)
 
-    # Get a list of all dates in this month (with pre/succeeding for nice layout)
+    # Get a list of all dates in this month (with pre/succeeding for nice
+    # layout)
     monthdates = [(x, None) for x in get_monthdates(month, year)]
     if len(monthdates) < 6 * 7:
         # always display six weeks to keep the table layout consistent
@@ -160,9 +187,13 @@ def build_calendar(year, month):
             monthdates += next_month[7:14]
 
     # get all upcoming events, ordered by start_date
-    events = groupby(Event.objects.published().filter(
-        start_date__gte=monthdates[0][0],
-        start_date__lte=monthdates[-1][0]).order_by('start_date'), attrgetter('start_date')
+    events = groupby(
+        Event.objects.published().translated(language).language(language)\
+        .filter(
+            start_date__gte=monthdates[0][0],
+            start_date__lte=monthdates[-1][0]
+        ).order_by('start_date'),
+        attrgetter('start_date')
     )
 
     # group events by starting_date

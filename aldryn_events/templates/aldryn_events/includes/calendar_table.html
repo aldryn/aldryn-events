@@ -1,3 +1,4 @@
+{% spaceless %}
 <table class="table-calendar" data-month-numeric="{{ current_date|date:'n' }}" data-month="{{ current_date|date:'F' }}" data-year="{{ current_date|date:'Y' }}">
 <tr class="header">
   <th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
@@ -13,7 +14,7 @@
   <td class="{% if events %}events{% endif%}{% if day|date:'w' in '06' %} weekend{% endif %}{% spaceless %}
 {% endspaceless %}{% if day|date:'n' != current_date|date:'n' or day|date:'Y' != current_date|date:'Y' %} disabled{% endif %}">
     {% if events %}
-    <a href="{% url 'events_list-by-day' year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
+    <a href="{% url 'aldryn_events:events_list-by-day' year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
     {% else %}
     <span>{{ day|date:'d' }}</span>
     {% endif %}
@@ -21,3 +22,4 @@
   {% endfor %}
 </tr>
 </table>
+{% endspaceless %}
