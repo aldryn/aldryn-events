@@ -7,6 +7,12 @@ from parler.managers import TranslatableManager, TranslatableQuerySet
 
 class EventQuerySet(TranslatableQuerySet):
 
+    def namespace(self, namespace):
+        """
+        Filter by app_config namespace
+        """
+        return self.filter(app_config__namespace=namespace)
+
     def upcoming(self, count, now=None):
         now = now or timezone.now()
         return self.future(now=now)[:count]
@@ -50,6 +56,9 @@ class EventQuerySet(TranslatableQuerySet):
 
 class EventManager(TranslatableManager):
     queryset_class = EventQuerySet
+
+    def namespace(self, namespace):
+        return self.get_queryset().namespace(namespace)
 
     def upcoming(self, count, now=None):
         return self.get_queryset().upcoming(count, now=now)

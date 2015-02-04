@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from aldryn_apphooks_config.admin import BaseAppHookConfig
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -16,7 +17,7 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
     search_fields = ('translations__title', )
     list_display = (
         'title', 'start_date', 'start_time', 'end_date', 'end_time',
-        'is_published', 'slug', 'location'
+        'is_published', 'app_config', 'slug', 'location'
     )
     list_editable = ('is_published',)
     list_filter = ('is_published',)
@@ -70,6 +71,12 @@ class RegistrationAdmin(TablibAdmin):
     list_display = ('first_name', 'last_name', 'event')
     list_filter = ('event', )
     date_hierarchy = 'created_at'
+
+
+class EventConfigAdmin(BaseAppHookConfig):
+
+    def get_config_fields(self):
+        return ('config.namespace',)
 
 
 admin.site.register(Event, EventAdmin)

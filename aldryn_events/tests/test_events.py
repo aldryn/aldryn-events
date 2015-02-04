@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from django.core.urlresolvers import reverse
 import mock
 import random
 from django.contrib.auth.models import AnonymousUser
@@ -16,7 +17,7 @@ from cms.utils import get_cms_setting
 import string
 from django.utils.timezone import get_current_timezone
 
-from aldryn_events.models import Event
+from aldryn_events.models import Event, EventsConfig
 
 from cms.middleware.toolbar import ToolbarMiddleware
 
@@ -47,6 +48,7 @@ class EventTestCase(TransactionTestCase):
     reset_sequences = True
 
     def setUp(self):
+        self.app_config, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
         self.root_page = api.create_page(
@@ -57,7 +59,7 @@ class EventTestCase(TransactionTestCase):
     def create_event(self):
         event = Event.objects.language('en').create(
             title='Event2014', slug='open-air', start_date='2014-09-10',
-            publish_at='2014-01-01 12:00'
+            publish_at='2014-01-01 12:00', app_config=self.app_config
         )
         event.set_current_language('de')
         event.title = 'Ereignis'
@@ -71,7 +73,8 @@ class EventTestCase(TransactionTestCase):
         """
         self.assertEqual(Event.objects.count(), 0)
         event = Event.objects.language('en').create(
-            title='Concert', start_date='2014-09-10', slug='open-concert'
+            title='Concert', start_date='2014-09-10', slug='open-concert',
+            app_config=self.app_config
         )
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 0)
@@ -109,10 +112,11 @@ class EventTestCase(TransactionTestCase):
             2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
         )
         page = api.create_page(
-            'Events en', self.template, 'en', slug="eventsapp", published=True,
-            apphook='EventListAppHook', apphook_namespace='aldryn_events'
+            'Events en', self.template, 'en', slug='eventsapp', published=True,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace
         )
-        api.create_title('de', 'Events de', page)
+        api.create_title('de', 'Events de', page, slug='eventsapp')
         page.publish('en')
         page.publish('de')
 
@@ -128,7 +132,8 @@ class EventTestCase(TransactionTestCase):
         event1 = self.create_event()
         event2 = Event.objects.language('en').create(
             title='Event2015 only english', slug='event2015-only-english',
-            start_date='2014-09-10', publish_at='2014-01-01 12:00'
+            start_date='2014-09-10', publish_at='2014-01-01 12:00',
+            app_config=self.app_config
         )
 
         # test english, have 2 events
@@ -150,85 +155,61 @@ class EventTestCase(TransactionTestCase):
         """
         We add an event to the Event Plugin and look it up
         """
-
+        # start_date='2014-09-10',
+        # publish_at='2014-01-01 12:00'
         page = api.create_page(
-            'Events en', self.template, 'en', published=True
+            'Events en', self.template, 'en', published=True,
+            parent=self.root_page,
         )
         api.create_title('de', 'Events de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'EventListCMSPlugin', 'en')
-        plugin_de = api.add_plugin(ph, 'EventListCMSPlugin', 'de')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config
+        )
+        plugin_de = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'de', app_config=self.app_config
+        )
         page.publish('en')
         page.publish('de')
 
         # EN: test that is is empty
-        request = get_page_request(page, language='en')
-        context = RequestContext(request, {})
-        rendered = plugin_en.render_plugin(context, ph)
-        self.assertIn('<li>No events found.</li>', rendered)
+        response = self.client.get('/en/events-en/')
+        self.assertContains(response, '<li>No events found.</li>')
 
         # DE: test that is is empty
-        request = get_page_request(page, language='de')
-        context = RequestContext(request, {})
-        rendered = plugin_de.render_plugin(context, ph)
-        self.assertIn('<li>No events found.</li>', rendered)
+        response = self.client.get('/de/events-de/')
+        # TODO: fix the language here when have translations
+        self.assertContains(response, '<li>No events found.</li>')
 
         # add events
         event1 = self.create_event()
         event2 = Event.objects.language('en').create(
             title='Event2015 only english', start_date='2015-01-29',
-            slug='event2015-only-english'
+            slug='event2015-only-english', app_config=self.app_config
         )
         plugin_en.events = [event1, event2]
         plugin_en.save()
         plugin_de.events = [event1, event2]
         plugin_de.save()
+        page.publish('en')
+        page.publish('de')
 
         # EN: test plugin rendering
-        request = get_page_request(None, path='/en/events-en/', language='en')
-        context = RequestContext(request, {})
-        rendered = plugin_en.render_plugin(context, ph)
+        response = self.client.get('/en/events-en/')
         event1.set_current_language('en')
-        self.assertIn(
-            event1.title, rendered,
-            'Title "{}" for event1 in "EN" not found.'.format(event1.title)
-        )
-        self.assertIn(
-            event1.get_absolute_url(), rendered,
-            'URL "{}" for event in "EN" not found.'.format(event1.title)
-        )
+        self.assertContains(response, event1.title)
+        self.assertContains(response, event1.get_absolute_url())
         event2.set_current_language('en')
-        self.assertIn(
-            event2.title, rendered,
-            'Title "{}" for event2 in "EN" not found.'.format(event2.title)
-        )
-        self.assertIn(
-            event2.get_absolute_url(), rendered,
-            'URL "{}" for event2 in "EN" not found.'.format(event2.title)
-        )
+        self.assertContains(response, event2.title)
+        self.assertContains(response, event2.get_absolute_url())
 
         # DE: test plugin rendering
-        request = get_page_request(None, path='/de/events-de/', language='de')
-        context = RequestContext(request, {})
-        rendered = plugin_de.render_plugin(context, ph)
+        response = self.client.get('/de/events-de/')
         event1.set_current_language('de')
-        self.assertIn(
-            event1.title, rendered,
-            'Title "{}" for event1 in "DE" not found.'.format(event1.title)
-        )
-        self.assertIn(
-            event1.get_absolute_url(), rendered,
-            'URL "{}" for event in "DE" not found.'.format(event1.title)
-        )
-        # event 2 does not exist in German, so we assert that it is not in list
-        self.assertNotIn(
-            event2.title, rendered,
-            'Title "{}" for event2 in "EN" found in "DE".'.format(event2.title)
-        )
-        self.assertNotIn(
-            event2.get_absolute_url(), rendered,
-            'URL "{}" for event2 in "EN" found in "DE".'.format(event2.title)
-        )
+        self.assertContains(response, event1.title)
+        self.assertContains(response, event1.get_absolute_url())
+        self.assertNotContains(response, event2.title)
+        self.assertNotContains(response, event2.get_absolute_url())
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_future(self, timezone_mock):
@@ -241,12 +222,16 @@ class EventTestCase(TransactionTestCase):
         )
 
         page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home'
+            'Home en', self.template, 'en', published=True, slug='home',
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en')
-        plugin_de = api.add_plugin(ph, 'UpcomingPlugin', 'de')
+        plugin_en = api.add_plugin(
+            ph, 'UpcomingPlugin', 'en', app_config=self.app_config
+        )
+        plugin_de = api.add_plugin(
+            ph, 'UpcomingPlugin', 'de', app_config=self.app_config
+        )
         page.publish('en')
         page.publish('de')
 
@@ -257,7 +242,8 @@ class EventTestCase(TransactionTestCase):
                 title="{} {} {}".format(text, num, lang),
                 slug="{}-{}-{}".format(text, num, lang),
                 start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00'
+                publish_at='2014-01-01 12:00',
+                app_config=self.app_config
             )
             return event
         for i in range(1, 7):
@@ -317,7 +303,9 @@ class EventTestCase(TransactionTestCase):
         Test the upcoming events plugin for past entries
         """
         page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home'
+            'Home en', self.template, 'en', published=True, slug='home',
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
@@ -336,7 +324,7 @@ class EventTestCase(TransactionTestCase):
                 title="{} {} {}".format(text, num, lang),
                 slug="{}-{}-{}".format(text, num, lang),
                 start_date='2014-06-29', end_date='2014-07-05',
-                publish_at='2014-06-20 12:00'
+                publish_at='2014-06-20 12:00', app_config=self.app_config
             )
             return event
         for i in range(1, 7):
@@ -400,7 +388,7 @@ class EventTestCase(TransactionTestCase):
         )
 
         page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home'
+            'Home en', self.template, 'en', published=True, slug='home',
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
@@ -416,7 +404,7 @@ class EventTestCase(TransactionTestCase):
                 title="{} {} {}".format(text, num, lang),
                 slug="{}-{}-{}".format(text, num, lang),
                 start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00'
+                publish_at='2014-01-01 12:00', app_config=self.app_config
             )
             return event
 
@@ -447,13 +435,16 @@ class RegistrationTestCase(TransactionTestCase):
 
     @mock.patch('aldryn_events.models.timezone')
     def test_submit_registration(self, timezone_mock):
+        app_config = EventsConfig.objects.create(namespace='aldryn_events')
+
         timezone_mock.now.return_value = datetime(
             2015, 2, 5, 9, 0, tzinfo=get_current_timezone()
         )
         event = Event.objects.language('en').create(
             title='Event2014', slug='open-air', start_date='2015-02-07',
             publish_at='2015-02-02 09:00', enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00'
+            registration_deadline_at='2015-02-07 00:00',
+            app_config=app_config
         )
         event.event_coordinators.create(name='The big boss',
                                         email='theboss@gmail.com')
@@ -505,3 +496,23 @@ class RegistrationTestCase(TransactionTestCase):
         registration = event.registration_set.get()
         for k, v in data.items():
             self.assertEqual(getattr(registration, k), v)
+
+    def test_unattached_namespace(self):
+        template = get_cms_setting('TEMPLATES')[0][0]
+        event1 = Event.objects.create(
+            title='Event2015 current namespace',
+            slug='open-air', start_date='2015-02-07',
+            publish_at='2015-02-02 09:00', enable_registration=True,
+            registration_deadline_at='2015-02-07 00:00',
+            app_config=EventsConfig.objects.create(namespace='aldryn_events')
+        )
+        event2 = Event.objects.create(
+            title='Event new namespace', slug='open-air-new-namespace',
+            start_date='2015-02-07', publish_at='2015-02-02 09:00',
+            enable_registration=True,
+            registration_deadline_at='2015-02-07 00:00',
+            app_config=EventsConfig.objects.create(namespace='another')
+        )
+        response = self.client.get(reverse('aldryn_events:events_list'))
+        self.assertContains(response, event1.title)
+        self.assertNotContains(response, event2.title)
