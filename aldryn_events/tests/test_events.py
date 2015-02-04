@@ -94,11 +94,13 @@ class EventTestCase(TransactionTestCase):
         """
         event = self.create_event()
 
+        # '/events/' came from tests/urls.py, '/open-air/' from the event slug
         self.assertEqual(event.get_absolute_url(), '/en/events/open-air/')
         response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
         event.set_current_language('de')
+        # '/events/' came from tests/urls.py, '/im-freien/' from the event slug
         self.assertEqual(event.get_absolute_url(), '/de/events/im-freien/')
         response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
@@ -120,20 +122,13 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # Test page empty
-        self.assertContains(
-            self.client.get('/en/eventsapp/'), '<li>No events found.</li>'
-        )
-        self.assertContains(
-            self.client.get('/de/eventsapp/'), '<li>No events found.</li>'
-        )
-
         # create events
         event1 = self.create_event()
         event2 = Event.objects.language('en').create(
-            title='Event2015 only english', slug='event2015-only-english',
+            title='Event2015 only english',
             start_date='2014-09-10', publish_at='2014-01-01 12:00',
             app_config=self.app_config
+
         )
 
         # test english, have 2 events
@@ -172,20 +167,10 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # EN: test that is is empty
-        response = self.client.get('/en/events-en/')
-        self.assertContains(response, '<li>No events found.</li>')
-
-        # DE: test that is is empty
-        response = self.client.get('/de/events-de/')
-        # TODO: fix the language here when have translations
-        self.assertContains(response, '<li>No events found.</li>')
-
         # add events
         event1 = self.create_event()
         event2 = Event.objects.language('en').create(
-            title='Event2015 only english', start_date='2015-01-29',
-            slug='event2015-only-english', app_config=self.app_config
+            title='Event2015 only english', start_date='2015-01-29'
         )
         plugin_en.events = [event1, event2]
         plugin_en.save()
@@ -430,6 +415,30 @@ class EventTestCase(TransactionTestCase):
             'Expected html `{}` not found on rendered plugin for '
             'language "{}"'.format(html.format('en'), 'EN')
         )
+
+
+    def test_event_fill_slug_with_manager_create(self):
+        event = Event.objects.create(title='show me the slug',
+                                     start_date='2015-02-04')
+        self.assertEqual(event.slug, 'show-me-the-slug')
+
+    def test_event_fill_slug_with_instance_save(self):
+        event = Event(title='show me the slug', start_date='2015-02-04')
+        event.save()
+        self.assertEqual(event.slug, 'show-me-the-slug')
+
+    def test_event_not_overwrite_slug_with_manager_create(self):
+        event = Event.objects.create(title='show me the slug',
+                                     slug='gotchaa',
+                                     start_date='2015-02-04')
+        self.assertEqual(event.slug, 'gotchaa')
+
+    def test_event_not_overwrite_slug_with_instance_save(self):
+        event = Event(title='show me the slug', slug='gotchaa',
+                      start_date='2015-02-04')
+        event.save()
+        self.assertEqual(event.slug, 'gotchaa')
+
 
 class RegistrationTestCase(TransactionTestCase):
 

@@ -3,6 +3,7 @@
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, override
 
@@ -98,7 +99,7 @@ class Event(TranslatableModel):
         ),
         meta={'unique_together': (('language_code', 'slug'),)}
     )
-    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'), null=True)
+    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
 
     objects = EventManager()
 
@@ -166,6 +167,18 @@ class Event(TranslatableModel):
                 current_app=self.app_config.namespace
             )
 
+def set_event_slug(instance, **kwargs):
+    if not instance.slug:
+        translation = instance.get_translation(instance.get_current_language())
+        unique_slugify(
+            instance=instance.get_translation(instance.get_current_language()),
+            value=translation.title or uuid4().hex[:8],
+            queryset=instance.translations.filter(
+                language_code=instance.get_current_language()
+            )
+        )
+
+post_save.connect(set_event_slug, sender=Event)
 
 class EventCoordinator(models.Model):
 
@@ -253,7 +266,7 @@ class Registration(models.Model):
 
 
 class BaseEventPlugin(CMSPlugin):
-    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'), null=True)
+    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
 
     def copy_relations(self, old_instance):
         self.app_config = old_instance.app_config
