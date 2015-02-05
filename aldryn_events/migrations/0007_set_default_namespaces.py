@@ -19,17 +19,8 @@ def create_default_namespaces(apps, schema_editor):
 
 def remove_namespaces(apps, schema_editor):
     EventsConfig = apps.get_model('aldryn_events', 'EventsConfig')
-    # Event = apps.get_model('aldryn_events', 'Event')
-    # UpcomingPluginItem = apps.get_model('aldryn_events', 'UpcomingPluginItem')
-    # EventListPlugin = apps.get_model('aldryn_events', 'EventListPlugin')
-    # EventCalendarPlugin = apps.get_model('aldryn_events', 'EventCalendarPlugin')
-
     EventsConfig.objects.filter(namespace='aldryn_events').delete()
-    #
-    # for model in [Event, EventListPlugin, UpcomingPluginItem, EventCalendarPlugin]:
-    #     for entry in model.objects.filter(app_config__isnull=True):
-    #         entry.app_config = ns
-    #         entry.save()
+
 
 class Migration(migrations.Migration):
 

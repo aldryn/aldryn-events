@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from django.core.urlresolvers import reverse
+
 import mock
 import random
-from django.contrib.auth.models import AnonymousUser
+import string
 
+from django.contrib.auth.models import AnonymousUser
 from django.core import mail
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template import RequestContext
 from django.test import RequestFactory
 from django.test import TransactionTestCase
-
 from cms import api
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
-import string
+from datetime import datetime
 from django.utils.timezone import get_current_timezone
 
 from aldryn_events.models import Event, EventsConfig
 
-from cms.middleware.toolbar import ToolbarMiddleware
 
 
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
@@ -170,7 +170,8 @@ class EventTestCase(TransactionTestCase):
         # add events
         event1 = self.create_event()
         event2 = Event.objects.language('en').create(
-            title='Event2015 only english', start_date='2015-01-29'
+            title='Event2015 only english', start_date='2015-01-29',
+            app_config=self.app_config
         )
         plugin_en.events = [event1, event2]
         plugin_en.save()
@@ -226,9 +227,10 @@ class EventTestCase(TransactionTestCase):
             event = Event.objects.language(lang).create(
                 title="{} {} {}".format(text, num, lang),
                 slug="{}-{}-{}".format(text, num, lang),
+                app_config=self.app_config,
                 start_date='2015-01-29', end_date='2015-02-05',
                 publish_at='2014-01-01 12:00',
-                app_config=self.app_config
+
             )
             return event
         for i in range(1, 7):
@@ -294,8 +296,10 @@ class EventTestCase(TransactionTestCase):
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en')
-        plugin_de = api.add_plugin(ph, 'UpcomingPlugin', 'de')
+        plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en',
+                                   app_config=self.app_config)
+        plugin_de = api.add_plugin(ph, 'UpcomingPlugin', 'de',
+                                   app_config=self.app_config)
         plugin_en.past_events, plugin_de.past_events = True, True
         plugin_en.save()
         plugin_de.save()
@@ -377,8 +381,8 @@ class EventTestCase(TransactionTestCase):
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        api.add_plugin(ph, 'CalendarPlugin', 'en')
-        api.add_plugin(ph, 'CalendarPlugin', 'de')
+        api.add_plugin(ph, 'CalendarPlugin', 'en', app_config=self.app_config)
+        api.add_plugin(ph, 'CalendarPlugin', 'de', app_config=self.app_config)
         page.publish('en')
         page.publish('de')
 
@@ -419,23 +423,26 @@ class EventTestCase(TransactionTestCase):
 
     def test_event_fill_slug_with_manager_create(self):
         event = Event.objects.create(title='show me the slug',
-                                     start_date='2015-02-04')
+                                     start_date='2015-02-04',
+                                     app_config=self.app_config)
         self.assertEqual(event.slug, 'show-me-the-slug')
 
     def test_event_fill_slug_with_instance_save(self):
-        event = Event(title='show me the slug', start_date='2015-02-04')
+        event = Event(title='show me the slug', start_date='2015-02-04',
+                      app_config=self.app_config)
         event.save()
         self.assertEqual(event.slug, 'show-me-the-slug')
 
     def test_event_not_overwrite_slug_with_manager_create(self):
         event = Event.objects.create(title='show me the slug',
                                      slug='gotchaa',
-                                     start_date='2015-02-04')
+                                     start_date='2015-02-04',
+                                     app_config=self.app_config)
         self.assertEqual(event.slug, 'gotchaa')
 
     def test_event_not_overwrite_slug_with_instance_save(self):
         event = Event(title='show me the slug', slug='gotchaa',
-                      start_date='2015-02-04')
+                      start_date='2015-02-04', app_config=self.app_config)
         event.save()
         self.assertEqual(event.slug, 'gotchaa')
 

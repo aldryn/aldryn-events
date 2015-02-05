@@ -189,15 +189,14 @@ def build_calendar(year, month, language, namespace=None):
             monthdates += next_month[7:14]
 
     # get all upcoming events, ordered by start_date
-    events = (Event.objects.published()
+    events = (Event.objects.namespace(namespace)
+                           .published()
                            .translated(language)
                            .language(language)
                            .filter(
                               start_date__gte=monthdates[0][0],
                               start_date__lte=monthdates[-1][0]
                             ).order_by('start_date'))
-    if namespace:
-        events = events.namespace(namespace)
 
     events = groupby(events, attrgetter('start_date'))
 

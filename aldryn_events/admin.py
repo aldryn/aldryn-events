@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from aldryn_apphooks_config.admin import BaseAppHookConfig
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from aldryn_apphooks_config.admin import BaseAppHookConfig
 from cms.admin.placeholderadmin import PlaceholderAdmin
 from cms.admin.placeholderadmin import FrontendEditableAdmin
 from django_tablib.admin import TablibAdmin

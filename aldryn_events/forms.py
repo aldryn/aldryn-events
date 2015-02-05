@@ -13,7 +13,9 @@ from app_data import AppDataForm
 from parler.forms import TranslatableModelForm
 
 from .models import Registration, UpcomingPluginItem, Event, EventsConfig
-from .utils import send_user_confirmation_email, send_manager_confirmation_email
+from .utils import (
+    send_user_confirmation_email, send_manager_confirmation_email
+)
 
 
 class EventAdminForm(TranslatableModelForm):

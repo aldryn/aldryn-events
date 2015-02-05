@@ -1,5 +1,4 @@
 import datetime
-from aldryn_apphooks_config.utils import get_app_instance
 
 from django.conf.urls import patterns, url
 from django.utils.dates import MONTHS
@@ -15,6 +14,7 @@ from .utils import build_calendar
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
 )
+
 from .forms import UpcomingPluginForm
 
 
@@ -29,12 +29,11 @@ class UpcomingPlugin(CMSPluginBase):
         # translated filter the events, language set current language
         language = get_language_from_request(context['request'],
                                              check_path=True)
-        events = (Event.objects.translated(language)
-                               .language(language))
+        namespace = instance.app_config_id and instance.app_config.namespace
 
-        namespace = instance.app_config and instance.app_config.namespace
-        if namespace:
-            events = events.namespace(namespace)
+        events = (Event.objects.namespace(namespace)
+                               .translated(language)
+                               .language(language))
 
         if instance.past_events:
             events = events.past(count=instance.latest_entries)
@@ -64,10 +63,10 @@ class EventListCMSPlugin(CMSPluginBase):
         language = get_language_from_request(context['request'],
                                              check_path=True)
 
-        events = instance.events.translated(language).language(language)
-        namespace = instance.app_config and instance.app_config.namespace
-        if namespace:
-            events = events.namespace(namespace)
+        namespace = instance.app_config_id and instance.app_config.namespace
+        events = (instance.events.namespace(namespace)
+                                 .translated(language)
+                                 .language(language))
 
         context['instance'] = instance
         context['events'] = events
@@ -98,7 +97,7 @@ class CalendarPlugin(CMSPluginBase):
         language = get_language_from_request(
             context['request'], check_path=True
         )
-        namespace = instance.app_config and instance.app_config.namespace
+        namespace = instance.app_config_id and instance.app_config.namespace
         context['days'] = build_calendar(year, month, language, namespace)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
