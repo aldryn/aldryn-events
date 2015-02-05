@@ -3,12 +3,14 @@
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 
+from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
 from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
@@ -23,6 +25,12 @@ from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
 
 STANDARD = 'standard'
+
+
+class EventsConfig(TranslatableModel, AppHookConfig):
+    translations = TranslatedFields(
+        app_title=models.CharField(_('application title'), max_length=234),
+    )
 
 
 class Event(TranslatableModel):
@@ -91,6 +99,7 @@ class Event(TranslatableModel):
         ),
         meta={'unique_together': (('language_code', 'slug'),)}
     )
+    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
 
     objects = EventManager()
 
@@ -121,12 +130,12 @@ class Event(TranslatableModel):
                 )
             )
 
-        if self.start_date and self.end_date \
-                and self.end_date < self.start_date:
+        if (self.start_date and self.end_date
+                and self.end_date < self.start_date):
             raise ValidationError(_('start should be before end'))
 
-        if self.end_date and self.start_date == self.end_date \
-                and self.end_time < self.start_time:
+        if (self.end_date and self.start_date == self.end_date
+                and self.end_time < self.start_time):
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
@@ -154,9 +163,22 @@ class Event(TranslatableModel):
         slug = self.safe_translation_getter('slug')
         with override(self.get_current_language()):
             return reverse(
-                'aldryn_events:events_detail', kwargs={'slug': slug}
+                'aldryn_events:events_detail', kwargs={'slug': slug},
+                current_app=self.app_config.namespace
             )
 
+def set_event_slug(instance, **kwargs):
+    if not instance.slug:
+        translation = instance.get_translation(instance.get_current_language())
+        unique_slugify(
+            instance=instance.get_translation(instance.get_current_language()),
+            value=translation.title or uuid4().hex[:8],
+            queryset=instance.translations.filter(
+                language_code=instance.get_current_language()
+            )
+        )
+
+post_save.connect(set_event_slug, sender=Event)
 
 class EventCoordinator(models.Model):
 
@@ -243,7 +265,17 @@ class Registration(models.Model):
         return self.address
 
 
-class UpcomingPluginItem(CMSPlugin):
+class BaseEventPlugin(CMSPlugin):
+    app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
+
+    def copy_relations(self, old_instance):
+        self.app_config = old_instance.app_config
+
+    class Meta:
+        abstract = True
+
+
+class UpcomingPluginItem(BaseEventPlugin):
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
     ]
@@ -278,7 +310,7 @@ class UpcomingPluginItem(CMSPlugin):
         )
 
 
-class EventListPlugin(CMSPlugin):
+class EventListPlugin(BaseEventPlugin):
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
     ]
@@ -295,4 +327,11 @@ class EventListPlugin(CMSPlugin):
         return str(self.pk)
 
     def copy_relations(self, oldinstance):
+        super(EventListPlugin, self).copy_relations(oldinstance)
         self.events = oldinstance.events.all()
+
+
+class EventCalendarPlugin(BaseEventPlugin):
+
+    def __unicode__(self):
+        return str(self.pk)

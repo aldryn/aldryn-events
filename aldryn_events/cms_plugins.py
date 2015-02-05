@@ -11,7 +11,10 @@ from cms.plugin_pool import plugin_pool
 
 from .views import EventDatesView
 from .utils import build_calendar
-from .models import UpcomingPluginItem, Event, EventListPlugin
+from .models import (
+    UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
+)
+
 from .forms import UpcomingPluginForm
 
 
@@ -26,7 +29,11 @@ class UpcomingPlugin(CMSPluginBase):
         # translated filter the events, language set current language
         language = get_language_from_request(context['request'],
                                              check_path=True)
-        events = Event.objects.translated(language).language(language)
+        namespace = instance.app_config_id and instance.app_config.namespace
+
+        events = (Event.objects.namespace(namespace)
+                               .translated(language)
+                               .language(language))
 
         if instance.past_events:
             events = events.past(count=instance.latest_entries)
@@ -35,8 +42,9 @@ class UpcomingPlugin(CMSPluginBase):
 
         context['events'] = events
         context['instance'] = instance
-        self.render_template = \
+        self.render_template = (
             'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
+        )
         return context
 
 plugin_pool.register_plugin(UpcomingPlugin)
@@ -49,13 +57,20 @@ class EventListCMSPlugin(CMSPluginBase):
     model = EventListPlugin
 
     def render(self, context, instance, placeholder):
-        self.render_template = \
+        self.render_template = (
             'aldryn_events/plugins/list/%s/list.html' % instance.style
+        )
         language = get_language_from_request(context['request'],
                                              check_path=True)
+
+        namespace = instance.app_config_id and instance.app_config.namespace
+        events = (instance.events.namespace(namespace)
+                                 .translated(language)
+                                 .language(language))
+
         context['instance'] = instance
-        context['events'] = \
-            instance.events.translated(language).language(language)
+        context['events'] = events
+
         return context
 
 plugin_pool.register_plugin(EventListCMSPlugin)
@@ -66,6 +81,7 @@ class CalendarPlugin(CMSPluginBase):
     name = _('Calendar')
     module = _('Events')
     cache = False
+    model = EventCalendarPlugin
 
     def render(self, context, instance, placeholder):
         year = context.get('event_year')
@@ -81,7 +97,8 @@ class CalendarPlugin(CMSPluginBase):
         language = get_language_from_request(
             context['request'], check_path=True
         )
-        context['days'] = build_calendar(year, month, language)
+        namespace = instance.app_config_id and instance.app_config.namespace
+        context['days'] = build_calendar(year, month, language, namespace)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
         context['next_month'] = current_date + datetime.timedelta(days=35)

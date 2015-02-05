@@ -25,8 +25,8 @@ class EventsIndex(get_index_base()):
         return {'translations__language_code': language}
 
     def get_index_queryset(self, language):
-        return self.get_model().objects.published()\
-            .translated(language).language(language)
+        return (self.get_model().objects.published()
+            .translated(language).language(language))
 
     def get_model(self):
         return Event

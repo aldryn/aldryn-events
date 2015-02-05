@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from aldryn_apphooks_config.utils import get_app_instance
 
 from django.core.urlresolvers import reverse
 from django import forms
@@ -10,6 +11,8 @@ from django.views.generic import (
     ListView,
     TemplateView,
 )
+
+from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_events import request_events_event_identifier
 
 from .utils import (
@@ -26,15 +29,15 @@ class NavigationMixin(object):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
         language = get_language_from_request(self.request, check_path=True)
         events_by_year = build_events_by_year(
-            events=Event.objects.future().translated(language).language(
-                language
-            )
+            events=Event.objects.namespace(self.namespace)
+                                .future()
+                                .translated(language).language(language)
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
-            events=Event.objects.archive().translated(language).language(
-                language
-            ),
+            events=Event.objects.namespace(self.namespace)
+                                .archive()
+                                .translated(language).language(language),
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year
@@ -44,13 +47,17 @@ class NavigationMixin(object):
         return context
 
 
-class EventListView(NavigationMixin, ListView):
+class EventListView(AppConfigMixin, NavigationMixin, ListView):
     model = Event
     template_name = 'aldryn_events/events_list.html'
     archive = False
 
     def get_queryset(self):
-        qs = super(EventListView, self).get_queryset()
+        qs = (super(EventListView, self).get_queryset()
+                                        .namespace(self.namespace))
+
+        language = get_language_from_request(self.request, check_path=True)
+        qs = qs.translated(language).language(language)
 
         if self.archive:
             qs = qs.archive()
@@ -68,25 +75,24 @@ class EventListView(NavigationMixin, ListView):
         if day:
             qs = qs.filter(start_date__day=day)
 
-        language = get_language_from_request(self.request, check_path=True)
-        qs = qs.translated(language).language(language).order_by(
-            'start_date', 'start_time', 'end_date', 'end_time'
-        )
-        return qs
+        return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
 
 
-class EventDetailView(NavigationMixin, CreateView):
+class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     model = Registration
     template_name = 'aldryn_events/events_detail.html'
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
+        self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        self.event = Event.objects.published().translated(
-            language, slug=kwargs['slug']
-        ).language(language).get()
+        self.event = (Event.objects.namespace(self.namespace)
+                                   .published()
+                                   .translated(language, slug=kwargs['slug'])
+                                   .language(language).get())
 
         setattr(self.request, request_events_event_identifier, self.event)
+
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
 
@@ -94,8 +100,9 @@ class EventDetailView(NavigationMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
-        registered_events = \
+        registered_events = (
             self.request.session.get('registered_events', set())
+        )
         context['event'] = self.event
         context['already_registered'] = self.event.id in registered_events
         return context
@@ -106,6 +113,7 @@ class EventDetailView(NavigationMixin, CreateView):
             self.request.session.get('registered_events', [])
         )
         registered_events.add(self.event.id)
+
         # set's are not json serializable
         self.request.session['registered_events'] = list(registered_events)
         return registration
@@ -116,24 +124,30 @@ class EventDetailView(NavigationMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super(EventDetailView, self).get_form_kwargs()
         kwargs['event'] = self.event
-        kwargs['language_code'] = \
+        kwargs['language_code'] = (
             get_language_from_request(self.request, check_path=True)
+        )
         return kwargs
 
 
-class ResetEventRegistration(FormView):
+class ResetEventRegistration(AppConfigMixin, FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
         language = get_language_from_request(request, check_path=True)
-        self.event = Event.objects.translated(language, slug=kwargs['slug'])\
-            .language(language).get()
+        self.event = (
+            Event.objects.namespace(self.namespace)
+                         .translated(language, slug=kwargs['slug'])
+                         .language(language)
+                         .get()
+        )
         return super(ResetEventRegistration, self).dispatch(request, *args,
                                                             **kwargs)
 
     def form_valid(self, form):
-        registered_events = \
+        registered_events = (
             self.request.session.get('registered_events', set())
+        )
         registered_events.remove(self.event.id)
         self.request.session['registered_events'] = registered_events
         return super(ResetEventRegistration, self).form_valid(form)
@@ -142,7 +156,7 @@ class ResetEventRegistration(FormView):
         return reverse('events_detail', kwargs={'slug': self.event.slug})
 
 
-class EventDatesView(TemplateView):
+class EventDatesView(AppConfigMixin, TemplateView):
     template_name = 'aldryn_events/includes/calendar_table.html'
 
     def get_context_data(self, **kwargs):
