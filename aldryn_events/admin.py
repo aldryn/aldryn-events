@@ -8,7 +8,7 @@ from cms.admin.placeholderadmin import FrontendEditableAdmin
 from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 
-from .models import Event, EventCoordinator, Registration
+from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
@@ -50,6 +50,9 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
         (_('publishing'), {'fields': (
             ('is_published', 'publish_at',)
         )}),
+        (None, {'fields': (
+            ('app_config',)
+        )}),
     )
 
     def get_prepopulated_fields(self, request, obj=None):
@@ -73,12 +76,15 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(BaseAppHookConfig):
-
-    def get_config_fields(self):
-        return ('config.namespace',)
+class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
+    pass
+    # We can use something like this in the future to configure
+    # each app instance.
+    # def get_config_fields(self):
+    #     return ('config.some_field', )
 
 
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventCoordinator, EventCoordinatorAdmin)
 admin.site.register(Registration, RegistrationAdmin)
+admin.site.register(EventsConfig, EventConfigAdmin)

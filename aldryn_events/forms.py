@@ -29,12 +29,11 @@ class EventAdminForm(TranslatableModelForm):
         help_text = _('Acceptable Formats: %(format_list)s')
 
         for key, field in self.fields.items():
-            format_list = ', '.join(
-                [now.strftime(f) for f in field.input_formats]
-            )
-
             if (isinstance(field, DateField) or isinstance(field, TimeField)
                     or isinstance(field, DateTimeField)):
+                format_list = ', '.join(
+                    [now.strftime(f) for f in field.input_formats]
+                )
                 self.fields[key].help_text = (
                     help_text % ({'format_list': format_list})
                 )
