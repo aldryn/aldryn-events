@@ -50,6 +50,9 @@ class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
         (_('publishing'), {'fields': (
             ('is_published', 'publish_at',)
         )}),
+        (None, {'fields': (
+            ('app_config',)
+        )}),
     )
 
     def get_prepopulated_fields(self, request, obj=None):
