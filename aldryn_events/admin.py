@@ -79,7 +79,7 @@ class RegistrationAdmin(TablibAdmin):
 class EventConfigAdmin(BaseAppHookConfig):
 
     def get_config_fields(self):
-        return ('config.namespace',)
+        return ('app_title', )
 
 
 admin.site.register(Event, EventAdmin)
