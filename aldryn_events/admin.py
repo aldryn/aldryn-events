@@ -76,10 +76,12 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(BaseAppHookConfig):
-
-    def get_config_fields(self):
-        return ('app_title', )
+class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
+    pass
+    # We can use something like this in the future to configure
+    # each app instance.
+    # def get_config_fields(self):
+    #     return ('config.some_field', )
 
 
 admin.site.register(Event, EventAdmin)
