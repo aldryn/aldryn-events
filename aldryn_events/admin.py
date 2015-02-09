@@ -8,7 +8,7 @@ from cms.admin.placeholderadmin import FrontendEditableAdmin
 from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 
-from .models import Event, EventCoordinator, Registration
+from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
@@ -85,3 +85,4 @@ class EventConfigAdmin(BaseAppHookConfig):
 admin.site.register(Event, EventAdmin)
 admin.site.register(EventCoordinator, EventCoordinatorAdmin)
 admin.site.register(Registration, RegistrationAdmin)
+admin.site.register(EventsConfig, EventConfigAdmin)
