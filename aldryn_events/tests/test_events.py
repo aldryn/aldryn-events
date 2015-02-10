@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from django.core.exceptions import ValidationError
 
 import mock
 import random
@@ -10,8 +10,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template import RequestContext
-from django.test import RequestFactory
-from django.test import TransactionTestCase
+from django.test import RequestFactory, TestCase, TransactionTestCase
 from cms import api
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
@@ -42,6 +41,54 @@ def get_page_request(page, user=None, path=None, edit=False, language='en'):
 
 def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
     return prefix + u''.join(random.choice(chars) for _ in range(length))
+
+class EventUnitTestCase(TestCase):
+
+    def setUp(self):
+        self.app_config, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+
+    def test_event_days_property_shows_correct_value(self):
+        event = Event.objects.create(
+            title='5 days event', app_config=self.app_config,
+            start_date='2015-01-01', end_date='2015-01-05'
+        )
+        self.assertEqual(event.days, 5)
+        event.end_date = None
+        self.assertEqual(event.days, 1)
+
+    def test_event_creation_with_wrong_date_format_raises_validationerror(self):
+        with self.assertRaises(ValidationError):
+            Event.objects.create(
+                title='5 days event', app_config=self.app_config,
+                start_date='blah'
+            )
+        with self.assertRaises(ValidationError):
+            Event.objects.create(
+                title='5 days event', app_config=self.app_config,
+                start_date='2015-01-01', end_date='blah'
+            )
+
+    def test_event_days_property_raises_validationerror(self):
+        event = Event.objects.create(
+            title='5 days event', app_config=self.app_config,
+            start_date='2015-01-01'  # must have start_date
+        )
+        event.start_date, event.end_date = 'blah', 'blah'
+        self.assertRaises(ValidationError, lambda: event.days)
+        event.start_date = '2015-01-01'
+        self.assertRaises(ValidationError, lambda: event.days)
+
+    def test_event_take_single_day_property(self):
+        event1 = Event.objects.create(
+            title='blah', app_config=self.app_config,
+            start_date='2015-01-01'
+        )
+        event2 = Event.objects.create(
+            title='bleh', app_config=self.app_config,
+            start_date='2015-01-01', end_date='2015-01-05'
+        )
+        self.assertTrue(event1.takes_single_day)
+        self.assertFalse(event2.takes_single_day)
 
 
 class EventTestCase(TransactionTestCase):
@@ -513,8 +560,9 @@ class RegistrationTestCase(TransactionTestCase):
         for k, v in data.items():
             self.assertEqual(getattr(registration, k), v)
 
-    def test_unattached_namespace(self):
-        template = get_cms_setting('TEMPLATES')[0][0]
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_unattached_namespace(self, timezone_mock):
+        timezone_mock.now.return_value = datetime(2015, 2, 2, 10)
         event1 = Event.objects.create(
             title='Event2015 current namespace',
             slug='open-air', start_date='2015-02-07',
