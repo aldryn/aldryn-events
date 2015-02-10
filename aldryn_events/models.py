@@ -155,6 +155,33 @@ class Event(TranslatableModel):
         return date_or_datetime(self.end_date, self.end_time)
 
     @property
+    def days(self):
+        """
+        Return the number of days between start_date and end_date.
+        If end_date is null, consider start_date as end_date.
+        Minimal value will be always 1 because a event has at
+        least 1 day.
+
+        :return: number of days
+        """
+        # Need to normalize values to date objects cuz it can be strings
+        # and Django does not normalize in some situations, like when
+        # using 'Event.objects.create'
+        start_date_field = self._meta.get_field_by_name('start_date')[0]
+        end_date_field = self._meta.get_field_by_name('end_date')[0]
+        self.start_date = start_date_field.to_python(self.start_date)
+        if self.end_date:
+            self.end_date = end_date_field.to_python(self.end_date)
+
+        end_date = self.end_date or self.start_date
+        return (end_date - self.start_date).days + 1
+
+    @property
+    def takes_single_day(self):
+        """ True if event take a single day, else False """
+        return self.days == 1
+
+    @property
     def is_registration_deadline_passed(self):
         return not (self.registration_deadline_at
                     and self.registration_deadline_at > timezone.now())
