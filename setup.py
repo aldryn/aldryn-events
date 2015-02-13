@@ -14,7 +14,13 @@ REQUIREMENTS = [
     'django-filer',
     'django-hvad',
     'django-sortedm2m',
-    'django-parler'
+    'django-parler',
+    'aldryn-apphooks-config',
+    'django-reversion'
+]
+
+DEPENDENCY_LINKS = [
+    'git+https://github.com/aldryn/aldryn-apphooks-config@v0.1.2#egg=aldryn-apphooks-config-0.1.2'
 ]
 
 CLASSIFIERS = [
@@ -30,6 +36,7 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Application Frameworks',
 ]
 
+
 setup(
     name='aldryn-events',
     version=__version__,
@@ -41,6 +48,7 @@ setup(
     license='LICENSE.txt',
     platforms=['OS Independent'],
     install_requires=REQUIREMENTS,
+    dependency_links=DEPENDENCY_LINKS,
     classifiers=CLASSIFIERS,
     include_package_data=True,
     zip_safe=False

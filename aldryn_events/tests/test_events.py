@@ -11,11 +11,12 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template import RequestContext
 from django.test import RequestFactory, TestCase, TransactionTestCase
+from django.utils.timezone import get_current_timezone
+
 from cms import api
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
 from datetime import datetime
-from django.utils.timezone import get_current_timezone
 
 from aldryn_events.models import Event, EventsConfig
 
