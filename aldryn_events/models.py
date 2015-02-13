@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.models import CMSPlugin
@@ -305,7 +306,7 @@ class UpcomingPluginItem(BaseEventPlugin):
     )
 
     def __unicode__(self):
-        return unicode(
+        return force_text(
             self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
         )
 
@@ -324,7 +325,7 @@ class EventListPlugin(BaseEventPlugin):
     events = SortedManyToManyField(Event, blank=True, null=True)
 
     def __unicode__(self):
-        return str(self.pk)
+        return force_text(self.pk)
 
     def copy_relations(self, oldinstance):
         super(EventListPlugin, self).copy_relations(oldinstance)
@@ -334,4 +335,4 @@ class EventListPlugin(BaseEventPlugin):
 class EventCalendarPlugin(BaseEventPlugin):
 
     def __unicode__(self):
-        return str(self.pk)
+        return force_text(self.pk)
