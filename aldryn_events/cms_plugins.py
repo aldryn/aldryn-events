@@ -77,7 +77,7 @@ plugin_pool.register_plugin(EventListCMSPlugin)
 
 
 class CalendarPlugin(CMSPluginBase):
-    render_template = 'aldryn_events/plugins/calendar.html'
+    render_template = 'aldryn_events/tags/calendar.html'
     name = _('Calendar')
     module = _('Events')
     cache = False

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import date, datetime, timedelta
 import calendar
 from itertools import groupby
 from operator import attrgetter
@@ -7,6 +7,7 @@ from operator import attrgetter
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.datastructures import SortedDict
@@ -24,7 +25,7 @@ def build_months(year, is_archive_view=False):
         months[month] = {
             'year': year,
             'month': month,
-            'date': datetime.date(year, month, 1),
+            'date': date(year, month, 1),
             'events': []
         }
     return months
@@ -62,7 +63,7 @@ def build_events_by_year(events, **config):
         if year not in events_by_year:
             events_by_year[year] = {
                 'year': year,
-                'date': datetime.date(year, 1, 1),
+                'date': date(year, 1, 1),
                 'months': build_months(year=year,
                                        is_archive_view=is_archive_view)
             }
@@ -168,6 +169,9 @@ def get_monthdates(month, year):
 
 
 def build_calendar(year, month, language, namespace=None):
+    """
+    Returns complete list of monthdates with events happening in that day
+    """
     from .models import Event
 
     month = int(month)
@@ -175,47 +179,55 @@ def build_calendar(year, month, language, namespace=None):
 
     # Get a list of all dates in this month (with pre/succeeding for nice
     # layout)
-    monthdates = [(x, None) for x in get_monthdates(month, year)]
+    monthdates = [(x, []) for x in get_monthdates(month, year)]
     if len(monthdates) < 6 * 7:
         # always display six weeks to keep the table layout consistent
         if month == 12:
             month = 0
             year += 1
 
-        next_month = [(x, None) for x in get_monthdates(month + 1, year)]
+        next_month = [(x, []) for x in get_monthdates(month + 1, year)]
         if next_month[0][0].month == month + 1:
             monthdates += next_month[:6]
         else:
             monthdates += next_month[7:14]
 
     # get all upcoming events, ordered by start_date
+    filter_args = (
+        Q(start_date__gte=monthdates[0][0], start_date__lte=monthdates[-1][0])
+        | Q(
+            Q(end_date__isnull=True) | Q(
+                end_date__gte=monthdates[0][0],
+                end_date__lte=monthdates[-1][0]
+            )
+        )
+    )
     events = (Event.objects.namespace(namespace)
-                           .published()
-                           .translated(language)
-                           .language(language)
-                           .filter(
-                              start_date__gte=monthdates[0][0],
-                              start_date__lte=monthdates[-1][0]
-                            ).order_by('start_date'))
+              .published()
+              .translated(language)
+              .language(language)
+              .filter(filter_args)
+              .order_by('start_date'))
 
-    events = groupby(events, attrgetter('start_date'))
+    # merge events into monthdates, but do the grouping manually
+    # because need to consider all event duration, not only start date
+    monthdates = SortedDict(monthdates)
 
-    # group events by starting_date
-    grouped_events = [(date, list(event_list)) for date, event_list in events]
+    def get_event_dates(obj):
+        return [obj.start_date + timedelta(days=i) for i in range(obj.days)]
 
-    # merge events into monthdates
-    for date, event_list in grouped_events:
-        index = monthdates.index((date, None))
-        monthdates[index] = (date, event_list)
+    for event in events:
+        for day in get_event_dates(event):
+            monthdates[day].append(event)
 
-    return monthdates
+    return monthdates.items()
 
 
 def date_or_datetime(d, t):
     # either a date or a datetime
     if d and t:
         # TODO: not timezone aware!
-        return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute)
+        return datetime(d.year, d.month, d.day, t.hour, t.minute)
     elif d:
         return d
     else:
