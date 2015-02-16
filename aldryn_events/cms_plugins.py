@@ -77,7 +77,7 @@ plugin_pool.register_plugin(EventListCMSPlugin)
 
 
 class CalendarPlugin(CMSPluginBase):
-    render_template = 'aldryn_events/tags/calendar.html'
+    render_template = 'aldryn_events/plugins/calendar.html'
     name = _('Calendar')
     module = _('Events')
     cache = False
@@ -91,18 +91,14 @@ class CalendarPlugin(CMSPluginBase):
             year = str(datetime.datetime.today().year)
             month = str(datetime.datetime.today().month)
 
-        current_date = datetime.date(
-            day=1, month=int(month), year=int(year)
+        context['namespace'] = (
+            instance.app_config_id and instance.app_config.namespace
         )
-        language = get_language_from_request(
+        context['request_language'] = get_language_from_request(
             context['request'], check_path=True
         )
-        namespace = instance.app_config_id and instance.app_config.namespace
-        context['days'] = build_calendar(year, month, language, namespace)
-        context['current_date'] = current_date
-        context['last_month'] = current_date + datetime.timedelta(days=-1)
-        context['next_month'] = current_date + datetime.timedelta(days=35)
-        context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
+        context['event_year'] = year
+        context['event_month'] = month
 
         return context
 

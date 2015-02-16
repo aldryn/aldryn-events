@@ -6,13 +6,12 @@
   <th class="weekend">S</th>
 </tr>
 <tr>
-  {% for day, events in days %}
+  {% for day, events, css_classes in calendar %}
   {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:'7' %}
 </tr>
 <tr>
   {% endif %}
-  <td class="{% if events %}events{% endif%}{% if day|date:'w' in '06' %} weekend{% endif %}{% spaceless %}
-{% endspaceless %}{% if day|date:'n' != current_date|date:'n' or day|date:'Y' != current_date|date:'Y' %} disabled{% endif %}">
+  <td class="{{ css_classes }}">
     {% if events %}
     <a href="{% url 'aldryn_events:events_list-by-day' year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
     {% else %}

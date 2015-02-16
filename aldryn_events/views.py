@@ -53,6 +53,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
     archive = False
 
     def get_queryset(self):
+        import ipdb;ipdb.set_trace()
         qs = (super(EventListView, self).get_queryset()
                                         .namespace(self.namespace))
 

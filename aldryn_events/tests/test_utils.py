@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 from aldryn_events.models import Event, EventsConfig
 from aldryn_events.utils import build_calendar
 from datetime import date
 
 
-class UtilsTestCase(TestCase):
+class UtilsTestCase(TransactionTestCase):
 
     def setUp(self):
-        self.config = EventsConfig.objects.create(namespace='aldryn_events')
+        super(UtilsTestCase, self).setUp()
+        self.config, created = (
+            EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        )
 
     def create_event(self, lang, title, start_date, end_date=None, slug=None,
                      config=None):
@@ -33,7 +36,7 @@ class UtilsTestCase(TestCase):
         ev6 = self.create_event('en', 'ev6', '2015-02-25')
 
         # make dates a dict cuz is easy to test
-        dates = dict(build_calendar('2015', '02', 'en', self.config.namespace))
+        dates = build_calendar('2015', '02', 'en', self.config.namespace)
 
         # ev1 and ev2 in his days
         self.assertEqual(dates[date(2015, 2, 13)], [ev1])

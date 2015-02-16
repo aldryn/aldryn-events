@@ -1,6 +1,4 @@
 {% load i18n sekizai_tags %}
-
-<div class="plugin plugin-events">
   <div class="events-calendar">
     <h3>{{ calendar_label }}</h3>
     <p class="controls">
@@ -9,7 +7,6 @@
     </p>
     {% include "aldryn_events/includes/calendar_table.html" %}
   </div>
-</div>
 
 {% addtoblock "js" %}
 <script type="text/javascript">

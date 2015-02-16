@@ -21,7 +21,6 @@ from datetime import datetime
 from aldryn_events.models import Event, EventsConfig
 
 
-
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
 
     path = path or page and page.get_absolute_url()
@@ -40,13 +39,18 @@ def get_page_request(page, user=None, path=None, edit=False, language='en'):
     mid.process_request(request)
     return request
 
+
 def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
     return prefix + u''.join(random.choice(chars) for _ in range(length))
 
-class EventUnitTestCase(TestCase):
+
+class EventUnitTestCase(TransactionTestCase):
 
     def setUp(self):
-        self.app_config, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        super(EventUnitTestCase, self).setUp()
+        self.app_config, created = (
+            EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        )
 
     def test_event_days_property_shows_correct_value(self):
         event = Event.objects.create(
@@ -96,7 +100,10 @@ class EventTestCase(TransactionTestCase):
     reset_sequences = True
 
     def setUp(self):
-        self.app_config, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        super(EventTestCase, self).setUp()
+        self.app_config, created = (
+            EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        )
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
         self.root_page = api.create_page(
@@ -153,39 +160,59 @@ class EventTestCase(TransactionTestCase):
         response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_add_event_app_to_page(self, timezone_mock):
+    # @mock.patch('aldryn_events.managers.timezone')
+    # @mock.patch('aldryn_events.templatetags.aldryn_events.now')
+    # def test_add_event_app_to_page(self, manager_now_mock, tag_now_mock):
+    @mock.patch('django.utils.timezone.now')
+    def test_add_event_app_to_page(self, now_mock):
         """
-        We add an event to the app
+        When we link event app to any page it should list events
         """
-        timezone_mock.now.return_value = datetime(
-            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
+        now_mock.return_value = datetime(
+            2014, 6, 8, tzinfo=get_current_timezone()
         )
+        root_page = api.create_page(
+            'root page', self.template, self.language, published=True,
+            publication_date=datetime(
+                2014, 6, 8, tzinfo=get_current_timezone()
+            )
+        )
+        api.create_title('de', 'root page de', root_page)
         page = api.create_page(
-            'Events en', self.template, 'en', slug='eventsapp', published=True,
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            parent=root_page,
             apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace
+            apphook_namespace=self.app_config.namespace,
+            publication_date=datetime(
+                2014, 6, 8, tzinfo=get_current_timezone()
+            )
         )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
         page.publish('en')
+        api.create_title('de', 'Events de', page, slug='eventsapp')
         page.publish('de')
 
         # create events
-        event1 = self.create_event()
-        event2 = Event.objects.language('en').create(
-            title='Event2015 only english',
-            start_date='2014-09-10', publish_at='2014-01-01 12:00',
+        event1 = Event.objects.language('en').create(
+            title='Event2014',
+            start_date='2014-09-10', publish_at='2014-06-05 12:00',
             app_config=self.app_config
 
         )
+        event1.create_translation('de', title='Ereignis', slug='im-freien')
+        event2 = Event.objects.language('en').create(
+            title='Event2014 only english',
+            start_date='2014-09-12', publish_at='2014-06-05 12:00',
+            app_config=self.app_config
 
+        )
         # test english, have 2 events
         response = self.client.get('/en/eventsapp/')
         self.assertContains(response, event1.title)
         self.assertContains(response, event1.get_absolute_url())
         self.assertContains(response, event2.title)
         self.assertContains(response, event2.get_absolute_url())
-
+        
         # test german, have 1 event, event 2 is only english
         event1.set_current_language('de')
         response = self.client.get('/de/eventsapp/')
@@ -499,7 +526,9 @@ class RegistrationTestCase(TransactionTestCase):
 
     @mock.patch('aldryn_events.models.timezone')
     def test_submit_registration(self, timezone_mock):
-        app_config = EventsConfig.objects.create(namespace='aldryn_events')
+        app_config, created = (
+            EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        )
 
         timezone_mock.now.return_value = datetime(
             2015, 2, 5, 9, 0, tzinfo=get_current_timezone()
