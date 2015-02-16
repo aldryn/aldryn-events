@@ -101,6 +101,7 @@ class EventTestCase(TransactionTestCase):
     reset_sequences = True
 
     def setUp(self):
+        super(EventTestCase, self).setUp()
         self.app_config, created = (
             EventsConfig.objects.get_or_create(namespace='aldryn_events')
         )
