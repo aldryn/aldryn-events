@@ -2,7 +2,16 @@
 # -*- coding: utf-8 -*-
 import sys
 
+class DisableMigrations(dict):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
+
 gettext = lambda s: s
+
 HELPER_SETTINGS = {
     'ROOT_URLCONF': 'aldryn_events.tests.urls',
     'TIME_ZONE': 'Europe/Zurich',
@@ -67,9 +76,11 @@ HELPER_SETTINGS = {
     'SOUTH_TESTS_MIGRATE': False,
     # 'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
-    'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True
+    'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
+    # Disable migrations so tests runs really faster
+    # Source: https://gist.github.com/c-rhodes/cebe9d4619125949dff8
+    'MIGRATION_MODULES': DisableMigrations()
 }
-
 
 
 def run():

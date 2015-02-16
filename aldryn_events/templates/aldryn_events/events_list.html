@@ -1,7 +1,12 @@
 {% extends "aldryn_events/base.html" %}
-{% load i18n %}
+{% load i18n aldryn_events %}
 
 {% block content_events %}
 <h2>{% trans "Events" %}</h2>
 {% include "aldryn_events/includes/event_items.html" %}
 {% endblock content_events %}
+
+{% block content_sidebar %}
+{% get_current_language as language %}
+{% calendar event_year event_month language view.namespace %}
+{% endblock content_sidebar %}

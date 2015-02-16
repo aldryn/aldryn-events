@@ -173,7 +173,6 @@ def build_calendar(year, month, language, namespace=None):
     Returns complete list of monthdates with events happening in that day
     """
     from .models import Event
-
     month = int(month)
     year = int(year)
 
@@ -199,7 +198,8 @@ def build_calendar(year, month, language, namespace=None):
             Q(end_date__isnull=True) | Q(
                 end_date__gte=monthdates[0][0],
                 end_date__lte=monthdates[-1][0]
-            )
+            ),
+            start_date__lte=monthdates[0][0]
         )
     )
     events = (Event.objects.namespace(namespace)
@@ -220,7 +220,7 @@ def build_calendar(year, month, language, namespace=None):
         for day in get_event_dates(event):
             monthdates[day].append(event)
 
-    return monthdates.items()
+    return monthdates
 
 
 def date_or_datetime(d, t):
