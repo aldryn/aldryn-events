@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.i18n import force_language
 from django.core.exceptions import ValidationError
 
 import mock
@@ -100,16 +101,21 @@ class EventTestCase(TransactionTestCase):
     reset_sequences = True
 
     def setUp(self):
-        super(EventTestCase, self).setUp()
         self.app_config, created = (
             EventsConfig.objects.get_or_create(namespace='aldryn_events')
         )
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
-        self.root_page = api.create_page(
-            'root page', self.template, self.language, published=True
+
+    def create_root_page(self, publication_date=None):
+        root_page = api.create_page(
+            'root page', self.template, self.language, published=True,
+            publication_date=publication_date
         )
-        api.create_title('de', 'root page de', self.root_page)
+        api.create_title('de', 'root page de', root_page)
+        root_page.publish('en')
+        root_page.publish('de')
+        return root_page.reload()
 
     def create_event(self):
         event = Event.objects.language('en').create(
@@ -160,24 +166,25 @@ class EventTestCase(TransactionTestCase):
         response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
-    # @mock.patch('aldryn_events.managers.timezone')
-    # @mock.patch('aldryn_events.templatetags.aldryn_events.now')
-    # def test_add_event_app_to_page(self, manager_now_mock, tag_now_mock):
-    @mock.patch('django.utils.timezone.now')
-    def test_add_event_app_to_page(self, now_mock):
+    @mock.patch('aldryn_events.managers.timezone')
+    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
+    def test_add_event_app_to_page(self, manager_timezone_mock,
+                                   tag_timezone_mock):
         """
         When we link event app to any page it should list events
         """
-        now_mock.return_value = datetime(
+        manager_timezone_mock.now.return_value = datetime(
             2014, 6, 8, tzinfo=get_current_timezone()
         )
-        root_page = api.create_page(
-            'root page', self.template, self.language, published=True,
+        tag_timezone_mock.now.return_value = datetime(
+            2014, 6, 8, tzinfo=get_current_timezone()
+        )
+
+        root_page = self.create_root_page(
             publication_date=datetime(
                 2014, 6, 8, tzinfo=get_current_timezone()
             )
         )
-        api.create_title('de', 'root page de', root_page)
         page = api.create_page(
             title='Events en', template=self.template, language='en',
             slug='eventsapp', published=True,
@@ -188,8 +195,8 @@ class EventTestCase(TransactionTestCase):
                 2014, 6, 8, tzinfo=get_current_timezone()
             )
         )
-        page.publish('en')
         api.create_title('de', 'Events de', page, slug='eventsapp')
+        page.publish('en')
         page.publish('de')
 
         # create events
@@ -206,20 +213,23 @@ class EventTestCase(TransactionTestCase):
             app_config=self.app_config
 
         )
+
         # test english, have 2 events
-        response = self.client.get('/en/eventsapp/')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        self.assertContains(response, event2.title)
-        self.assertContains(response, event2.get_absolute_url())
-        
+        with force_language('en'):
+            response = self.client.get(page.get_absolute_url('en'))
+            self.assertContains(response, event1.title)
+            self.assertContains(response, event1.get_absolute_url())
+            self.assertContains(response, event2.title)
+            self.assertContains(response, event2.get_absolute_url())
+
         # test german, have 1 event, event 2 is only english
         event1.set_current_language('de')
-        response = self.client.get('/de/eventsapp/')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        self.assertNotContains(response, event2.title)
-        self.assertNotContains(response, event2.get_absolute_url())
+        with force_language('de'):
+            response = self.client.get(page.get_absolute_url('de'))
+            self.assertContains(response, event1.title)
+            self.assertContains(response, event1.get_absolute_url())
+            self.assertNotContains(response, event2.title)
+            self.assertNotContains(response, event2.get_absolute_url())
 
     def test_event_list_plugin(self):
         """
@@ -227,9 +237,10 @@ class EventTestCase(TransactionTestCase):
         """
         # start_date='2014-09-10',
         # publish_at='2014-01-01 12:00'
+        root_page = self.create_root_page()
         page = api.create_page(
             'Events en', self.template, 'en', published=True,
-            parent=self.root_page,
+            parent=root_page,
         )
         api.create_title('de', 'Events de', page)
         ph = page.placeholders.get(slot='content')
@@ -448,11 +459,14 @@ class EventTestCase(TransactionTestCase):
         This plugin should show a link to event list page on days that has events
         """
         timezone_mock.now.return_value = datetime(
-            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
+            2015, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
         )
 
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
+            publication_date=datetime(
+                2015, 1, 2, tzinfo=get_current_timezone()
+            )
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
@@ -479,8 +493,10 @@ class EventTestCase(TransactionTestCase):
         # Test plugin rendering for both languages in a forloop. I don't
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
-        rendered['en'] = self.client.get('/en/home/').content
-        rendered['de'] = self.client.get('/de/home/').content
+        with force_language('en'):
+            rendered['en'] = self.client.get(page.get_absolute_url('en')).content
+        with force_language('de'):
+            rendered['de'] = self.client.get(page.get_absolute_url('de')).content
 
         html = ('<td class="events disabled"><a href="/{}/events/2015/1/29/">'
                 '29</a></td>')

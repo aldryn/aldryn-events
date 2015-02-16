@@ -28,9 +28,9 @@ class TagsTestCase(TransactionTestCase):
             end_time='23:59'
         )
 
-    @mock.patch('aldryn_events.templatetags.aldryn_events.now')
-    def test_calendar_tag_rendering(self, now_mock):
-        now_mock.return_value = (
+    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
+    def test_calendar_tag_rendering(self, timezone_mock):
+        timezone_mock.now.return_value = (
             datetime(2015, 1, 10, 12, 0, tzinfo=get_current_timezone())
         )
         other_config = EventsConfig.objects.create(namespace='other')
