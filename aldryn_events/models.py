@@ -68,6 +68,9 @@ class Event(TranslatableModel):
         'EventCoordinator', verbose_name=_('event coordinators'),
         null=True, blank=True
     )
+    description=PlaceholderField(
+        'aldryn_events_event_description', verbose_name=_('description')
+    )
 
     translations = TranslatedFields(
         title=models.CharField(
@@ -79,9 +82,6 @@ class Event(TranslatableModel):
         short_description=HTMLField(
             _('short description'), blank=True, default='',
             help_text=_('translated')
-        ),
-        description=PlaceholderField(
-            'aldryn_events_event_description', verbose_name=_('description')
         ),
         location=models.TextField(_('location'), blank=True, default=''),
         location_lat=models.FloatField(
