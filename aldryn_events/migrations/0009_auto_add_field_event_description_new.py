@@ -8,7 +8,7 @@ import cms.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0004_auto_20150218_0122'),
+        ('cms', '0003_auto_20140926_2347.py'),
         ('aldryn_events', '0008_app_config_fields_changed_to_not_null'),
     ]
 
