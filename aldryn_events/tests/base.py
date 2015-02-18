@@ -60,13 +60,34 @@ class EventBaseTestCase(TransactionTestCase):
         root_page.publish('de')
         return root_page.reload()
 
-    def create_event(self):
-        event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2014-09-10',
-            publish_at='2014-01-01 12:00', app_config=self.app_config
-        )
-        event.set_current_language('de')
-        event.title = 'Ereignis'
-        event.slug = 'im-freien'
-        event.save()
+    def create_event(self, de={}, **en):
+        """
+        Create events in english and german. Use **en because normaly
+        for very simple tests we just create events in english.
+        """
+        if not en and not de:
+            raise ValueError("You must provide data for english and/or german!")
+        if en:
+            en.setdefault('app_config', self.app_config)
+            event = Event.objects.language('en').create(**en)
+        if de:
+            if not en:
+                de.setdefault('app_config', self.app_config)
+                event = Event.objects.language('de').create(**de)
+            else:
+                event.create_translation('de', **de)
         return Event.objects.language('en').get(pk=event.pk)
+
+    def create_default_event(self):
+        en = {
+            'title': 'Event2014',
+            'slug': 'open-air',
+            'start_date': '2014-09-10',
+            'publish_at': '2014-09-10 09:00',
+            'app_config': self.app_config
+        }
+        de = {
+            'title': 'Ereignis',
+            'slug': 'im-freien'
+        }
+        return self.create_event(de=de, **en)

@@ -12,33 +12,34 @@ from aldryn_events.tests.base import EventBaseTestCase
 
 class TagsTestCase(EventBaseTestCase):
 
-    def _create_event(self, lang, title, start_date, end_date=None, slug=None,
-                     app_config=None):
-        """ Custom create_event for this test case """
-        return Event.objects.language(lang).create(
-            title=title,
-            slug=slug,
-            start_date=start_date,
-            end_date=end_date,
-            app_config=app_config or self.app_config,
-            start_time='00:00',
-            end_time='23:59'
-        )
-
     @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
     def test_calendar_tag_rendering(self, timezone_mock):
         timezone_mock.now.return_value = (
             datetime(2015, 1, 10, 12, 0, tzinfo=get_current_timezone())
         )
         other_config = EventsConfig.objects.create(namespace='other')
-        ev1 = self._create_event('en', 'ev1', '2015-01-13')
-        ev2 = self._create_event('en', 'ev2', '2015-01-15')
-        ev3 = self._create_event('de', 'ev3', '2015-01-16')
-        ev4 = self._create_event(
-            'en', 'ev4', '2015-01-18', app_config=other_config
+        ev1 = self.create_event(
+            title='ev1', start_date='2015-01-13', publish_at='2015-01-10'
         )
-        ev5 = self._create_event('en', 'ev5', '2015-01-22', '2015-01-27')
-        ev6 = self._create_event('en', 'ev6', '2015-01-25')
+        ev2 = self.create_event(
+            title='ev2', start_date='2015-01-15', publish_at='2015-01-10'
+        )
+        ev3 = self.create_event(
+            de=dict(
+                title='ev3', start_date='2015-01-16', publish_at='2015-01-10'
+            )
+        )
+        ev4 = self.create_event(
+            title='ev4', start_date='2015-01-18', publish_at='2015-01-10',
+            app_config=other_config
+        )
+        ev5 = self.create_event(
+            title='ev5', start_date='2015-01-22', end_date='2015-01-27',
+            publish_at='2015-01-10'
+        )
+        ev6 = self.create_event(
+            title='ev6', start_date='2015-01-25', publish_at='2015-01-10'
+        )
 
         t = Template(
             "{% load aldryn_events %}"

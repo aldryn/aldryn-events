@@ -12,7 +12,7 @@ from cms.utils.i18n import force_language
 from datetime import datetime
 
 from aldryn_events.models import Event, EventsConfig
-from aldryn_events.tests.base import EventBaseTestCase, get_page_request
+from .base import EventBaseTestCase, get_page_request
 
 
 class EventTestCase(EventBaseTestCase):
@@ -113,7 +113,7 @@ class EventPagesTestCase(EventBaseTestCase):
         """
         Test if proper url and event page are created
         """
-        event = self.create_event()
+        event = self.create_default_event()
 
         # '/events/' came from tests/urls.py, '/open-air/' from the event slug
         self.assertEqual(event.get_absolute_url(), '/en/events/open-air/')
@@ -238,7 +238,7 @@ class EventPluginsTestCase(EventBaseTestCase):
         page.publish('de')
 
         # add events
-        event1 = self.create_event()
+        event1 = self.create_default_event()
         event2 = Event.objects.language('en').create(
             title='Event2015 only english', start_date='2015-01-29',
             app_config=self.app_config

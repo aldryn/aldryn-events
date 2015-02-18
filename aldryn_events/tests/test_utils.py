@@ -2,11 +2,12 @@
 
 from django.test import TransactionTestCase
 from aldryn_events.models import Event, EventsConfig
+from aldryn_events.tests.base import EventBaseTestCase
 from aldryn_events.utils import build_calendar
 from datetime import date
 
 
-class UtilsTestCase(TransactionTestCase):
+class UtilsTestCase(EventBaseTestCase):
 
     def setUp(self):
         super(UtilsTestCase, self).setUp()
@@ -14,28 +15,31 @@ class UtilsTestCase(TransactionTestCase):
             EventsConfig.objects.get_or_create(namespace='aldryn_events')
         )
 
-    def create_event(self, lang, title, start_date, end_date=None, slug=None,
-                     config=None):
-        return Event.objects.language(lang).create(
-            title=title,
-            slug=slug,
-            start_date=start_date,
-            end_date=end_date,
-            app_config=config or self.config,
-            start_time='00:00',
-            end_time='23:59'
-        )
-
     def test_build_calendar(self):
         other_config = EventsConfig.objects.create(namespace='other')
-        ev1 = self.create_event('en', 'ev1', '2015-02-13')
-        ev2 = self.create_event('en', 'ev2', '2015-02-15')
-        ev3 = self.create_event('de', 'ev3', '2015-02-16')
-        ev4 = self.create_event('en', 'ev4', '2015-02-18', config=other_config)
-        ev5 = self.create_event('en', 'ev5', '2015-02-22', '2015-02-27')
-        ev6 = self.create_event('en', 'ev6', '2015-02-25')
+        ev1 = self.create_event(
+            title='ev1', start_date='2015-02-13', publish_at='2015-02-10'
+        )
+        ev2 = self.create_event(
+            title='ev2', start_date='2015-02-15', publish_at='2015-02-10'
+        )
+        ev3 = self.create_event(
+            de=dict(
+                title='ev3', start_date='2015-02-16', publish_at='2015-02-10'
+            )
+        )
+        ev4 = self.create_event(
+            title='ev4', start_date='2015-02-18', publish_at='2015-02-10',
+            app_config=other_config
+        )
+        ev5 = self.create_event(
+            title='ev5', start_date='2015-02-22', end_date='2015-02-27',
+            publish_at='2015-02-10'
+        )
+        ev6 = self.create_event(
+            title='ev6', start_date='2015-02-25', publish_at='2015-02-10'
+        )
 
-        # make dates a dict cuz is easy to test
         dates = build_calendar('2015', '02', 'en', self.config.namespace)
 
         # ev1 and ev2 in his days
