@@ -49,6 +49,14 @@ class EventQuerySet(AppHookConfigTranslatableQueryset):
         now = now or timezone.now()
         return self.filter(is_published=True, publish_at__lte=now)
 
+    def ongoing(self, now=None):
+        now = now or timezone.now()
+        _date = now.date()
+        return self.published(now).filter(
+            Q(end_date__isnull=True, start_date=_date)
+            | Q(start_date__lte=_date, end_date__gte=_date)
+        )
+
 
 class EventManager(AppHookConfigTranslatableManager):
 
@@ -69,3 +77,6 @@ class EventManager(AppHookConfigTranslatableManager):
 
     def published(self, now=None):
         return self.get_queryset().published(now=now)
+
+    def ongoing(self, now=None):
+        return self.get_queryset().ongoing(now=now)
