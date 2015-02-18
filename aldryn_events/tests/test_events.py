@@ -1,57 +1,21 @@
 # -*- coding: utf-8 -*-
-from cms.utils.i18n import force_language
-from django.core.exceptions import ValidationError
-
 import mock
-import random
-import string
 
-from django.contrib.auth.models import AnonymousUser
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.template import RequestContext
-from django.test import RequestFactory, TestCase, TransactionTestCase
 from django.utils.timezone import get_current_timezone
 
 from cms import api
-from cms.middleware.toolbar import ToolbarMiddleware
-from cms.utils import get_cms_setting
+from cms.utils.i18n import force_language
 from datetime import datetime
 
 from aldryn_events.models import Event, EventsConfig
+from aldryn_events.tests.base import EventBaseTestCase, get_page_request
 
 
-def get_page_request(page, user=None, path=None, edit=False, language='en'):
-
-    path = path or page and page.get_absolute_url()
-    if edit:
-        path += '?edit'
-    request = RequestFactory().get(path)
-    request.session = {}
-    request.user = user or AnonymousUser()
-    request.LANGUAGE_CODE = language
-    if edit:
-        request.GET = {'edit': None}
-    else:
-        request.GET = {'edit_off': None}
-    request.current_page = page
-    mid = ToolbarMiddleware()
-    mid.process_request(request)
-    return request
-
-
-def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
-    return prefix + u''.join(random.choice(chars) for _ in range(length))
-
-
-class EventUnitTestCase(TransactionTestCase):
-
-    def setUp(self):
-        super(EventUnitTestCase, self).setUp()
-        self.app_config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
+class EventTestCase(EventBaseTestCase):
 
     def test_event_days_property_shows_correct_value(self):
         event = Event.objects.create(
@@ -77,7 +41,7 @@ class EventUnitTestCase(TransactionTestCase):
     def test_event_days_property_raises_validationerror(self):
         event = Event.objects.create(
             title='5 days event', app_config=self.app_config,
-            start_date='2015-01-01'  # must have start_date
+            start_date='2015-01-01'
         )
         event.start_date, event.end_date = 'blah', 'blah'
         self.assertRaises(ValidationError, lambda: event.days)
@@ -95,39 +59,6 @@ class EventUnitTestCase(TransactionTestCase):
         )
         self.assertTrue(event1.takes_single_day)
         self.assertFalse(event2.takes_single_day)
-
-
-class EventTestCase(TransactionTestCase):
-    reset_sequences = True
-
-    def setUp(self):
-        super(EventTestCase, self).setUp()
-        self.app_config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
-        self.template = get_cms_setting('TEMPLATES')[0][0]
-        self.language = settings.LANGUAGES[0][0]
-
-    def create_root_page(self, publication_date=None):
-        root_page = api.create_page(
-            'root page', self.template, self.language, published=True,
-            publication_date=publication_date
-        )
-        api.create_title('de', 'root page de', root_page)
-        root_page.publish('en')
-        root_page.publish('de')
-        return root_page.reload()
-
-    def create_event(self):
-        event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2014-09-10',
-            publish_at='2014-01-01 12:00', app_config=self.app_config
-        )
-        event.set_current_language('de')
-        event.title = 'Ereignis'
-        event.slug = 'im-freien'
-        event.save()
-        return Event.objects.language('en').get(pk=event.pk)
 
     def test_create_event(self):
         """
@@ -149,6 +80,34 @@ class EventTestCase(TransactionTestCase):
 
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 1)
+
+    def test_event_fill_slug_with_manager_create(self):
+        event = Event.objects.create(title='show me the slug',
+                                     start_date='2015-02-04',
+                                     app_config=self.app_config)
+        self.assertEqual(event.slug, 'show-me-the-slug')
+
+    def test_event_fill_slug_with_instance_save(self):
+        event = Event(title='show me the slug', start_date='2015-02-04',
+                      app_config=self.app_config)
+        event.save()
+        self.assertEqual(event.slug, 'show-me-the-slug')
+
+    def test_event_not_overwrite_slug_with_manager_create(self):
+        event = Event.objects.create(title='show me the slug',
+                                     slug='gotchaa',
+                                     start_date='2015-02-04',
+                                     app_config=self.app_config)
+        self.assertEqual(event.slug, 'gotchaa')
+
+    def test_event_not_overwrite_slug_with_instance_save(self):
+        event = Event(title='show me the slug', slug='gotchaa',
+                      start_date='2015-02-04', app_config=self.app_config)
+        event.save()
+        self.assertEqual(event.slug, 'gotchaa')
+
+
+class EventPagesTestCase(EventBaseTestCase):
 
     def test_event_detail_page(self):
         """
@@ -232,6 +191,30 @@ class EventTestCase(TransactionTestCase):
             self.assertNotContains(response, event2.title)
             self.assertNotContains(response, event2.get_absolute_url())
 
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_unattached_namespace(self, timezone_mock):
+        timezone_mock.now.return_value = datetime(2015, 2, 2, 10)
+        event1 = Event.objects.create(
+            title='Event2015 current namespace',
+            slug='open-air', start_date='2015-02-07',
+            publish_at='2015-02-02 09:00', enable_registration=True,
+            registration_deadline_at='2015-02-07 00:00',
+            app_config=EventsConfig.objects.get(namespace='aldryn_events')
+        )
+        event2 = Event.objects.create(
+            title='Event new namespace', slug='open-air-new-namespace',
+            start_date='2015-02-07', publish_at='2015-02-02 09:00',
+            enable_registration=True,
+            registration_deadline_at='2015-02-07 00:00',
+            app_config=EventsConfig.objects.create(namespace='another')
+        )
+        response = self.client.get(reverse('aldryn_events:events_list'))
+        self.assertContains(response, event1.title)
+        self.assertNotContains(response, event2.title)
+
+
+class EventPluginsTestCase(EventBaseTestCase):
+
     def test_event_list_plugin(self):
         """
         We add an event to the Event Plugin and look it up
@@ -309,15 +292,14 @@ class EventTestCase(TransactionTestCase):
         page.publish('de')
 
         # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
+        def new_event(num, language):
+            title = 'event' if language == 'en' else 'ereignis'
+            event = Event.objects.language(language).create(
+                title="{} {} {}".format(title, num, language),
+                slug="{}-{}-{}".format(title, num, language),
                 app_config=self.app_config,
                 start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00',
-
+                publish_at='2014-01-01 12:00'
             )
             return event
         for i in range(1, 7):
@@ -513,33 +495,7 @@ class EventTestCase(TransactionTestCase):
         )
 
 
-    def test_event_fill_slug_with_manager_create(self):
-        event = Event.objects.create(title='show me the slug',
-                                     start_date='2015-02-04',
-                                     app_config=self.app_config)
-        self.assertEqual(event.slug, 'show-me-the-slug')
-
-    def test_event_fill_slug_with_instance_save(self):
-        event = Event(title='show me the slug', start_date='2015-02-04',
-                      app_config=self.app_config)
-        event.save()
-        self.assertEqual(event.slug, 'show-me-the-slug')
-
-    def test_event_not_overwrite_slug_with_manager_create(self):
-        event = Event.objects.create(title='show me the slug',
-                                     slug='gotchaa',
-                                     start_date='2015-02-04',
-                                     app_config=self.app_config)
-        self.assertEqual(event.slug, 'gotchaa')
-
-    def test_event_not_overwrite_slug_with_instance_save(self):
-        event = Event(title='show me the slug', slug='gotchaa',
-                      start_date='2015-02-04', app_config=self.app_config)
-        event.save()
-        self.assertEqual(event.slug, 'gotchaa')
-
-
-class RegistrationTestCase(TransactionTestCase):
+class RegistrationTestCase(EventBaseTestCase):
 
     @mock.patch('aldryn_events.models.timezone')
     def test_submit_registration(self, timezone_mock):
@@ -607,23 +563,3 @@ class RegistrationTestCase(TransactionTestCase):
         for k, v in data.items():
             self.assertEqual(getattr(registration, k), v)
 
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_unattached_namespace(self, timezone_mock):
-        timezone_mock.now.return_value = datetime(2015, 2, 2, 10)
-        event1 = Event.objects.create(
-            title='Event2015 current namespace',
-            slug='open-air', start_date='2015-02-07',
-            publish_at='2015-02-02 09:00', enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=EventsConfig.objects.create(namespace='aldryn_events')
-        )
-        event2 = Event.objects.create(
-            title='Event new namespace', slug='open-air-new-namespace',
-            start_date='2015-02-07', publish_at='2015-02-02 09:00',
-            enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=EventsConfig.objects.create(namespace='another')
-        )
-        response = self.client.get(reverse('aldryn_events:events_list'))
-        self.assertContains(response, event1.title)
-        self.assertNotContains(response, event2.title)

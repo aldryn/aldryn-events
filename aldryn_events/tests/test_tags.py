@@ -7,23 +7,20 @@ import mock
 from pyquery import PyQuery
 from aldryn_events.models import Event, EventsConfig
 from django.template import Template, Context
+from aldryn_events.tests.base import EventBaseTestCase
 
-class TagsTestCase(TransactionTestCase):
 
-    def setUp(self):
-        super(TagsTestCase, self).setUp()
-        self.config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
+class TagsTestCase(EventBaseTestCase):
 
-    def create_event(self, lang, title, start_date, end_date=None, slug=None,
-                     config=None):
+    def _create_event(self, lang, title, start_date, end_date=None, slug=None,
+                     app_config=None):
+        """ Custom create_event for this test case """
         return Event.objects.language(lang).create(
             title=title,
             slug=slug,
             start_date=start_date,
             end_date=end_date,
-            app_config=config or self.config,
+            app_config=app_config or self.app_config,
             start_time='00:00',
             end_time='23:59'
         )
@@ -34,12 +31,14 @@ class TagsTestCase(TransactionTestCase):
             datetime(2015, 1, 10, 12, 0, tzinfo=get_current_timezone())
         )
         other_config = EventsConfig.objects.create(namespace='other')
-        ev1 = self.create_event('en', 'ev1', '2015-01-13')
-        ev2 = self.create_event('en', 'ev2', '2015-01-15')
-        ev3 = self.create_event('de', 'ev3', '2015-01-16')
-        ev4 = self.create_event('en', 'ev4', '2015-01-18', config=other_config)
-        ev5 = self.create_event('en', 'ev5', '2015-01-22', '2015-01-27')
-        ev6 = self.create_event('en', 'ev6', '2015-01-25')
+        ev1 = self._create_event('en', 'ev1', '2015-01-13')
+        ev2 = self._create_event('en', 'ev2', '2015-01-15')
+        ev3 = self._create_event('de', 'ev3', '2015-01-16')
+        ev4 = self._create_event(
+            'en', 'ev4', '2015-01-18', app_config=other_config
+        )
+        ev5 = self._create_event('en', 'ev5', '2015-01-22', '2015-01-27')
+        ev6 = self._create_event('en', 'ev6', '2015-01-25')
 
         t = Template(
             "{% load aldryn_events %}"
