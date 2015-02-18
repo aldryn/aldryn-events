@@ -16,7 +16,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         db.rename_column('aldryn_events_event', 'description_id', 'description_new_id')
-        
+
         # Adding field 'EventTranslation.description'
         db.add_column(u'aldryn_events_event_translation', 'description',
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cms.Placeholder'], null=True),
