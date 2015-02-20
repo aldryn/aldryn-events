@@ -134,6 +134,7 @@ class ResetEventRegistration(AppConfigMixin, FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
+        self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
         self.event = (
             Event.objects.namespace(self.namespace)
@@ -153,7 +154,8 @@ class ResetEventRegistration(AppConfigMixin, FormView):
         return super(ResetEventRegistration, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('events_detail', kwargs={'slug': self.event.slug})
+        return reverse('aldryn_events:events_detail', kwargs={'slug': self.event.slug},
+                       current_app=self.namespace)
 
 
 class EventDatesView(AppConfigMixin, TemplateView):
