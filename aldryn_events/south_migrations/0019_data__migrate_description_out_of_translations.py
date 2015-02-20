@@ -12,14 +12,22 @@ class Migration(DataMigration):
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
         for event in orm.Event.objects.all():
-            event.description_new = event.description
-            event.save()
+            first = True
+            for tr in event.translations.all():
+                if first:
+                    event.description_new_id = tr.description_id
+                    event.save()
+                    first = False
+                else:
+                    plugins = (
+                        tr.description.cmsplugin_set.filter(language=tr.language_code)
+                    )
+                    plugins.update(placeholder_id=event.description_new_id)
 
     def backwards(self, orm):
         "Write your backwards methods here."
         for event in orm.Event.objects.all():
-            event.description = event.description_new
-            event.save()
+            event.translations.update(description_id=event.description_new_id)
 
     models = {
         u'aldryn_events.event': {
