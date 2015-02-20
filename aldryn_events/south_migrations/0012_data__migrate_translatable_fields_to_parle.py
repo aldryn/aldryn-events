@@ -28,9 +28,7 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
-        Event = orm['aldryn_events.Event']
-
-        for obj in Event.objects.all():
+        for obj in orm.Event.objects.all():
 
             # Set all translations with current values for new translated fields because each
             # translation have used same value before this migration.
@@ -49,14 +47,19 @@ class Migration(DataMigration):
         for obj in Event.objects.all():
             translations = EventTranslation.objects.filter(master_id=obj.pk)
 
-            # Set translated fields to old untranslated fields. Use default translation to do it
-            # is our best shot because default language probably is same.
+            # Set translated fields to old untranslated fields.
+            # Use default translation to do it is our best shot because
+            # default language probably is same.
             translation = _get_default_translation(translations)
             obj.slug = translation.slug_new
             obj.description = translation.description_new
             obj.image = translation.image_new
             obj.flyer = translation.flyer_new
             obj.save()
+
+            for tr in translations.exclude(pk=translation.pk):
+                plugins = tr.description_new.cmsplugin_set.filter(language=tr.language_code)
+                plugins.update(description_new_id=obj.description_id)
 
     models = {
         u'aldryn_events.event': {
