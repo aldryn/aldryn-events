@@ -10,6 +10,7 @@ from django.utils.timezone import get_current_timezone
 from cms import api
 from cms.utils.i18n import force_language
 from datetime import datetime
+from pyquery import PyQuery
 
 from aldryn_events.models import Event, EventsConfig
 from .base import EventBaseTestCase, get_page_request
@@ -211,6 +212,80 @@ class EventPagesTestCase(EventBaseTestCase):
         response = self.client.get(reverse('aldryn_events:events_list'))
         self.assertContains(response, event1.title)
         self.assertNotContains(response, event2.title)
+
+    @mock.patch('aldryn_events.managers.timezone')
+    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
+    def test_ongoing_events_in_event_list(self, managers_timezone_mock,
+                                          tag_timezone_mock):
+        managers_timezone_mock.now.return_value = datetime(
+            2014, 4, 7, 9, 30, tzinfo=get_current_timezone()
+        )
+        tag_timezone_mock.now.return_value = datetime(
+            2014, 4, 7, 9, 30, tzinfo=get_current_timezone()
+        )
+
+        root_page = self.create_root_page(
+            publication_date=datetime(
+                2014, 4, 1, tzinfo=get_current_timezone()
+            )
+        )
+        root_page.publish('en')
+        page = api.create_page(
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            parent=root_page,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=datetime(
+                2014, 4, 1, tzinfo=get_current_timezone()
+            )
+        )
+        page.publish('en')
+
+        # happens in Apr 5
+        self.create_event(
+            title='ev1', start_date='2014-04-05', publish_at='2014-04-01'
+        )
+        # Apr 6 12:00 to Apr 7 09:00
+        ev2 = self.create_event(
+            title='ev2',
+            start_date='2014-04-06', end_date='2014-04-07',
+            start_time='12:00', end_time='09:00',
+            publish_at='2014-04-02'
+        )
+        # happens in Apr 7
+        ev3 = self.create_event(
+            title='ev3', start_date='2014-04-07', publish_at='2014-04-03'
+        )
+        # happens in Apr 8
+        self.create_event(
+            title='ev4', start_date='2014-04-08', publish_at='2014-04-04'
+        )
+
+        # setUp app config
+        original_show_ongoing_first = self.app_config.show_ongoing_first
+        self.app_config.show_ongoing_first = True
+        self.app_config.save()
+
+        with force_language('en'):
+            response = self.client.get(page.get_absolute_url('en'))
+            context = response.context_data
+
+        # tearDown app config
+        self.app_config.show_ongoing_first = original_show_ongoing_first
+        self.app_config.save()
+
+        self.assertQuerysetEqual(
+            context['ongoing_objects'], ['ev2', 'ev3'], transform=str
+        )
+        self.assertQuerysetEqual(
+            context['object_list'], ['ev4'], transform=str
+        )
+        ongoing_list = PyQuery(response.content)('ul.ongoing-events')
+        links = ongoing_list.find('h3 a')
+        self.assertEqual(2, links.length)
+        self.assertEqual(ev2.get_absolute_url(), links[0].attrib['href'])
+        self.assertEqual(ev3.get_absolute_url(), links[1].attrib['href'])
 
 
 class EventPluginsTestCase(EventBaseTestCase):
