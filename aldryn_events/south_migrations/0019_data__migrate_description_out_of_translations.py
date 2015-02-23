@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
@@ -23,11 +24,17 @@ class Migration(DataMigration):
                         tr.description.cmsplugin_set.filter(language=tr.language_code)
                     )
                     plugins.update(placeholder_id=event.description_new_id)
+                    for plugin in plugins:
+                        plugin.placeholder_id = event.description_new_id
+                        plugin.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."
         for event in orm.Event.objects.all():
-            event.translations.update(description_id=event.description_new_id)
+            for tr in event.translations:
+                tr.description_id = event.description_new_id
+                tr.save()
+
 
     models = {
         u'aldryn_events.event': {

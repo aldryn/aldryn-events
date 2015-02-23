@@ -38,7 +38,9 @@ def backwards_func(apps, schema_editor):
 
         for tr in translations.exclude(pk=translation.pk):
             plugins = tr.description_new.cmsplugin_set.filter(language=tr.language_code)
-            plugins.update(description_new_id=obj.description_id)
+            for plugin in plugins:
+                plugin.placeholder_id = obj.description_id
+                plugin.save()
 
 
 def _get_default_translation(translations):
