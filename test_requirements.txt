@@ -1,3 +1,4 @@
 djangocms-helper
+mock
 pysqlite
 coverage
