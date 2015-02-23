@@ -18,12 +18,17 @@ def forwards(apps, schema_editor):
                 plugins = (
                     tr.description.cmsplugin_set.filter(language=tr.language_code)
                 )
-                plugins.update(placeholder_id=event.description_new_id)
+                for plugin in plugins:
+                    plugin.placeholder_id = event.description_new_id
+                    plugin.save()
+
 
 def backwards(apps, schema_editor):
     Event = apps.get_model('aldryn_events', 'Event')
     for event in Event.objects.all():
-        event.translations.update(description_id=event.description_new_id)
+        for tr in event.translations.all():
+            tr.description_id = event.description_new_id
+            tr.save()
 
 
 class Migration(migrations.Migration):
