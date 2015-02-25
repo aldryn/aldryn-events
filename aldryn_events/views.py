@@ -2,8 +2,8 @@
 import datetime
 from aldryn_apphooks_config.utils import get_app_instance
 
-from django.core.urlresolvers import reverse
 from django import forms
+from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,

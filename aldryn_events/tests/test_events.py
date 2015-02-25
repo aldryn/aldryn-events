@@ -15,11 +15,11 @@ from django.test import TransactionTestCase
 from cms import api
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
+from cms.utils.i18n import force_language
 from datetime import datetime
 from django.utils.timezone import get_current_timezone
 
 from aldryn_events.models import Event, EventsConfig
-
 
 
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
@@ -40,6 +40,7 @@ def get_page_request(page, user=None, path=None, edit=False, language='en'):
     mid.process_request(request)
     return request
 
+
 def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
     return prefix + u''.join(random.choice(chars) for _ in range(length))
 
@@ -57,52 +58,78 @@ class EventTestCase(TransactionTestCase):
         api.create_title('de', 'root page de', self.root_page)
 
     def create_event(self):
-        event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2014-09-10',
-            publish_at='2014-01-01 12:00', app_config=self.app_config
-        )
-        event.set_current_language('de')
-        event.title = 'Ereignis'
-        event.slug = 'im-freien'
-        event.save()
+        with force_language('en'):
+            event = Event.objects.language('en').create(
+                title='Event2014', slug='open-air', start_date='2014-09-10',
+                publish_at='2014-01-01 12:00', app_config=self.app_config
+            )
+        event.create_translation('de', title='Ereignis', slug='im-freien')
         return Event.objects.language('en').get(pk=event.pk)
 
-    def test_create_event(self):
+    # add events
+    def new_event_from_num(self, num, start_date, end_date, publish_at):
+        """ create event based on a num in both languages """
+        text, text_de = 'event', 'ereignis'
+        with force_language('en'):
+            event = Event.objects.create(
+                title='{} {} en'.format(text, num),
+                slug='{}-{}-en'.format(text, num),
+                app_config=self.app_config,
+                start_date=start_date, end_date=end_date,
+                publish_at=publish_at
+            )
+        event.create_translation(
+            language_code='de',
+            title='{} {} de'.format(text_de, num),
+            slug='{}-{}-de'.format(text_de, num)
+        )
+        return Event.objects.language('en').get(pk=event.pk)
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_create_event(self, timezone_mock):
         """
         We can create an event with a name in two languages
         """
-        self.assertEqual(Event.objects.count(), 0)
-        event = Event.objects.language('en').create(
-            title='Concert', start_date='2014-09-10', slug='open-concert',
-            app_config=self.app_config
+        timezone_mock.now.return_value = datetime(
+            2014, 9, 9, tzinfo=get_current_timezone()
         )
+        self.assertEqual(Event.objects.count(), 0)
+        with force_language('en'):
+            event = Event.objects.create(
+                title='Concert', start_date='2014-09-10', slug='open-concert',
+                publish_at=datetime(2014, 9, 9, tzinfo=get_current_timezone()),
+                app_config=self.app_config
+            )
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 0)
         self.assertEqual(event.get_current_language(), 'en')
 
-        event.set_current_language('de')
-        event.title = 'Konzert'
-        event.slug = 'offene-konzert'
-        event.save()
+        event.create_translation('de', title='Konzert', slug='offene-konzert')
 
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 1)
 
-    def test_event_detail_page(self):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_event_detail_page(self, timezone_mock):
         """
         Test if proper url and event page are created
         """
+        timezone_mock.now.return_value = datetime(
+            2014, 9, 1, 12, tzinfo=get_current_timezone()
+        )
         event = self.create_event()
 
         # '/events/' came from tests/urls.py, '/open-air/' from the event slug
         self.assertEqual(event.get_absolute_url(), '/en/events/open-air/')
-        response = self.client.get(event.get_absolute_url())
+        with force_language('en'):
+            response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
         event.set_current_language('de')
         # '/events/' came from tests/urls.py, '/im-freien/' from the event slug
         self.assertEqual(event.get_absolute_url(), '/de/events/im-freien/')
-        response = self.client.get(event.get_absolute_url())
+        with force_language('de'):
+            response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
     @mock.patch('aldryn_events.managers.timezone')
@@ -169,10 +196,11 @@ class EventTestCase(TransactionTestCase):
 
         # add events
         event1 = self.create_event()
-        event2 = Event.objects.language('en').create(
-            title='Event2015 only english', start_date='2015-01-29',
-            app_config=self.app_config
-        )
+        with force_language('en'):
+            event2 = Event.objects.create(
+                title='Event2015 only english', start_date='2015-01-29',
+                app_config=self.app_config
+            )
         plugin_en.events = [event1, event2]
         plugin_en.save()
         plugin_de.events = [event1, event2]
@@ -221,31 +249,23 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
-                app_config=self.app_config,
-                start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00',
-
-            )
-            return event
         for i in range(1, 7):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
+            self.new_event_from_num(
+                i, start_date='2015-01-29', end_date='2015-02-05',
+                publish_at='2014-01-01 12:00'
+            )
 
         # Test plugin rendering for both languages in a forloop. I don't
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
-        request = get_page_request(None, path='/en/home/', language='en')
-        context = RequestContext(request, {})
-        rendered['en'] = plugin_en.render_plugin(context, ph)
-        request = get_page_request(None, path='/de/home/', language='de')
-        context = RequestContext(request, {})
-        rendered['de'] = plugin_de.render_plugin(context, ph)
+        with force_language('en'):
+            request = get_page_request(None, path='/en/home/', language='en')
+            context = RequestContext(request, {})
+            rendered['en'] = plugin_en.render_plugin(context, ph)
+        with force_language('de'):
+            request = get_page_request(None, path='/de/home/', language='de')
+            context = RequestContext(request, {})
+            rendered['de'] = plugin_de.render_plugin(context, ph)
 
         for i in range(1, 6):
             for lang in ['en', 'de']:
@@ -285,10 +305,14 @@ class EventTestCase(TransactionTestCase):
 
         )
 
-    def test_upcoming_plugin_for_past(self):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_upcoming_plugin_for_past(self, timezone_mock):
         """
         Test the upcoming events plugin for past entries
         """
+        timezone_mock.now.return_value = datetime(
+            2014, 7, 6, 12, tzinfo=get_current_timezone()
+        )
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
             apphook='EventListAppHook',
@@ -306,29 +330,23 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
-                start_date='2014-06-29', end_date='2014-07-05',
-                publish_at='2014-06-20 12:00', app_config=self.app_config
-            )
-            return event
         for i in range(1, 7):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
+            self.new_event_from_num(
+                i, start_date='2014-06-29', end_date='2014-07-05',
+                publish_at='2014-06-20 12:00'
+            )
 
         # Test plugin rendering for both languages in a forloop. I don't
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
-        request = get_page_request(None, path='/en/home/', language='en')
-        context = RequestContext(request, {})
-        rendered['en'] = plugin_en.render_plugin(context, ph)
-        request = get_page_request(None, path='/de/home/', language='de')
-        context = RequestContext(request, {})
-        rendered['de'] = plugin_de.render_plugin(context, ph)
+        with force_language('en'):
+            request = get_page_request(None, path='/en/home/', language='en')
+            context = RequestContext(request, {})
+            rendered['en'] = plugin_en.render_plugin(context, ph)
+        with force_language('de'):
+            request = get_page_request(None, path='/de/home/', language='de')
+            context = RequestContext(request, {})
+            rendered['de'] = plugin_de.render_plugin(context, ph)
 
         for i in range(1, 6):
             for lang in ['en', 'de']:
@@ -386,26 +404,19 @@ class EventTestCase(TransactionTestCase):
         page.publish('en')
         page.publish('de')
 
-        # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
-                start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00', app_config=self.app_config
+        for i in range(1, 7):
+            self.new_event_from_num(
+                i, start_date='2015-01-29', end_date='2015-02-05',
+                publish_at='2014-01-01 12:00'
             )
-            return event
-
-        for i in range(1, 3):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
 
         # Test plugin rendering for both languages in a forloop. I don't
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
-        rendered['en'] = self.client.get('/en/home/').content
-        rendered['de'] = self.client.get('/de/home/').content
+        with force_language('en'):
+            rendered['en'] = self.client.get('/en/home/').content
+        with force_language('de'):
+            rendered['de'] = self.client.get('/de/home/').content
 
         html = ('<td class="events disabled"><a href="/{}/events/2015/1/29/">'
                 '29</a></td>')
@@ -456,17 +467,16 @@ class RegistrationTestCase(TransactionTestCase):
         timezone_mock.now.return_value = datetime(
             2015, 2, 5, 9, 0, tzinfo=get_current_timezone()
         )
-        event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2015-02-07',
-            publish_at='2015-02-02 09:00', enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=app_config
-        )
+        with force_language('en'):
+            event = Event.objects.create(
+                title='Event2014', slug='open-air', start_date='2015-02-07',
+                publish_at='2015-02-02 09:00', enable_registration=True,
+                registration_deadline_at='2015-02-07 00:00',
+                app_config=app_config
+            )
         event.event_coordinators.create(name='The big boss',
                                         email='theboss@gmail.com')
-        event.set_current_language('de')
-        event.title = 'Ereignis'
-        event.slug = 'im-freien'
+        event.create_translation('de', title='Ereignis', slug='im-freien')
         event.save()
         event.set_current_language('en')
 
@@ -513,7 +523,11 @@ class RegistrationTestCase(TransactionTestCase):
         for k, v in data.items():
             self.assertEqual(getattr(registration, k), v)
 
-    def test_unattached_namespace(self):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_unattached_namespace(self, manager_timezone_mock):
+        manager_timezone_mock.now.return_value = datetime(
+            2015, 2, 2, 10, tzinfo=get_current_timezone()
+        )
         template = get_cms_setting('TEMPLATES')[0][0]
         event1 = Event.objects.create(
             title='Event2015 current namespace',
