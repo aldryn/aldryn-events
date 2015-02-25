@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
+import sys
 from setuptools import setup, find_packages
 from aldryn_events import __version__
 
+py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
+py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
+
+if not py26 and not py27:
+    raise ValueError("Aldryn Events currently support only python 2.6 and 2.7")
+
 REQUIREMENTS = [
-    'Django<1.8,>=1.3',
     'South<1.1,>=1.0.2',
     'django-extended-choices',
-    'django-tablib',
     'django-appconf',
     'django-standard-form',
     'djangocms-text-ckeditor',
@@ -14,7 +19,25 @@ REQUIREMENTS = [
     'django-filer',
     'django-hvad',
     'django-sortedm2m',
-    'django-parler'
+    'django-parler',
+    # 'aldryn-apphooks-config'
+]
+
+if py26:
+    REQUIREMENTS += [
+        'Django<1.7,>=1.5',
+        'django-tablib<3.0'
+    ]
+
+if py27:
+    REQUIREMENTS += [
+        'Django<1.8,>=1.5',
+        'django-tablib'
+    ]
+
+
+DEPENDENCY_LINKS = [
+    # 'git@github.com:aldryn/aldryn-apphooks-config.git#aldryn-apphooks-config'
 ]
 
 CLASSIFIERS = [
@@ -41,6 +64,7 @@ setup(
     license='LICENSE.txt',
     platforms=['OS Independent'],
     install_requires=REQUIREMENTS,
+    dependency_links=DEPENDENCY_LINKS,
     classifiers=CLASSIFIERS,
     include_package_data=True,
     zip_safe=False
