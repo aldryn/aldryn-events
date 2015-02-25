@@ -18,7 +18,6 @@ HELPER_SETTINGS = {
     'TIME_ZONE': 'Europe/Zurich',
     'INSTALLED_APPS': [
         'mptt',
-        'reversion',
         'parler',
         'hvad',
         'filer',
@@ -75,7 +74,7 @@ HELPER_SETTINGS = {
     #     'filer': 'filer.migrations_django',
     # },
     'MIGRATION_MODULES': DisableMigrations(),
-    'SOUTH_TESTS_MIGRATE': False,
+    'SOUTH_TESTS_MIGRATE': True,
     # 'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True
