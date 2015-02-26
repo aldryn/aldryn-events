@@ -64,9 +64,13 @@ class EventListCMSPlugin(CMSPluginBase):
                                              check_path=True)
 
         namespace = instance.app_config_id and instance.app_config.namespace
-        events = (instance.events.namespace(namespace)
-                                 .translated(language)
-                                 .language(language))
+        # With Django 1.5 and because a bug in SortedManyToManyField
+        # we can not use instance.events or we get a error like:
+        # DatabaseError: no such column: aldryn_events_eventlistplugin_events.sort_value
+        events = (Event.objects.namespace(namespace)
+                               .translated(language)
+                               .language(language)
+                               .filter(eventlistplugin__pk=instance.pk))
 
         context['instance'] = instance
         context['events'] = events

@@ -179,21 +179,6 @@ class EventTestCase(TransactionTestCase):
         """
         We add an event to the Event Plugin and look it up
         """
-        page = api.create_page(
-            'Events en', self.template, 'en', published=True,
-            parent=self.root_page,
-        )
-        api.create_title('de', 'Events de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config
-        )
-        plugin_de = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'de', app_config=self.app_config
-        )
-        page.publish('en')
-        page.publish('de')
-
         # add events
         event1 = self.create_event()
         with force_language('en'):
@@ -202,29 +187,43 @@ class EventTestCase(TransactionTestCase):
                 start_date=tz_datetime(2015, 1, 29),
                 app_config=self.app_config
             )
+        page = api.create_page(
+            'Events en', self.template, 'en', published=True,
+            parent=self.root_page,
+        )
+        api.create_title('de', 'Events de', page)
+        ph = page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_de = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'de', app_config=self.app_config,
+        )
         plugin_en.events = [event1, event2]
         plugin_en.save()
-        plugin_de.events = [event1, event2]
+        plugin_de.events = [event1]
         plugin_de.save()
         page.publish('en')
         page.publish('de')
 
         # EN: test plugin rendering
-        response = self.client.get('/en/events-en/')
-        event1.set_current_language('en')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        event2.set_current_language('en')
-        self.assertContains(response, event2.title)
-        self.assertContains(response, event2.get_absolute_url())
+        with force_language('en'):
+            response = self.client.get('/en/events-en/')
+            event1.set_current_language('en')
+            self.assertContains(response, event1.title)
+            self.assertContains(response, event1.get_absolute_url())
+            event2.set_current_language('en')
+            self.assertContains(response, event2.title)
+            self.assertContains(response, event2.get_absolute_url())
 
         # DE: test plugin rendering
-        response = self.client.get('/de/events-de/')
-        event1.set_current_language('de')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        self.assertNotContains(response, event2.title)
-        self.assertNotContains(response, event2.get_absolute_url())
+        with force_language('de'):
+            response = self.client.get('/de/events-de/')
+            event1.set_current_language('de')
+            self.assertContains(response, event1.title)
+            self.assertContains(response, event1.get_absolute_url())
+            self.assertNotContains(response, event2.title)
+            self.assertNotContains(response, event2.get_absolute_url())
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_future(self, timezone_mock):
