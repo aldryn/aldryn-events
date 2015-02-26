@@ -329,7 +329,10 @@ class EventListPlugin(BaseEventPlugin):
 
     def copy_relations(self, oldinstance):
         super(EventListPlugin, self).copy_relations(oldinstance)
-        self.events = oldinstance.events.all()
+        # With Django 1.5 and because a bug in SortedManyToManyField
+        # we can not use oldinstance.events or we get a error like:
+        # DatabaseError: no such column: aldryn_events_eventlistplugin_events.sort_value
+        self.events = Event.objects.filter(eventlistplugin__pk=oldinstance.pk)
 
 
 class EventCalendarPlugin(BaseEventPlugin):
