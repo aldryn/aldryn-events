@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+from django import get_version
+
 
 class DisableMigrations(dict):
 
@@ -69,24 +71,30 @@ HELPER_SETTINGS = {
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     ),
-    # 'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
+    'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
     # 'MIGRATION_MODULES ': {
     #     'filer': 'filer.migrations_django',
     # },
-    'MIGRATION_MODULES': DisableMigrations(),
-    'SOUTH_TESTS_MIGRATE': True,
+    'MIGRATION_MODULES': DisableMigrations(),  # disable migration for DJ 1.7 in tests
+    'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
     # 'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
-    'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True
+    'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
+    'CACHES': {  # disable cache for tests
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
 }
 
-# if 'test' in sys.argv:
+# if '1.6' <= get_version() < '1.7' and 'test' in sys.argv:
 #     HELPER_SETTINGS['DATABASES'] = {
 #         'default': {
 #             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
-#             'TEST_NAME': os.path.join(os.path.dirname(__file__), 'test.db'),
-#        }
+#             'NAME': ':memory:',
+#             'TEST_NAME': ':memory:',
+#             'ATOMIC_REQUESTS': True
+#         }
 #     }
 
 

@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf.urls import patterns, url
+from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
     ugettext_lazy as _, get_language_from_request
@@ -60,8 +61,10 @@ class EventListCMSPlugin(CMSPluginBase):
         self.render_template = (
             'aldryn_events/plugins/list/%s/list.html' % instance.style
         )
-        language = get_language_from_request(context['request'],
-                                             check_path=True)
+        language = (
+            instance.language or
+            get_language_from_request(context['request'], check_path=True)
+        )
 
         namespace = instance.app_config_id and instance.app_config.namespace
         # With Django 1.5 and because a bug in SortedManyToManyField
@@ -92,8 +95,8 @@ class CalendarPlugin(CMSPluginBase):
         month = context.get('event_month')
 
         if not all([year, month]):
-            year = str(datetime.datetime.today().year)
-            month = str(datetime.datetime.today().month)
+            year = str(timezone.now().date().year)
+            month = str(timezone.now().date().month)
 
         current_date = datetime.date(
             day=1, month=int(month), year=int(year)
