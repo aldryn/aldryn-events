@@ -7,6 +7,7 @@ import string
 
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.template import RequestContext
@@ -17,13 +18,13 @@ from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
 from datetime import datetime
-from django.utils.timezone import get_current_timezone
+from django.utils.timezone import utc
 
 from aldryn_events.models import Event, EventsConfig
 
 
 def tz_datetime(*args, **kwargs):
-    return datetime(tzinfo=get_current_timezone(), *args, **kwargs)
+    return datetime(tzinfo=utc, *args, **kwargs)
 
 
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
@@ -63,7 +64,7 @@ class EventTestCase(TransactionTestCase):
 
     def create_event(self):
         with force_language('en'):
-            event = Event.objects.language('en').create(
+            event = Event.objects.create(
                 title='Event2014', slug='open-air',
                 start_date=tz_datetime(2014, 9, 10),
                 publish_at=tz_datetime(2014, 1, 1, 12),
@@ -175,16 +176,20 @@ class EventTestCase(TransactionTestCase):
         self.assertNotContains(response, event2.title)
         self.assertNotContains(response, event2.get_absolute_url())
 
-    def test_event_list_plugin(self):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_event_list_plugin(self, timezone_mock):
         """
         We add an event to the Event Plugin and look it up
         """
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12),
+
         # add events
         event1 = self.create_event()
         with force_language('en'):
             event2 = Event.objects.create(
-                title='Event2015 only english',
-                start_date=tz_datetime(2015, 1, 29),
+                title='Event2014 only english',
+                start_date=tz_datetime(2014, 1, 29),
+                publish_at=tz_datetime(2014, 1, 1, 12),
                 app_config=self.app_config
             )
         page = api.create_page(
@@ -250,9 +255,9 @@ class EventTestCase(TransactionTestCase):
         for i in range(1, 7):
             self.new_event_from_num(
                 i,
-                start_date=tz_datetime(2015, 1, 29),
-                end_date=tz_datetime(2015, 2, 5),
-                publish_at=tz_datetime(2015, 1, 1, 12)
+                start_date=tz_datetime(2014, 1, 29),
+                end_date=tz_datetime(2014, 2, 5),
+                publish_at=tz_datetime(2014, 1, 1, 12)
             )
 
         # Test plugin rendering for both languages in a forloop. I don't
@@ -386,11 +391,13 @@ class EventTestCase(TransactionTestCase):
         )
 
     @mock.patch('aldryn_events.managers.timezone')
-    def test_calendar_plugin(self, timezone_mock):
+    @mock.patch('aldryn_events.cms_plugins.timezone')
+    def test_calendar_plugin(self, timezone_mock, plugin_timezone_mock):
         """
         This plugin should show a link to event list page on days that has events
         """
         timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
+        plugin_timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
 
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
@@ -405,8 +412,8 @@ class EventTestCase(TransactionTestCase):
         for i in range(1, 7):
             self.new_event_from_num(
                 i,
-                start_date=tz_datetime(2015, 1, 29),
-                end_date=tz_datetime(2015, 2, 5),
+                start_date=tz_datetime(2014, 1, 29, 12),
+                end_date=tz_datetime(2014, 2, 5, 12),
                 publish_at=tz_datetime(2014, 1, 1, 12)
             )
 
@@ -418,7 +425,7 @@ class EventTestCase(TransactionTestCase):
         with force_language('de'):
             rendered['de'] = self.client.get('/de/home/').content
 
-        html = ('<td class="events disabled"><a href="/{0}/events/2015/1/29/">'
+        html = ('<td class="events"><a href="/{0}/events/2014/1/29/">'
                 '29</a></td>')
         self.assertIn(
             html.format('de'), rendered['de'],
@@ -486,9 +493,7 @@ class RegistrationTestCase(TransactionTestCase):
         event.event_coordinators.create(name='The big boss',
                                         email='theboss@gmail.com')
         event.create_translation('de', title='Ereignis', slug='im-freien')
-        event.save()
         event.set_current_language('en')
-
         data = {
             'salutation': 'mrs',
             'company': 'any',
