@@ -35,9 +35,11 @@ class NavigationMixin(object):
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
-            events=Event.objects.namespace(self.namespace)
-                                .archive()
-                                .translated(language).language(language),
+            events=(
+                Event.objects.namespace(self.namespace)
+                             .archive()
+                             .translated(language).language(language)
+            ),
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year

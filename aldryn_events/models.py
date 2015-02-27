@@ -68,7 +68,7 @@ class Event(TranslatableModel):
         'EventCoordinator', verbose_name=_('event coordinators'),
         null=True, blank=True
     )
-    description=PlaceholderField(
+    description = PlaceholderField(
         'aldryn_events_event_description', verbose_name=_('description')
     )
 
@@ -131,12 +131,12 @@ class Event(TranslatableModel):
                 )
             )
 
-        if (self.start_date and self.end_date
-                and self.end_date < self.start_date):
+        if (self.start_date and self.end_date and
+                self.end_date < self.start_date):
             raise ValidationError(_('start should be before end'))
 
-        if (self.end_date and self.start_date == self.end_date
-                and self.end_time < self.start_time):
+        if (self.end_date and self.start_date == self.end_date and
+                self.end_time < self.start_time):
             raise ValidationError(_('start should be before end'))
 
         if self.enable_registration and self.register_link:
@@ -157,8 +157,8 @@ class Event(TranslatableModel):
 
     @property
     def is_registration_deadline_passed(self):
-        return not (self.registration_deadline_at
-                    and self.registration_deadline_at > timezone.now())
+        return not (self.registration_deadline_at and
+                    self.registration_deadline_at > timezone.now())
 
     def get_absolute_url(self):
         slug = self.safe_translation_getter('slug')
@@ -167,6 +167,7 @@ class Event(TranslatableModel):
                 'aldryn_events:events_detail', kwargs={'slug': slug},
                 current_app=self.app_config.namespace
             )
+
 
 def set_event_slug(instance, **kwargs):
     if not instance.slug:
@@ -180,6 +181,7 @@ def set_event_slug(instance, **kwargs):
         )
 
 post_save.connect(set_event_slug, sender=Event)
+
 
 class EventCoordinator(models.Model):
 
