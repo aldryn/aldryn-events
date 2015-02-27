@@ -136,6 +136,7 @@ class ResetEventRegistration(AppConfigMixin, FormView):
     form_class = forms.Form
 
     def dispatch(self, request, *args, **kwargs):
+        self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
         self.event = (
             Event.objects.namespace(self.namespace)
