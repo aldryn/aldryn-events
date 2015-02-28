@@ -80,9 +80,10 @@ HELPER_SETTINGS = {
     # 'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
-    'CACHES': {  # disable cache for tests
+    'CACHES': {
         'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/aldryn_events_test_cache',
         }
     }
 }
