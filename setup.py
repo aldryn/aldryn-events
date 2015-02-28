@@ -13,7 +13,7 @@ REQUIREMENTS = [
     'South<1.1,>=1.0.2',
     'django-extended-choices',
     'django-appconf',
-    'django-standard-form',
+    'django-standard-form>=1.1.1',
     'djangocms-text-ckeditor',
     'aldryn-common>=0.0.6',
     'django-filer',

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from importlib import import_module
 
 import mock
 import random
@@ -61,6 +61,10 @@ class EventTestCase(TransactionTestCase):
             'root page', self.template, self.language, published=True
         )
         api.create_title('de', 'root page de', self.root_page)
+
+    def tearDown(self):
+        super(EventTestCase, self).tearDown()
+        cache.clear()
 
     def create_event(self):
         with force_language('en'):
@@ -476,6 +480,10 @@ class EventTestCase(TransactionTestCase):
 
 class RegistrationTestCase(TransactionTestCase):
 
+    def tearDown(self):
+        super(RegistrationTestCase, self).tearDown()
+        cache.clear()
+
     @mock.patch('aldryn_events.models.timezone')
     def test_submit_registration(self, timezone_mock):
         app_config = EventsConfig.objects.create(namespace='aldryn_events')
@@ -483,6 +491,7 @@ class RegistrationTestCase(TransactionTestCase):
 
         with force_language('en'):
             event = Event.objects.create(
+                id=5,
                 title='Event2014', slug='open-air',
                 start_date=tz_datetime(2015, 2, 7),
                 publish_at=tz_datetime(2015, 2, 2, 9),
@@ -508,16 +517,10 @@ class RegistrationTestCase(TransactionTestCase):
             'message': "I'm testing you"
         }
         response = self.client.post(
-            event.get_absolute_url(), data, follow=True
+            event.get_absolute_url(), data
         )
-        form = response.context_data.get('form')
-        # fail, show form error
-        self.assertFalse(
-            bool(form.errors),
-            "Registration form has errors:\n{0}".format(
-                form.errors.as_text()
-            )
-        )
+
+        self.assertRedirects(response, event.get_absolute_url())
 
         # test if emails was sent
         self.assertEqual(len(mail.outbox), 2)
@@ -537,10 +540,74 @@ class RegistrationTestCase(TransactionTestCase):
         for k, v in data.items():
             self.assertEqual(getattr(registration, k), v)
 
+    @mock.patch('aldryn_events.models.timezone')
+    def test_reset_registration(self, timezone_mock):
+        app_config = EventsConfig.objects.create(namespace='aldryn_events')
+        timezone_mock.now.return_value = tz_datetime(2015, 2, 5, 9)
+
+        with force_language('en'):
+            event = Event.objects.create(
+                title='Event2014', slug='open-air',
+                start_date=tz_datetime(2015, 2, 7),
+                publish_at=tz_datetime(2015, 2, 2, 9),
+                registration_deadline_at=tz_datetime(2015, 2, 7),
+                enable_registration=True,
+                app_config=app_config
+            )
+        event.create_translation('de', title='Ereignis2014', slug='im-freien')
+        event.event_coordinators.create(name='The big boss',
+                                        email='theboss@gmail.com')
+        event.registration_set.create(
+            salutation='mrs',
+            company='any',
+            first_name='Felipe',
+            last_name='Somename',
+            address='My Street, 77, Brazil, Earth, Solar system',
+            address_zip='00000-000',
+            address_city=u'São Paulo',
+            phone='+55 (11) 1234-5678',
+            mobile='+55 (11) 1234-5678',
+            email='myemail@gmail.com',
+            message="I'm testing you"
+        )
+        with force_language('en'):
+            reset_url = reverse(
+                'aldryn_events:events_registration_reset',
+                kwargs={'slug': event.slug},
+                current_app=app_config.namespace
+            )
+        custom_settings = {
+            'SESSION_ENGINE': 'django.contrib.sessions.backends.db'
+        }
+        with self.settings(**custom_settings):
+            # create the session
+            engine = import_module(settings.SESSION_ENGINE)
+            session = engine.SessionStore()
+            session['registered_events'] = [event.pk]
+            session.save()
+
+            # Set the cookie to represent the session.
+            session_cookie = settings.SESSION_COOKIE_NAME
+            self.client.cookies[session_cookie] = session.session_key
+            cookie_data = {
+                'max-age': None,
+                'path': '/',
+                'domain': settings.SESSION_COOKIE_DOMAIN,
+                'secure': settings.SESSION_COOKIE_SECURE or None,
+                'expires': None,
+            }
+            self.client.cookies[session_cookie].update(cookie_data)
+
+            response = self.client.post(reset_url, {})
+
+        # load session data modified in request
+        del session._session_cache  # need to remove it so updated data is loaded
+        self.assertEqual(session.get('registered_events'), [])
+        self.assertRedirects(response, event.get_absolute_url())
+
     @mock.patch('aldryn_events.managers.timezone')
     def test_unattached_namespace(self, manager_timezone_mock):
         manager_timezone_mock.now.return_value = tz_datetime(2015, 2, 2, 10)
-        template = get_cms_setting('TEMPLATES')[0][0]
         event1 = Event.objects.create(
             title='Event2015 current namespace',
             slug='open-air',

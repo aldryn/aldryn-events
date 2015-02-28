@@ -12,7 +12,7 @@ from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
-class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
+class EventAdmin(TranslatableAdmin, FrontendEditableAdmin, PlaceholderAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
