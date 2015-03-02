@@ -76,8 +76,8 @@ def build_events_by_year(events, **config):
             year['event_count'] += month['event_count']
             month['has_events'] = bool(month['event_count'])
             month['display_in_navigation'] = (
-                (not display_months_without_events and month['has_events'])
-                or display_months_without_events
+                (not display_months_without_events and month['has_events']) or
+                display_months_without_events
             )
 
         # if this is the current year, hide months before this month (or after

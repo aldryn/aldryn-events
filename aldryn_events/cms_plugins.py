@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf.urls import patterns, url
+from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
     ugettext_lazy as _, get_language_from_request
@@ -60,13 +61,19 @@ class EventListCMSPlugin(CMSPluginBase):
         self.render_template = (
             'aldryn_events/plugins/list/%s/list.html' % instance.style
         )
-        language = get_language_from_request(context['request'],
-                                             check_path=True)
+        language = (
+            instance.language or
+            get_language_from_request(context['request'], check_path=True)
+        )
 
         namespace = instance.app_config_id and instance.app_config.namespace
-        events = (instance.events.namespace(namespace)
-                                 .translated(language)
-                                 .language(language))
+        # With Django 1.5 and because a bug in SortedManyToManyField
+        # we can not use instance.events or we get a error like:
+        # DatabaseError: no such column: aldryn_events_eventlistplugin_events.sort_value
+        events = (Event.objects.namespace(namespace)
+                               .translated(language)
+                               .language(language)
+                               .filter(eventlistplugin__pk=instance.pk))
 
         context['instance'] = instance
         context['events'] = events
@@ -88,8 +95,8 @@ class CalendarPlugin(CMSPluginBase):
         month = context.get('event_month')
 
         if not all([year, month]):
-            year = str(datetime.datetime.today().year)
-            month = str(datetime.datetime.today().month)
+            year = str(timezone.now().date().year)
+            month = str(timezone.now().date().month)
 
         current_date = datetime.date(
             day=1, month=int(month), year=int(year)

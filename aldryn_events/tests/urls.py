@@ -12,7 +12,8 @@ from cms.utils.conf import get_cms_setting
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(
         r'^media/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.MEDIA_ROOT, 'show_indexes': True
@@ -32,7 +33,8 @@ urlpatterns = patterns('',
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
+urlpatterns += i18n_patterns(
+    '',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^events/', include('aldryn_events.urls', namespace='aldryn_events')),
     url(r'^', include('cms.urls')),

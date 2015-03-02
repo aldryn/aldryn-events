@@ -2,8 +2,8 @@
 import datetime
 from aldryn_apphooks_config.utils import get_app_instance
 
-from django.core.urlresolvers import reverse
 from django import forms
+from django.core.urlresolvers import reverse
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -35,9 +35,11 @@ class NavigationMixin(object):
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
-            events=Event.objects.namespace(self.namespace)
-                                .archive()
-                                .translated(language).language(language),
+            events=(
+                Event.objects.namespace(self.namespace)
+                             .archive()
+                             .translated(language).language(language)
+            ),
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year
@@ -154,8 +156,10 @@ class ResetEventRegistration(AppConfigMixin, FormView):
         return super(ResetEventRegistration, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('aldryn_events:events_detail', kwargs={'slug': self.event.slug},
-                       current_app=self.namespace)
+        return reverse(
+            'aldryn_events:events_detail', kwargs={'slug': self.event.slug},
+            current_app=self.namespace
+        )
 
 
 class EventDatesView(AppConfigMixin, TemplateView):
