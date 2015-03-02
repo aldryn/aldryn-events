@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import sys
 from setuptools import setup, find_packages
@@ -20,7 +21,7 @@ REQUIREMENTS = [
     'django-hvad',
     'django-sortedm2m',
     'django-parler',
-    # 'aldryn-apphooks-config'
+    'aldryn-apphooks-config'
 ]
 
 if py26:
@@ -35,9 +36,8 @@ if py27:
         'django-tablib>=3.1.1'
     ]
 
-
 DEPENDENCY_LINKS = [
-    # 'git@github.com:aldryn/aldryn-apphooks-config.git#aldryn-apphooks-config'
+    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'
 ]
 
 CLASSIFIERS = [
