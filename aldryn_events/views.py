@@ -4,6 +4,7 @@ from aldryn_apphooks_config.utils import get_app_instance
 
 from django import forms
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -19,7 +20,7 @@ from .utils import (
     build_events_by_year,
     build_calendar,
 )
-from .models import Event, Registration
+from .models import Event, Registration, EventCalendarPlugin
 from .forms import EventRegistrationForm
 
 
@@ -167,16 +168,31 @@ class EventDatesView(AppConfigMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(EventDatesView, self).get_context_data(**kwargs)
+
         if 'year' not in ctx or 'month' not in ctx:
-            today = datetime.datetime.today()
+            today = timezone.now().date()
             ctx['month'] = today.month
             ctx['year'] = today.year
 
         current_date = datetime.date(
             day=1, month=int(ctx['month']), year=int(ctx['year'])
         )
-        language = get_language_from_request(self.request, check_path=True)
-        ctx['days'] = build_calendar(ctx['year'], ctx['month'], language)
+
+        # Get namespace from plugin instead view
+        try:
+            pk = self.request.GET.get('plugin_pk')
+            if pk:
+                plugin = EventCalendarPlugin.objects.get(pk=pk)
+        except EventCalendarPlugin.DoesNotExist:
+            namespace = None
+            language = get_language_from_request(self.request, check_path=True)
+        else:
+            namespace = plugin.app_config.namespace
+            language = plugin.language
+
+        ctx['days'] = build_calendar(
+            ctx['year'], ctx['month'], language, namespace or self.namespace
+        )
         ctx['current_date'] = current_date
         ctx['last_month'] = current_date + datetime.timedelta(days=-1)
         ctx['next_month'] = current_date + datetime.timedelta(days=35)

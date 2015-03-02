@@ -50,6 +50,14 @@ def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
     return prefix + u''.join(random.choice(chars) for _ in range(length))
 
 
+def calendar_url(year, month, language):
+    with force_language(language):
+        url = reverse(
+            'admin:get-calendar-dates', kwargs={'year': year, 'month': month}
+        )
+    return url
+
+
 class EventTestCase(TransactionTestCase):
     reset_sequences = True
 
@@ -408,8 +416,14 @@ class EventTestCase(TransactionTestCase):
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        api.add_plugin(ph, 'CalendarPlugin', 'en', app_config=self.app_config)
-        api.add_plugin(ph, 'CalendarPlugin', 'de', app_config=self.app_config)
+        plugins = {
+            'en': api.add_plugin(
+                ph, 'CalendarPlugin', 'en', app_config=self.app_config
+            ),
+            'de': api.add_plugin(
+                ph, 'CalendarPlugin', 'de', app_config=self.app_config
+            )
+        }
         page.publish('en')
         page.publish('de')
 
@@ -421,25 +435,58 @@ class EventTestCase(TransactionTestCase):
                 publish_at=tz_datetime(2014, 1, 1, 12)
             )
 
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
+        # add a event for next month to check if date is rendered
+        self.new_event_from_num(
+            7,
+            start_date=tz_datetime(2014, 2, 10, 12),
+            end_date=tz_datetime(2014, 2, 15, 1),
+            publish_at=tz_datetime(2014, 1, 1, 12)
+        )
+
         rendered = {}
         with force_language('en'):
-            rendered['en'] = self.client.get('/en/home/').content
+            rendered['en'] = {
+                'p1': self.client.get('/en/home/').content,
+                'p2': self.client.get(
+                    "{0}?plugin_pk={1}".format(
+                        calendar_url(2014, 2, 'en'), plugins['en'].pk
+                    )
+                ).content
+            }
         with force_language('de'):
-            rendered['de'] = self.client.get('/de/home/').content
+            rendered['de'] = {
+                'p1': self.client.get('/de/home/').content,
+                'p2': self.client.get(
+                    "{0}?plugin_pk={1}".format(
+                        calendar_url(2014, 2, 'de'), plugins['de'].pk
+                    )
+                ).content
+            }
 
-        html = ('<td class="events"><a href="/{0}/events/2014/1/29/">'
-                '29</a></td>')
+        html_p1 = ('<td class="events"><a href="/{0}/events/2014/1/29/">'
+                   '29</a></td>')
+        html_p2 = ('<td class="events"><a href="/{0}/events/2014/2/10/">'
+                   '10</a></td>')
         self.assertIn(
-            html.format('de'), rendered['de'],
+            html_p1.format('de'), rendered['de']['p1'],
             'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html.format('de'), 'DE')
+            'language "{1}"'.format(html_p1.format('de'), 'DE')
         )
         self.assertIn(
-            html.format('en'), rendered['en'],
+            html_p1.format('en'), rendered['en']['p1'],
             'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html.format('en'), 'EN')
+            'language "{1}"'.format(html_p1.format('en'), 'EN')
+        )
+
+        self.assertIn(
+            html_p2.format('de'), rendered['de']['p2'],
+            'Expected html `{0}` not found on rendered plugin for '
+            'language "{1}"'.format(html_p2.format('de'), 'DE')
+        )
+        self.assertIn(
+            html_p2.format('en'), rendered['en']['p2'],
+            'Expected html `{0}` not found on rendered plugin for '
+            'language "{1}"'.format(html_p2.format('en'), 'EN')
         )
 
     def test_event_fill_slug_with_manager_create(self):
