@@ -4,8 +4,8 @@
   <div class="events-calendar">
     <h3>{{ calendar_label }}</h3>
     <p class="controls">
-      <a href="" class="back">{% trans "Previous month" %}</a>
-      <a href="" class="next">{% trans "Next month" %}</a>
+      <a href="" class="back"><< {% trans "Previous month" %}</a>
+      <a href="" class="next">{% trans "Next month" %} >></a>
     </p>
     {% include "aldryn_events/includes/calendar_table.html" %}
   </div>
@@ -13,7 +13,7 @@
 
 {% addtoblock "js" %}
 <script type="text/javascript">
-  $( ".controls a" ).click(function(event) {
+  $( ".events-calendar .controls a" ).click(function(event) {
     event.preventDefault();
     var wrapper = $(this).closest("div.events-calendar");
     var title = $(wrapper).find("h3");
@@ -29,8 +29,7 @@
       } else if (direction == 'back') {
         if (month == 1) { month = 12; year -= 1; } else { month -= 1; }
       }
-
-      $.get("{% url 'admin:get-calendar-dates' %}" + year + "/" + month + "/", function(data) {
+      $.get("{% url 'admin:get-calendar-dates' %}" + year + "/" + month + "/?plugin_pk={{ plugin.instance.pk }}", function(data) {
         $(table).replaceWith(data);
         $(title).html($(data).data('month') + ' ' + $(data).data('year'));
       });

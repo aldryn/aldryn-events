@@ -10,7 +10,7 @@ from django.utils.translation import (
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .views import EventDatesView
+from .views import event_dates
 from .utils import build_calendar
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
@@ -101,24 +101,21 @@ class CalendarPlugin(CMSPluginBase):
         current_date = datetime.date(
             day=1, month=int(month), year=int(year)
         )
-        language = get_language_from_request(
-            context['request'], check_path=True
-        )
+        language = instance.language
         namespace = instance.app_config_id and instance.app_config.namespace
         context['days'] = build_calendar(year, month, language, namespace)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
         context['next_month'] = current_date + datetime.timedelta(days=35)
         context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
-
+        context['calendar_namespace'] = namespace
         return context
 
     def get_plugin_urls(self):
         return patterns('',  # NOQA
-            url(r'^get-dates/$', EventDatesView.as_view(),
-                name='get-calendar-dates'),
+            url(r'^get-dates/$', event_dates, name='get-calendar-dates'),
             url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
-                EventDatesView.as_view(), name='get-calendar-dates'),
+                event_dates, name='get-calendar-dates'),
         )
 
 
