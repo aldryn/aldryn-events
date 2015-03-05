@@ -25,8 +25,11 @@ class EventsIndex(get_index_base()):
         return {'translations__language_code': language}
 
     def get_index_queryset(self, language):
-        return (self.get_model().objects.published()
-            .translated(language).language(language))
+        return (
+            self.get_model().objects.published()
+                                    .translated(language)
+                                    .language(language)
+        )
 
     def get_model(self):
         return Event
@@ -38,6 +41,8 @@ class EventsIndex(get_index_base()):
         for base_plugin in plugins:
             instance, plugin_type = base_plugin.get_plugin_instance()
             if instance is not None:
-                content = strip_tags(instance.render_plugin(context=RequestContext(request)))
+                content = strip_tags(
+                    instance.render_plugin(context=RequestContext(request))
+                )
                 text_bits.append(content)
         return ' '.join(text_bits)

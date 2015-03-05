@@ -53,8 +53,8 @@ class EventQuerySet(AppHookConfigTranslatableQueryset):
         now = now or timezone.now()
         _date = now.date()
         return self.published(now).filter(
-            Q(end_date__isnull=True, start_date=_date)
-            | Q(start_date__lte=_date, end_date__gte=_date)
+            Q(end_date__isnull=True, start_date=_date) |
+            Q(start_date__lte=_date, end_date__gte=_date)
         )
 
 
@@ -62,6 +62,8 @@ class EventManager(AppHookConfigTranslatableManager):
 
     def get_queryset(self):
         return EventQuerySet(self.model, using=self.db)
+
+    get_query_set = get_queryset
 
     def upcoming(self, count, now=None):
         return self.get_queryset().upcoming(count, now=now)

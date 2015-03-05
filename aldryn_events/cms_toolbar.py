@@ -31,17 +31,21 @@ class EventsToolbar(CMSToolbar):
 
         if current:
             if can('change', 'event'):
-                menu = self.toolbar.get_or_create_menu('events-app', _('Events'))
+                menu = self.toolbar.get_or_create_menu(
+                    'events-app', _('Events')
+                )
                 menu.add_modal_item(
                     _('Edit this event'),
                     reverse(
-                        'admin:aldryn_events_event_change', args=(current.pk, )
+                        'admin:aldryn_events_event_change', args=(current.pk,)
                     ))
 
             if can('delete', 'event'):
-                menu = self.toolbar.get_or_create_menu('events-app', _('Events'))
+                menu = self.toolbar.get_or_create_menu(
+                    'events-app', _('Events')
+                )
                 menu.add_modal_item(
                     _('Delete this event'),
                     reverse(
-                        'admin:aldryn_events_event_delete', args=(current.pk, )
+                        'admin:aldryn_events_event_delete', args=(current.pk,)
                     ))

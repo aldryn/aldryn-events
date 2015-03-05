@@ -3,8 +3,8 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from aldryn_apphooks_config.admin import BaseAppHookConfig
-from cms.admin.placeholderadmin import PlaceholderAdmin
-from cms.admin.placeholderadmin import FrontendEditableAdmin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 
@@ -12,7 +12,8 @@ from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
-class EventAdmin(FrontendEditableAdmin, TranslatableAdmin, PlaceholderAdmin):
+class EventAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin,
+                 TranslatableAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (

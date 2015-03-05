@@ -1,16 +1,25 @@
 # -*- coding: utf-8 -*-
 import random
 import string
+from cms.utils.i18n import force_language
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.test import RequestFactory, TransactionTestCase
+from django.utils.timezone import get_current_timezone
 
 from cms import api
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils import get_cms_setting
+from datetime import datetime
 
 from aldryn_events.models import EventsConfig, Event
+
+
+def tz_datetime(*args, **kwargs):
+    """ Return datetime with arguments in UTC timezone """
+    return datetime(tzinfo=get_current_timezone(), *args, **kwargs)
 
 
 def get_page_request(page, user=None, path=None, edit=False, language='en'):
@@ -40,8 +49,8 @@ class EventBaseTestCase(TransactionTestCase):
 
     def setUp(self):
         super(EventBaseTestCase, self).setUp()
-        self.app_config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        self.app_config = EventsConfig.objects.create(
+            namespace='aldryn_events'
         )
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
@@ -49,7 +58,8 @@ class EventBaseTestCase(TransactionTestCase):
     def tearDown(self):
         super(EventBaseTestCase, self).tearDown()
         self.app_config.delete()
-    
+        cache.clear()
+
     def create_root_page(self, publication_date=None):
         root_page = api.create_page(
             'root page', self.template, self.language, published=True,
@@ -66,14 +76,18 @@ class EventBaseTestCase(TransactionTestCase):
         for very simple tests we just create events in english.
         """
         if not en and not de:
-            raise ValueError("You must provide data for english and/or german!")
+            raise ValueError(
+                "You must provide data for english and/or german!"
+            )
         if en:
             en.setdefault('app_config', self.app_config)
-            event = Event.objects.language('en').create(**en)
+            with force_language('en'):
+                event = Event.objects.create(**en)
         if de:
             if not en:
                 de.setdefault('app_config', self.app_config)
-                event = Event.objects.language('de').create(**de)
+                with force_language('de'):
+                    event = Event.objects.language('de').create(**de)
             else:
                 event.create_translation('de', **de)
         return Event.objects.language('en').get(pk=event.pk)
@@ -82,8 +96,8 @@ class EventBaseTestCase(TransactionTestCase):
         en = {
             'title': 'Event2014',
             'slug': 'open-air',
-            'start_date': '2014-09-10',
-            'publish_at': '2014-09-10 09:00',
+            'start_date': tz_datetime(2014, 9, 10),
+            'publish_at': tz_datetime(2014, 9, 10, 9),
             'app_config': self.app_config
         }
         de = {

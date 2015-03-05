@@ -67,7 +67,10 @@ def build_events_by_year(events, **config):
                 'months': build_months(year=year,
                                        is_archive_view=is_archive_view)
             }
-        events_by_year[year]['months'][event.start_date.month]['events'].append(event)
+        (
+            events_by_year[year]['months'][event.start_date.month]['events']
+            .append(event)
+        )
     flattened_events_by_year = events_by_year.values()
     for year in flattened_events_by_year:
         year['months'] = year['months'].values()
@@ -77,8 +80,8 @@ def build_events_by_year(events, **config):
             year['event_count'] += month['event_count']
             month['has_events'] = bool(month['event_count'])
             month['display_in_navigation'] = (
-                (not display_months_without_events and month['has_events'])
-                or display_months_without_events
+                (not display_months_without_events and month['has_events']) or
+                display_months_without_events
             )
 
         # if this is the current year, hide months before this month (or after
@@ -107,7 +110,7 @@ def send_user_confirmation_email(registration, language):
         ),
     }
     subject = render_to_string(
-        template_name='aldryn_events/emails/registrant_confirmation.subject.txt',
+        template_name='aldryn_events/emails/registrant_confirmation.subject.txt',  # NOQA
         dictionary=ctx
     )
     body = render_to_string(
@@ -193,8 +196,9 @@ def build_calendar(year, month, language, namespace=None):
 
     # get all upcoming events, ordered by start_date
     filter_args = (
-        Q(start_date__gte=monthdates[0][0], start_date__lte=monthdates[-1][0])
-        | Q(
+        Q(start_date__gte=monthdates[0][0],
+          start_date__lte=monthdates[-1][0]) |
+        Q(
             Q(end_date__isnull=True) | Q(
                 end_date__gte=monthdates[0][0],
                 end_date__lte=monthdates[-1][0]

@@ -1,33 +1,23 @@
 # -*- coding: utf-8 -*-
-import mock
-
-from django.core import mail
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.template import RequestContext
-from django.utils.timezone import get_current_timezone
-
-from cms import api
 from cms.utils.i18n import force_language
-from datetime import datetime
-from pyquery import PyQuery
-
-from aldryn_events.models import Event, EventsConfig
-from .base import EventBaseTestCase, get_page_request
+from aldryn_events.models import Event
+from .base import EventBaseTestCase, tz_datetime
 
 
 class EventTestCase(EventBaseTestCase):
 
     def test_event_days_property_shows_correct_value(self):
-        event = Event.objects.create(
-            title='5 days event', app_config=self.app_config,
-            start_date='2015-01-01', end_date='2015-01-05'
+        event = Event(
+            start_date=tz_datetime(2015, 1, 1),
+            end_date=tz_datetime(2015, 1, 5)
         )
         self.assertEqual(event.days, 5)
         event.end_date = None
         self.assertEqual(event.days, 1)
 
-    def test_event_creation_with_wrong_date_format_raises_validationerror(self):
+    def test_event_creation_with_wrong_dates_format_raises_validationerror(
+            self):
         with self.assertRaises(ValidationError):
             Event.objects.create(
                 title='5 days event', app_config=self.app_config,
@@ -38,10 +28,16 @@ class EventTestCase(EventBaseTestCase):
                 title='5 days event', app_config=self.app_config,
                 start_date='2015-01-01', end_date='blah'
             )
+        with self.assertRaises(ValidationError):
+            Event.objects.create(
+                title='5 days event', app_config=self.app_config,
+                start_date='2015-01-01', end_date='2015-01-01',
+                publish_at='blah'
+            )
 
-    def test_event_days_property_raises_validationerror(self):
-        event = Event.objects.create(
-            title='5 days event', app_config=self.app_config,
+    def test_event_days_property_raises_validation_error(self):
+        event = self.create_event(
+            title='5 days event',
             start_date='2015-01-01'
         )
         event.start_date, event.end_date = 'blah', 'blah'
@@ -50,13 +46,13 @@ class EventTestCase(EventBaseTestCase):
         self.assertRaises(ValidationError, lambda: event.days)
 
     def test_event_take_single_day_property(self):
-        event1 = Event.objects.create(
-            title='blah', app_config=self.app_config,
-            start_date='2015-01-01'
+        event1 = self.create_event(
+            title='blah', start_date=tz_datetime(2015, 1, 1)
         )
-        event2 = Event.objects.create(
-            title='bleh', app_config=self.app_config,
-            start_date='2015-01-01', end_date='2015-01-05'
+        event2 = self.create_event(
+            title='bleh',
+            start_date=tz_datetime(2015, 1, 1),
+            end_date=tz_datetime(2015, 1, 5)
         )
         self.assertTrue(event1.takes_single_day)
         self.assertFalse(event2.takes_single_day)
@@ -65,576 +61,52 @@ class EventTestCase(EventBaseTestCase):
         """
         We can create an event with a name in two languages
         """
-        self.assertEqual(Event.objects.count(), 0)
-        event = Event.objects.language('en').create(
-            title='Concert', start_date='2014-09-10', slug='open-concert',
-            app_config=self.app_config
-        )
+        with force_language('en'):
+            event = Event.objects.create(
+                title='Concert', slug='open-concert',
+                start_date=tz_datetime(2014, 9, 10),
+                publish_at=tz_datetime(2014, 9, 9),
+                app_config=self.app_config
+            )
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 0)
-        self.assertEqual(event.get_current_language(), 'en')
 
-        event.set_current_language('de')
-        event.title = 'Konzert'
-        event.slug = 'offene-konzert'
-        event.save()
+        event.create_translation('de', title='Konzert', slug='offene-konzert')
 
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 1)
 
     def test_event_fill_slug_with_manager_create(self):
-        event = Event.objects.create(title='show me the slug',
-                                     start_date='2015-02-04',
-                                     app_config=self.app_config)
+        event = Event.objects.create(
+            title='show me the slug',
+            start_date=tz_datetime(2015, 2, 4),
+            app_config=self.app_config
+        )
         self.assertEqual(event.slug, 'show-me-the-slug')
 
     def test_event_fill_slug_with_instance_save(self):
-        event = Event(title='show me the slug', start_date='2015-02-04',
-                      app_config=self.app_config)
+        event = Event(
+            title='show me the slug',
+            start_date=tz_datetime(2015, 2, 4),
+            app_config=self.app_config
+        )
         event.save()
         self.assertEqual(event.slug, 'show-me-the-slug')
 
     def test_event_not_overwrite_slug_with_manager_create(self):
-        event = Event.objects.create(title='show me the slug',
-                                     slug='gotchaa',
-                                     start_date='2015-02-04',
-                                     app_config=self.app_config)
+        event = Event.objects.create(
+            title='show me the slug',
+            slug='gotchaa',
+            start_date=tz_datetime(2015, 2, 4),
+            app_config=self.app_config
+        )
         self.assertEqual(event.slug, 'gotchaa')
 
     def test_event_not_overwrite_slug_with_instance_save(self):
-        event = Event(title='show me the slug', slug='gotchaa',
-                      start_date='2015-02-04', app_config=self.app_config)
+        event = Event(
+            title='show me the slug', slug='gotchaa',
+            start_date=tz_datetime(2015, 2, 4),
+            app_config=self.app_config
+        )
         event.save()
         self.assertEqual(event.slug, 'gotchaa')
-
-
-class EventPagesTestCase(EventBaseTestCase):
-
-    def test_event_detail_page(self):
-        """
-        Test if proper url and event page are created
-        """
-        event = self.create_default_event()
-
-        # '/events/' came from tests/urls.py, '/open-air/' from the event slug
-        self.assertEqual(event.get_absolute_url(), '/en/events/open-air/')
-        response = self.client.get(event.get_absolute_url())
-        self.assertContains(response, event.title)
-
-        event.set_current_language('de')
-        # '/events/' came from tests/urls.py, '/im-freien/' from the event slug
-        self.assertEqual(event.get_absolute_url(), '/de/events/im-freien/')
-        response = self.client.get(event.get_absolute_url())
-        self.assertContains(response, event.title)
-
-    @mock.patch('aldryn_events.managers.timezone')
-    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
-    def test_add_event_app_to_page(self, manager_timezone_mock,
-                                   tag_timezone_mock):
-        """
-        When we link event app to any page it should list events
-        """
-        manager_timezone_mock.now.return_value = datetime(
-            2014, 6, 8, tzinfo=get_current_timezone()
-        )
-        tag_timezone_mock.now.return_value = datetime(
-            2014, 6, 8, tzinfo=get_current_timezone()
-        )
-
-        root_page = self.create_root_page(
-            publication_date=datetime(
-                2014, 6, 8, tzinfo=get_current_timezone()
-            )
-        )
-        page = api.create_page(
-            title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
-            parent=root_page,
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace,
-            publication_date=datetime(
-                2014, 6, 8, tzinfo=get_current_timezone()
-            )
-        )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
-        page.publish('en')
-        page.publish('de')
-
-        # create events
-        event1 = Event.objects.language('en').create(
-            title='Event2014',
-            start_date='2014-09-10', publish_at='2014-06-05 12:00',
-            app_config=self.app_config
-
-        )
-        event1.create_translation('de', title='Ereignis', slug='im-freien')
-        event2 = Event.objects.language('en').create(
-            title='Event2014 only english',
-            start_date='2014-09-12', publish_at='2014-06-05 12:00',
-            app_config=self.app_config
-
-        )
-
-        # test english, have 2 events
-        with force_language('en'):
-            response = self.client.get(page.get_absolute_url('en'))
-            self.assertContains(response, event1.title)
-            self.assertContains(response, event1.get_absolute_url())
-            self.assertContains(response, event2.title)
-            self.assertContains(response, event2.get_absolute_url())
-
-        # test german, have 1 event, event 2 is only english
-        event1.set_current_language('de')
-        with force_language('de'):
-            response = self.client.get(page.get_absolute_url('de'))
-            self.assertContains(response, event1.title)
-            self.assertContains(response, event1.get_absolute_url())
-            self.assertNotContains(response, event2.title)
-            self.assertNotContains(response, event2.get_absolute_url())
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_unattached_namespace(self, timezone_mock):
-        timezone_mock.now.return_value = datetime(2015, 2, 2, 10)
-        event1 = Event.objects.create(
-            title='Event2015 current namespace',
-            slug='open-air', start_date='2015-02-07',
-            publish_at='2015-02-02 09:00', enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=EventsConfig.objects.get(namespace='aldryn_events')
-        )
-        event2 = Event.objects.create(
-            title='Event new namespace', slug='open-air-new-namespace',
-            start_date='2015-02-07', publish_at='2015-02-02 09:00',
-            enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=EventsConfig.objects.create(namespace='another')
-        )
-        response = self.client.get(reverse('aldryn_events:events_list'))
-        self.assertContains(response, event1.title)
-        self.assertNotContains(response, event2.title)
-
-    @mock.patch('aldryn_events.managers.timezone')
-    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
-    def test_ongoing_events_in_event_list(self, managers_timezone_mock,
-                                          tag_timezone_mock):
-        managers_timezone_mock.now.return_value = datetime(
-            2014, 4, 7, 9, 30, tzinfo=get_current_timezone()
-        )
-        tag_timezone_mock.now.return_value = datetime(
-            2014, 4, 7, 9, 30, tzinfo=get_current_timezone()
-        )
-
-        root_page = self.create_root_page(
-            publication_date=datetime(
-                2014, 4, 1, tzinfo=get_current_timezone()
-            )
-        )
-        root_page.publish('en')
-        page = api.create_page(
-            title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
-            parent=root_page,
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace,
-            publication_date=datetime(
-                2014, 4, 1, tzinfo=get_current_timezone()
-            )
-        )
-        page.publish('en')
-
-        # happens in Apr 5
-        self.create_event(
-            title='ev1', start_date='2014-04-05', publish_at='2014-04-01'
-        )
-        # Apr 6 12:00 to Apr 7 09:00
-        ev2 = self.create_event(
-            title='ev2',
-            start_date='2014-04-06', end_date='2014-04-07',
-            start_time='12:00', end_time='09:00',
-            publish_at='2014-04-02'
-        )
-        # happens in Apr 7
-        ev3 = self.create_event(
-            title='ev3', start_date='2014-04-07', publish_at='2014-04-03'
-        )
-        # happens in Apr 8
-        self.create_event(
-            title='ev4', start_date='2014-04-08', publish_at='2014-04-04'
-        )
-
-        # setUp app config
-        original_show_ongoing_first = self.app_config.show_ongoing_first
-        self.app_config.show_ongoing_first = True
-        self.app_config.save()
-
-        with force_language('en'):
-            response = self.client.get(page.get_absolute_url('en'))
-            context = response.context_data
-
-        # tearDown app config
-        self.app_config.show_ongoing_first = original_show_ongoing_first
-        self.app_config.save()
-
-        self.assertQuerysetEqual(
-            context['ongoing_objects'], ['ev2', 'ev3'], transform=str
-        )
-        self.assertQuerysetEqual(
-            context['object_list'], ['ev4'], transform=str
-        )
-        ongoing_list = PyQuery(response.content)('ul.ongoing-events')
-        links = ongoing_list.find('h3 a')
-        self.assertEqual(2, links.length)
-        self.assertEqual(ev2.get_absolute_url(), links[0].attrib['href'])
-        self.assertEqual(ev3.get_absolute_url(), links[1].attrib['href'])
-
-
-class EventPluginsTestCase(EventBaseTestCase):
-
-    def test_event_list_plugin(self):
-        """
-        We add an event to the Event Plugin and look it up
-        """
-        # start_date='2014-09-10',
-        # publish_at='2014-01-01 12:00'
-        root_page = self.create_root_page()
-        page = api.create_page(
-            'Events en', self.template, 'en', published=True,
-            parent=root_page,
-        )
-        api.create_title('de', 'Events de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config
-        )
-        plugin_de = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'de', app_config=self.app_config
-        )
-        page.publish('en')
-        page.publish('de')
-
-        # add events
-        event1 = self.create_default_event()
-        event2 = Event.objects.language('en').create(
-            title='Event2015 only english', start_date='2015-01-29',
-            app_config=self.app_config
-        )
-        plugin_en.events = [event1, event2]
-        plugin_en.save()
-        plugin_de.events = [event1, event2]
-        plugin_de.save()
-        page.publish('en')
-        page.publish('de')
-
-        # EN: test plugin rendering
-        response = self.client.get('/en/events-en/')
-        event1.set_current_language('en')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        event2.set_current_language('en')
-        self.assertContains(response, event2.title)
-        self.assertContains(response, event2.get_absolute_url())
-
-        # DE: test plugin rendering
-        response = self.client.get('/de/events-de/')
-        event1.set_current_language('de')
-        self.assertContains(response, event1.title)
-        self.assertContains(response, event1.get_absolute_url())
-        self.assertNotContains(response, event2.title)
-        self.assertNotContains(response, event2.get_absolute_url())
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_upcoming_plugin_for_future(self, timezone_mock):
-        """
-        Test the upcoming events plugin
-        """
-
-        timezone_mock.now.return_value = datetime(
-            2014, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
-        )
-
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-        )
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'UpcomingPlugin', 'en', app_config=self.app_config
-        )
-        plugin_de = api.add_plugin(
-            ph, 'UpcomingPlugin', 'de', app_config=self.app_config
-        )
-        page.publish('en')
-        page.publish('de')
-
-        # add events
-        def new_event(num, language):
-            title = 'event' if language == 'en' else 'ereignis'
-            event = Event.objects.language(language).create(
-                title="{} {} {}".format(title, num, language),
-                slug="{}-{}-{}".format(title, num, language),
-                app_config=self.app_config,
-                start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00'
-            )
-            return event
-        for i in range(1, 7):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
-
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
-        rendered = {}
-        request = get_page_request(None, path='/en/home/', language='en')
-        context = RequestContext(request, {})
-        rendered['en'] = plugin_en.render_plugin(context, ph)
-        request = get_page_request(None, path='/de/home/', language='de')
-        context = RequestContext(request, {})
-        rendered['de'] = plugin_de.render_plugin(context, ph)
-
-        for i in range(1, 6):
-            for lang in ['en', 'de']:
-                text = 'event' if lang == 'en' else 'ereignis'
-                name = '{} {} {}'.format(text, i, lang)
-                url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(
-                    name, rendered[lang],
-                    'Title "{}" not found in rendered plugin for '
-                    'language "{}".'.format(name, lang)
-                )
-                self.assertIn(
-                    url, rendered[lang],
-                    'URL "{}" not found in rendered plugin for '
-                    'language "{}".'.format(url, lang)
-                )
-
-        self.assertNotIn(
-            'event 6 en', rendered,
-            'Title "event 6 en" found in rendered plugin, but limit is '
-            '5 entries.'
-        )
-        self.assertNotIn(
-            'event-6-en', rendered,
-            'URL "event-6-en" found in rendered plugin, but limit is '
-            '5 entries.'
-        )
-        self.assertNotIn(
-            'event 6 de', rendered,
-            'Title "event 6 de" found in rendered plugin, but limit '
-            'is 5 entries.'
-        )
-        self.assertNotIn(
-            'event-6-de', rendered,
-            'URL "event-6-de" found in rendered plugin, but limit '
-            'is 5 entries.'
-
-        )
-
-    def test_upcoming_plugin_for_past(self):
-        """
-        Test the upcoming events plugin for past entries
-        """
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace
-        )
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en',
-                                   app_config=self.app_config)
-        plugin_de = api.add_plugin(ph, 'UpcomingPlugin', 'de',
-                                   app_config=self.app_config)
-        plugin_en.past_events, plugin_de.past_events = True, True
-        plugin_en.save()
-        plugin_de.save()
-        page.publish('en')
-        page.publish('de')
-
-        # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
-                start_date='2014-06-29', end_date='2014-07-05',
-                publish_at='2014-06-20 12:00', app_config=self.app_config
-            )
-            return event
-        for i in range(1, 7):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
-
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
-        rendered = {}
-        request = get_page_request(None, path='/en/home/', language='en')
-        context = RequestContext(request, {})
-        rendered['en'] = plugin_en.render_plugin(context, ph)
-        request = get_page_request(None, path='/de/home/', language='de')
-        context = RequestContext(request, {})
-        rendered['de'] = plugin_de.render_plugin(context, ph)
-
-        for i in range(1, 6):
-            for lang in ['en', 'de']:
-                text = 'event' if lang == 'en' else 'ereignis'
-                name = '{} {} {}'.format(text, i, lang)
-                url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(
-                    name, rendered[lang],
-                    'Title "{}" not found in rendered plugin for '
-                    'language "{}".'.format(name, lang)
-                )
-                self.assertIn(
-                    url, rendered[lang],
-                    'URL "{}" not found in rendered plugin for '
-                    'language "{}".'.format(url, lang)
-                )
-
-        self.assertNotIn(
-            'event 6 en', rendered,
-            'Title "event 6 en" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event-6-en', rendered,
-            'URL "event-6-en" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event 6 de', rendered,
-            'Title "event 6 de" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event-6-de', rendered,
-            'URL "event-6-de" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_calendar_plugin(self, timezone_mock):
-        """
-        This plugin should show a link to event list page on days that has events
-        """
-        timezone_mock.now.return_value = datetime(
-            2015, 1, 2, 0, 0, 0, tzinfo=get_current_timezone()
-        )
-
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-            publication_date=datetime(
-                2015, 1, 2, tzinfo=get_current_timezone()
-            )
-        )
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        api.add_plugin(ph, 'CalendarPlugin', 'en', app_config=self.app_config)
-        api.add_plugin(ph, 'CalendarPlugin', 'de', app_config=self.app_config)
-        page.publish('en')
-        page.publish('de')
-
-        # add events
-        def new_event(num, lang):
-            text = 'event' if lang == 'en' else 'ereignis'
-            event = Event.objects.language(lang).create(
-                title="{} {} {}".format(text, num, lang),
-                slug="{}-{}-{}".format(text, num, lang),
-                start_date='2015-01-29', end_date='2015-02-05',
-                publish_at='2014-01-01 12:00', app_config=self.app_config
-            )
-            return event
-
-        for i in range(1, 3):
-            for lang in ['en', 'de']:
-                new_event(i, lang)
-
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
-        rendered = {}
-        with force_language('en'):
-            rendered['en'] = self.client.get(page.get_absolute_url('en')).content
-        with force_language('de'):
-            rendered['de'] = self.client.get(page.get_absolute_url('de')).content
-
-        html = ('<td class="events disabled"><a href="/{}/events/2015/1/29/">'
-                '29</a></td>')
-        self.assertIn(
-            html.format('de'), rendered['de'],
-            'Expected html `{}` not found on rendered plugin for '
-            'language "{}"'.format(html.format('de'), 'DE')
-        )
-        self.assertIn(
-            html.format('en'), rendered['en'],
-            'Expected html `{}` not found on rendered plugin for '
-            'language "{}"'.format(html.format('en'), 'EN')
-        )
-
-
-class RegistrationTestCase(EventBaseTestCase):
-
-    @mock.patch('aldryn_events.models.timezone')
-    def test_submit_registration(self, timezone_mock):
-        app_config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
-
-        timezone_mock.now.return_value = datetime(
-            2015, 2, 5, 9, 0, tzinfo=get_current_timezone()
-        )
-        event = Event.objects.language('en').create(
-            title='Event2014', slug='open-air', start_date='2015-02-07',
-            publish_at='2015-02-02 09:00', enable_registration=True,
-            registration_deadline_at='2015-02-07 00:00',
-            app_config=app_config
-        )
-        event.event_coordinators.create(name='The big boss',
-                                        email='theboss@gmail.com')
-        event.set_current_language('de')
-        event.title = 'Ereignis'
-        event.slug = 'im-freien'
-        event.save()
-        event.set_current_language('en')
-
-        data = {
-            'salutation': 'mrs',
-            'company': 'any',
-            'first_name': 'Felipe',
-            'last_name': 'Somename',
-            'address': 'My Street, 77, Brazil, Earth, Solar system',
-            'address_zip': '00000-000',
-            'address_city': u'São Paulo',
-            'phone': '+55 (11) 1234-5678',
-            'mobile': '+55 (11) 1234-5678',
-            'email': 'myemail@gmail.com',
-            'message': "I'm testing you"
-        }
-        response = self.client.post(
-            event.get_absolute_url(), data, follow=True
-        )
-        form = response.context_data.get('form')
-        # fail, show form error
-        self.assertFalse(
-            bool(form.errors),
-            "Registration form has errors:\n{}".format(
-                form.errors.as_text()
-            )
-        )
-
-        # test if emails was sent
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[0].subject,
-            'Thank you for signing up to "{}"'.format(event.title)
-        )
-        self.assertEqual(['myemail@gmail.com'], mail.outbox[0].recipients())
-        self.assertEqual(
-            mail.outbox[1].subject,
-            'new registration for "{}"'.format(event.title)
-        )
-        self.assertEqual(['theboss@gmail.com'], mail.outbox[1].recipients())
-
-        # test if registration is really on db
-        registration = event.registration_set.get()
-        for k, v in data.items():
-            self.assertEqual(getattr(registration, k), v)
-

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import datetime
 from aldryn_apphooks_config.utils import get_app_instance
 
-from django.core.urlresolvers import reverse
 from django import forms
+from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -14,12 +14,12 @@ from django.views.generic import (
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_events import request_events_event_identifier
+from aldryn_events.templatetags.aldryn_events import calendar
 
 from .utils import (
     build_events_by_year,
-    build_calendar,
 )
-from .models import Event, Registration
+from .models import Event, Registration, EventCalendarPlugin
 from .forms import EventRegistrationForm
 
 
@@ -35,9 +35,11 @@ class NavigationMixin(object):
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
-            events=Event.objects.namespace(self.namespace)
-                                .archive()
-                                .translated(language).language(language),
+            events=(
+                Event.objects.namespace(self.namespace)
+                             .archive()
+                             .translated(language).language(language)
+            ),
             is_archive_view=True,
         )
         context['archived_events_by_year'] = archived_events_by_year
@@ -166,8 +168,10 @@ class ResetEventRegistration(AppConfigMixin, FormView):
         return super(ResetEventRegistration, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('aldryn_events:events_detail', kwargs={'slug': self.event.slug},
-                       current_app=self.namespace)
+        return reverse(
+            'aldryn_events:events_detail', kwargs={'slug': self.event.slug},
+            current_app=self.namespace
+        )
 
 
 class EventDatesView(AppConfigMixin, TemplateView):
@@ -175,19 +179,27 @@ class EventDatesView(AppConfigMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(EventDatesView, self).get_context_data(**kwargs)
-        if 'year' not in ctx or 'month' not in ctx:
-            today = datetime.datetime.today()
-            ctx['month'] = today.month
-            ctx['year'] = today.year
 
-        current_date = datetime.date(
-            day=1, month=int(ctx['month']), year=int(ctx['year'])
-        )
-        language = get_language_from_request(self.request, check_path=True)
-        ctx['days'] = build_calendar(ctx['year'], ctx['month'], language)
-        ctx['current_date'] = current_date
-        ctx['last_month'] = current_date + datetime.timedelta(days=-1)
-        ctx['next_month'] = current_date + datetime.timedelta(days=35)
+        today = timezone.now().date()
+        year = ctx.get('year', today.year)
+        month = ctx.get('month', today.month)
+
+        # Get namespace from plugin instead view
+        try:
+            pk = self.request.GET['plugin_pk']
+            if pk:
+                plugin = EventCalendarPlugin.objects.get(pk=pk)
+        except (EventCalendarPlugin.DoesNotExist, KeyError):
+            namespace = None
+            language = get_language_from_request(self.request, check_path=True)
+        else:
+            namespace = plugin.app_config.namespace
+            language = plugin.language
+
+        # calendar is the calendar tag
+        ctx.update(calendar(
+            ctx['year'], ctx['month'], language, namespace or self.namespace
+        ))
         return ctx
 
 event_dates = EventDatesView.as_view()

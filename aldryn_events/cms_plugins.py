@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf.urls import patterns, url
+from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
     ugettext_lazy as _, get_language_from_request
@@ -9,7 +10,7 @@ from django.utils.translation import (
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .views import EventDatesView
+from .views import event_dates
 from .utils import build_calendar
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
@@ -60,13 +61,20 @@ class EventListCMSPlugin(CMSPluginBase):
         self.render_template = (
             'aldryn_events/plugins/list/%s/list.html' % instance.style
         )
-        language = get_language_from_request(context['request'],
-                                             check_path=True)
+        language = (
+            instance.language or
+            get_language_from_request(context['request'], check_path=True)
+        )
 
         namespace = instance.app_config_id and instance.app_config.namespace
-        events = (instance.events.namespace(namespace)
-                                 .translated(language)
-                                 .language(language))
+        # With Django 1.5 and because a bug in SortedManyToManyField
+        # we can not use instance.events or we get a error like:
+        # DatabaseError:
+        #   no such column: aldryn_events_eventlistplugin_events.sort_value
+        events = (Event.objects.namespace(namespace)
+                               .translated(language)
+                               .language(language)
+                               .filter(eventlistplugin__pk=instance.pk))
 
         context['instance'] = instance
         context['events'] = events
@@ -88,26 +96,29 @@ class CalendarPlugin(CMSPluginBase):
         month = context.get('event_month')
 
         if not all([year, month]):
-            year = str(datetime.datetime.today().year)
-            month = str(datetime.datetime.today().month)
+            year = str(timezone.now().date().year)
+            month = str(timezone.now().date().month)
 
-        context['namespace'] = (
-            instance.app_config_id and instance.app_config.namespace
-        )
-        context['request_language'] = get_language_from_request(
-            context['request'], check_path=True
-        )
+        current_date = datetime.date(int(year), int(month), 1)
+        language = instance.language
+        namespace = instance.app_config_id and instance.app_config.namespace
+
         context['event_year'] = year
         context['event_month'] = month
-
+        context['days'] = build_calendar(year, month, language, namespace)
+        context['current_date'] = current_date
+        context['last_month'] = current_date + datetime.timedelta(days=-1)
+        context['next_month'] = current_date + datetime.timedelta(days=35)
+        context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
+        context['calendar_namespace'] = namespace
+        context['calendar_language'] = language
         return context
 
     def get_plugin_urls(self):
         return patterns('',  # NOQA
-            url(r'^get-dates/$', EventDatesView.as_view(),
-                name='get-calendar-dates'),
+            url(r'^get-dates/$', event_dates, name='get-calendar-dates'),
             url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
-                EventDatesView.as_view(), name='get-calendar-dates'),
+                event_dates, name='get-calendar-dates'),
         )
 
 
