@@ -9,12 +9,6 @@ from .base import EventBaseTestCase, tz_datetime
 
 class UtilsTestCase(EventBaseTestCase):
 
-    def setUp(self):
-        super(UtilsTestCase, self).setUp()
-        self.config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
-
     def test_build_calendar(self):
         other_config = EventsConfig.objects.create(namespace='other')
         ev1 = self.create_event(
@@ -52,7 +46,7 @@ class UtilsTestCase(EventBaseTestCase):
             publish_at=tz_datetime(2015, 2, 10)
         )
 
-        dates = build_calendar('2015', '02', 'en', self.config.namespace)
+        dates = build_calendar('2015', '02', 'en', self.app_config.namespace)
 
         # ev1 and ev2 in his days
         self.assertEqual(dates[date(2015, 2, 13)], [ev1])
