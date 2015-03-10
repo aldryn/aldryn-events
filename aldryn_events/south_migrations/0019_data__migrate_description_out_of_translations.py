@@ -20,10 +20,9 @@ class Migration(DataMigration):
                     event.save()
                     first = False
                 else:
-                    plugins = (
-                        tr.description.cmsplugin_set.filter(language=tr.language_code)
+                    plugins = tr.description.cmsplugin_set.filter(
+                        language=tr.language_code,
                     )
-                    plugins.update(placeholder_id=event.description_new_id)
                     for plugin in plugins:
                         plugin.placeholder_id = event.description_new_id
                         plugin.save()
