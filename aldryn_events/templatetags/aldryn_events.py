@@ -39,7 +39,7 @@ def calendar(year, month, language, namespace):
         'current_date': current_date,
         'last_month': current_date - timedelta(days=1),
         'next_month': (current_date + timedelta(days=31)).replace(day=1),
-        'label': "{0} {1}".format(MONTHS.get(int(month)), year)
+        'calendar_label': "{0} {1}".format(MONTHS.get(int(month)), year)
     }
 
     # add css classes here instead in template
