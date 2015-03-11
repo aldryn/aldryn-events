@@ -222,7 +222,8 @@ def build_calendar(year, month, language, namespace=None):
 
     for event in events:
         for day in get_event_dates(event):
-            monthdates[day].append(event)
+            day_list = monthdates.setdefault(day, [])
+            day_list.append(event)
 
     return monthdates
 
