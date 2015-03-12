@@ -78,11 +78,9 @@ class RegistrationAdmin(TablibAdmin):
 
 
 class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
-    pass
-    # We can use something like this in the future to configure
-    # each app instance.
-    # def get_config_fields(self):
-    #     return ('config.some_field', )
+
+    def get_config_fields(self):
+        return ('config.show_ongoing_first')
 
 
 admin.site.register(Event, EventAdmin)
