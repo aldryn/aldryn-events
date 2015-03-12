@@ -80,7 +80,7 @@ class RegistrationAdmin(TablibAdmin):
 class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
 
     def get_config_fields(self):
-        return ('config.show_ongoing_first')
+        return ('config.show_ongoing_first',)
 
 
 admin.site.register(Event, EventAdmin)
