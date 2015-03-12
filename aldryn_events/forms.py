@@ -123,6 +123,6 @@ class UpcomingPluginForm(forms.ModelForm):
 
 
 class EventOptionForm(AppDataForm):
-    pass
+    show_ongoing_first = forms.BooleanField()
 
 setup_config(EventOptionForm, EventsConfig)
