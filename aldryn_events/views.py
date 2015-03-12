@@ -80,7 +80,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
 
     def get_context_data(self, **kwargs):
-        if self.config and self.config.show_ongoing_first:
+        if self.config and self.config.app_data.config.show_ongoing_first:
             ongoing_objects = self.object_list.ongoing()
             object_list = self.object_list.exclude(
                 pk__in=ongoing_objects.values_list('pk', flat=True)

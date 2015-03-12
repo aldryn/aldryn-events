@@ -32,16 +32,6 @@ class EventsConfig(TranslatableModel, AppHookConfig):
     translations = TranslatedFields(
         app_title=models.CharField(_('application title'), max_length=234),
     )
-    show_ongoing_first = models.BooleanField(
-        default=False,
-        verbose_name=_("Show ongoing events first on events page"),
-        help_text=_(
-            "When flagged will add an ongoing_objects to the context and "
-            "exclude these objects from the normal list. If you are using "
-            "the default template it's rendered as 'Current events'. Note: "
-            "ongoing objects are not paginated."
-        )
-    )
 
 
 class Event(TranslatableModel):
