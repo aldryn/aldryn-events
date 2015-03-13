@@ -96,7 +96,9 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
                     Q(start_date__range=(date_start, date_end),
                       end_date__lte=date_end) |
                     Q(start_date__lt=date_start,
-                      end_date__range=(date_start, date_end))
+                      end_date__range=(date_start, date_end)) |
+                    Q(start_date__lt=date_start,
+                      end_date__gte=date_end)
                 ).published(last_datetime)
             else:
                 year = int(year)

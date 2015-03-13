@@ -169,7 +169,9 @@ class EventPagesTestCase(EventBaseTestCase):
         )
 
         # setUp app config
-        original_show_ongoing_first = self.app_config.app_data.config.show_ongoing_first
+        original_show_ongoing_first = (
+            self.app_config.app_data.config.show_ongoing_first
+        )
         self.app_config.app_data.config.show_ongoing_first = True
         self.app_config.save()
 
@@ -178,7 +180,9 @@ class EventPagesTestCase(EventBaseTestCase):
             context = response.context_data
 
         # tearDown app config
-        self.app_config.app_data.config.show_ongoing_first = original_show_ongoing_first
+        self.app_config.app_data.config.show_ongoing_first = (
+            original_show_ongoing_first
+        )
         self.app_config.save()
 
         self.assertQuerysetEqual(
@@ -192,6 +196,104 @@ class EventPagesTestCase(EventBaseTestCase):
         self.assertEqual(2, links.length)
         self.assertEqual(ev2.get_absolute_url(), links[0].attrib['href'])
         self.assertEqual(ev3.get_absolute_url(), links[1].attrib['href'])
+
+    def setUpForEventListPages(self):
+        return [
+            self.create_event(
+                title='ev1',
+                start_date=tz_datetime(2014, 3, 7),
+                publish_at=tz_datetime(2014, 3, 1),
+            ),
+            self.create_event(
+                title='joint action for development of StarTrek technologies',
+                start_date=tz_datetime(2014, 2, 25),
+                end_date=tz_datetime(2014, 4, 2),
+                publish_at=tz_datetime(2014, 1, 2)
+            ),
+            self.create_event(
+                title='ev3',
+                start_date=tz_datetime(2014, 3, 6),
+                end_date=tz_datetime(2014, 3, 14),
+                publish_at=tz_datetime(2014, 3, 1),
+            ),
+            self.create_event(
+                title='ev4',
+                start_date=tz_datetime(2014, 3, 7),
+                end_date=tz_datetime(2014, 3, 14),
+                publish_at=tz_datetime(2014, 3, 1),
+                is_published=False
+            ),
+            self.create_event(
+                # has better way to explain a year event?
+                title='womans day is every day',
+                start_date=tz_datetime(2013, 3, 8),
+                end_date=tz_datetime(2014, 3, 8),
+                publish_at=tz_datetime(2013, 3, 8)
+            ),
+            self.create_event(
+                title='ev6',
+                start_date=tz_datetime(2014, 3, 23),
+                publish_at=tz_datetime(2014, 3, 1)
+            ),
+            self.create_event(
+                title='ev7',
+                start_date=tz_datetime(2015, 3, 23),
+                publish_at=tz_datetime(2015, 3, 1)
+            )
+        ]
+
+    def test_event_list_page_by_day(self):
+        ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
+        url = reverse(
+            "aldryn_events:events_list-by-day",
+            kwargs={'year': 2014, 'month': 3, 'day': 7}
+        )
+        with force_language('en'):
+            response = self.client.get(url)
+            self.assertQuerysetEqual(
+                response.context_data['object_list'],
+                map(repr, [ev5, ev2, ev3, ev1]),
+            )
+            self.assertContains(response, ev5.get_absolute_url())
+            self.assertContains(response, ev2.get_absolute_url())
+            self.assertContains(response, ev3.get_absolute_url())
+            self.assertContains(response, ev1.get_absolute_url())
+
+    def test_event_list_page_by_month(self):
+        ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
+        url = reverse(
+            "aldryn_events:events_list-by-month",
+            kwargs={'year': 2014, 'month': 3}
+        )
+        with force_language('en'):
+            response = self.client.get(url)
+            self.assertQuerysetEqual(
+                response.context_data['object_list'],
+                map(repr, [ev5, ev2, ev3, ev1, ev6]),
+            )
+            self.assertContains(response, ev5.get_absolute_url())
+            self.assertContains(response, ev2.get_absolute_url())
+            self.assertContains(response, ev3.get_absolute_url())
+            self.assertContains(response, ev1.get_absolute_url())
+            self.assertContains(response, ev6.get_absolute_url())
+
+    def test_event_list_page_by_year(self):
+        ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
+        url = reverse(
+            "aldryn_events:events_list-by-year",
+            kwargs={'year': 2014}
+        )
+        with force_language('en'):
+            response = self.client.get(url)
+            self.assertQuerysetEqual(
+                response.context_data['object_list'],
+                map(repr, [ev5, ev2, ev3, ev1, ev6]),
+            )
+            self.assertContains(response, ev5.get_absolute_url())
+            self.assertContains(response, ev2.get_absolute_url())
+            self.assertContains(response, ev3.get_absolute_url())
+            self.assertContains(response, ev1.get_absolute_url())
+            self.assertContains(response, ev6.get_absolute_url())
 
 
 class RegistrationTestCase(EventBaseTestCase):
