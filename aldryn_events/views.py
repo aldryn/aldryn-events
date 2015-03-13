@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from django import forms
 from django.db.models.query import Q
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
@@ -57,6 +58,11 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
     model = Event
     template_name = 'aldryn_events/events_list.html'
     archive = False
+
+    def get_paginate_by(self, queryset):
+        return getattr(
+            settings, 'ALDRYN_NEWSBLOG_PAGINATE_BY', self.paginate_by
+        )
 
     def get_queryset(self):
         qs = (super(EventListView, self).get_queryset()

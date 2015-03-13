@@ -1,15 +1,7 @@
 {% load i18n sekizai_tags %}
-  <div class="events-calendar">
-    <h3>{{ calendar_label }}</h3>
-    <p class="controls">
-      <a href="" class="back">{% trans "Previous month" %}</a>
-      <a href="" class="next">{% trans "Next month" %}</a>
-    </p>
-    {% include "aldryn_events/includes/calendar_table.html" %}
-  </div>
-
 {% addtoblock "js" %}
 <script type="text/javascript">
+  console.debug("hello");
   $( ".controls a" ).click(function(event) {
     event.preventDefault();
     var wrapper = $(this).closest("div.events-calendar");
@@ -36,3 +28,11 @@
   });
 </script>
 {% endaddtoblock %}
+<div class="events-calendar">
+  <h3>{{ calendar_label }}</h3>
+  <p class="controls">
+    <a href="" class="back">{% trans "Previous month" %}</a>
+    <a href="" class="next">{% trans "Next month" %}</a>
+  </p>
+  {% include "aldryn_events/includes/calendar_table.html" %}
+</div>
