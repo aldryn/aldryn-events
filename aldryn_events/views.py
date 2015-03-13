@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from aldryn_apphooks_config.utils import get_app_instance
+from dateutil.relativedelta import relativedelta
 
 from django import forms
+from django.db.models.query import Q
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -13,14 +15,16 @@ from django.views.generic import (
 )
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
-from aldryn_events import request_events_event_identifier
-from aldryn_events.templatetags.aldryn_events import calendar
+from aldryn_apphooks_config.utils import get_app_instance
+from datetime import date, datetime
 
+from . import request_events_event_identifier
+from .forms import EventRegistrationForm
+from .models import Event, Registration, EventCalendarPlugin
+from .templatetags.aldryn_events import calendar
 from .utils import (
     build_events_by_year,
 )
-from .models import Event, Registration, EventCalendarPlugin
-from .forms import EventRegistrationForm
 
 
 class NavigationMixin(object):
@@ -61,21 +65,61 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         language = get_language_from_request(self.request, check_path=True)
         qs = qs.translated(language).language(language)
 
-        if self.archive:
-            qs = qs.archive()
-        else:
-            qs = qs.future()
-
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
 
-        if year:
-            qs = qs.filter(start_date__year=year)
-        if month:
-            qs = qs.filter(start_date__month=month)
-        if day:
-            qs = qs.filter(start_date__day=day)
+        if year or month or day:
+            tz = get_current_timezone()
+            if year and month and day:
+                year, month, day = map(int, [year, month, day])
+                _date = date(year, month, day)
+                last_datetime = datetime(
+                    year, month, day, 23, 59, 59, tzinfo=tz
+                )
+
+                qs = qs.filter(
+                    Q(start_date=_date, end_date__isnull=True) |
+                    Q(start_date__lte=_date, end_date__gte=_date)
+                ).published(last_datetime)
+            elif year and month:
+                year, month = map(int, [year, month])
+                date_start = date(year, month, 1)
+                date_end = date_start + relativedelta(months=1, days=-1)
+                last_datetime = datetime(
+                    tzinfo=tz, *(date_end.timetuple()[:3])
+                ) + relativedelta(days=1, minutes=-1)
+
+                qs = qs.filter(
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__isnull=True) |
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__lte=date_end) |
+                    Q(start_date__lt=date_start,
+                      end_date__range=(date_start, date_end))
+                ).published(last_datetime)
+            else:
+                year = int(year)
+                date_start = date(year, 1, 1)
+                date_end = date_start + relativedelta(years=1, days=-1)
+                last_datetime = datetime(
+                    tzinfo=tz, *(date_end.timetuple()[:3])
+                ) + relativedelta(days=1, minutes=-1)
+
+                qs = qs.filter(
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__isnull=True) |
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__lte=date_end) |
+                    Q(start_date__lt=date_start,
+                      end_date__range=(date_start, date_end))
+                ).published(last_datetime)
+
+        else:
+            if self.archive:
+                qs = qs.archive()
+            else:
+                qs = qs.future()
 
         return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
 
@@ -198,7 +242,7 @@ class EventDatesView(AppConfigMixin, TemplateView):
 
         # calendar is the calendar tag
         ctx.update(calendar(
-            ctx['year'], ctx['month'], language, namespace or self.namespace
+            year, month, language, namespace or self.namespace
         ))
         return ctx
 

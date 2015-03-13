@@ -20,7 +20,8 @@ REQUIREMENTS = [
     'django-hvad',
     'django-sortedm2m',
     'django-parler',
-    'aldryn-apphooks-config'
+    'aldryn-apphooks-config',
+    'python-dateutil'
 ]
 
 if py26:
