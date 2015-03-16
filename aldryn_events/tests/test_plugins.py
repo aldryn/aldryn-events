@@ -13,7 +13,7 @@ from aldryn_events.tests.base import (
 def calendar_url(year, month, language):
     with force_language(language):
         url = reverse(
-            'admin:get-calendar-dates', kwargs={'year': year, 'month': month}
+            'aldryn_events:get-calendar-dates', kwargs={'year': year, 'month': month}
         )
     return url
 

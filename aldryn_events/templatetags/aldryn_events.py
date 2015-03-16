@@ -3,6 +3,7 @@
 from datetime import timedelta, date
 
 from django import template
+from django.template.loader import get_template
 from django.utils.dates import MONTHS
 from django.utils import timezone
 from sekizai.context import SekizaiContext
@@ -12,10 +13,17 @@ from ..utils import build_calendar
 
 register = template.Library()
 
+@register.simple_tag(takes_context=True)
+def calendar(context, year, month, language, namespace):
+    template_name = 'aldryn_events/tags/calendar.html'
 
-@register.inclusion_tag('aldryn_events/tags/calendar.html',
-                        context_class=SekizaiContext)
-def calendar(year, month, language, namespace):
+    t = get_template(template_name)
+    context['calendar_tag'] = build_calendar_context(year, month, language,
+                                                     namespace)
+    rendered = t.render(context)
+    return rendered
+
+def build_calendar_context(year, month, language, namespace):
     # if not have a selected date
     today = timezone.now().date()
     if not all([year, month]):
@@ -39,15 +47,12 @@ def calendar(year, month, language, namespace):
         'current_date': current_date,
         'last_month': current_date - timedelta(days=1),
         'next_month': (current_date + timedelta(days=31)).replace(day=1),
-        'calendar_label': "{0} {1}".format(
-            unicode(MONTHS.get(int(month))), year
-        )
+        'label': u"{0} {1}".format(MONTHS.get(int(month)), year)
     }
 
     # add css classes here instead in template
     # TODO: can configure css classes in appconfig ;)
     _calendar = build_calendar(year, month, language, namespace)
-
     calendar_list = []
     for day, events in _calendar.items():
         css = []

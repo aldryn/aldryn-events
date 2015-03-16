@@ -22,7 +22,7 @@ from datetime import date, datetime
 from . import request_events_event_identifier
 from .forms import EventRegistrationForm
 from .models import Event, Registration, EventCalendarPlugin
-from .templatetags.aldryn_events import calendar
+from .templatetags.aldryn_events import build_calendar_context
 from .utils import (
     build_events_by_year,
 )
@@ -152,12 +152,16 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        self.event = (Event.objects.namespace(self.namespace)
-                                   .published()
-                                   .translated(language, slug=kwargs['slug'])
-                                   .language(language).get())
+        try:
+            self.event = (Event.objects.namespace(self.namespace)
+                                       .published()
+                                       .translated(language, slug=kwargs['slug'])
+                                       .language(language).get())
+        except:
+            import ipdb;ipdb.set_trace()
 
-        setattr(self.request, request_events_event_identifier, self.event)
+
+        setattr(self.request, request_events_event_identifier,  self.event)
 
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
@@ -236,22 +240,23 @@ class EventDatesView(AppConfigMixin, TemplateView):
         year = ctx.get('year', today.year)
         month = ctx.get('month', today.month)
 
-        # Get namespace from plugin instead view
+        # Get plugin if possible so we can use language and namespace from
+        # plugin, if not possible get namespace from view, language from
+        # request
         try:
-            pk = self.request.GET['plugin_pk']
-            if pk:
-                plugin = EventCalendarPlugin.objects.get(pk=pk)
+            pk = self.request.GET['plugin_pk'] or None
+            plugin = EventCalendarPlugin.objects.get(pk=pk)
         except (EventCalendarPlugin.DoesNotExist, KeyError):
-            namespace = None
+            namespace = self.namespace
             language = get_language_from_request(self.request, check_path=True)
         else:
             namespace = plugin.app_config.namespace
             language = plugin.language
 
         # calendar is the calendar tag
-        ctx.update(calendar(
-            year, month, language, namespace or self.namespace
-        ))
+        ctx['calendar_tag'] = build_calendar_context(
+            year, month, language, namespace
+        )
         return ctx
 
 event_dates = EventDatesView.as_view()
