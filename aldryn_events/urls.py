@@ -3,6 +3,9 @@ from django.conf.urls import url, patterns
 
 urlpatterns = patterns('aldryn_events.views',  # NOQA
     url(r'^$', 'event_list', name='events_list'),
+    url(r'^get-dates/$', 'event_dates', name='get-calendar-dates'),
+    url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
+        'event_dates', name='get-calendar-dates'),
     url(r'^(?P<year>\d{4})/$', 'event_list', name='events_list-by-year'),
     url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'event_list',
         name='events_list-by-month'),

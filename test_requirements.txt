@@ -1,5 +1,6 @@
 importlib
 djangocms-helper
-mock
 pysqlite
 coverage
+pyquery
+mock

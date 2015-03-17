@@ -69,7 +69,8 @@ class EventListCMSPlugin(CMSPluginBase):
         namespace = instance.app_config_id and instance.app_config.namespace
         # With Django 1.5 and because a bug in SortedManyToManyField
         # we can not use instance.events or we get a error like:
-        # DatabaseError: no such column: aldryn_events_eventlistplugin_events.sort_value
+        # DatabaseError:
+        #   no such column: aldryn_events_eventlistplugin_events.sort_value
         events = (Event.objects.namespace(namespace)
                                .translated(language)
                                .language(language)
@@ -98,25 +99,27 @@ class CalendarPlugin(CMSPluginBase):
             year = str(timezone.now().date().year)
             month = str(timezone.now().date().month)
 
-        current_date = datetime.date(
-            day=1, month=int(month), year=int(year)
-        )
+        current_date = datetime.date(int(year), int(month), 1)
         language = instance.language
         namespace = instance.app_config_id and instance.app_config.namespace
+
+        context['event_year'] = year
+        context['event_month'] = month
         context['days'] = build_calendar(year, month, language, namespace)
         context['current_date'] = current_date
         context['last_month'] = current_date + datetime.timedelta(days=-1)
         context['next_month'] = current_date + datetime.timedelta(days=35)
         context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
         context['calendar_namespace'] = namespace
+        context['calendar_language'] = language
         return context
 
-    def get_plugin_urls(self):
-        return patterns('',  # NOQA
-            url(r'^get-dates/$', event_dates, name='get-calendar-dates'),
-            url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
-                event_dates, name='get-calendar-dates'),
-        )
+    # def get_plugin_urls(self):
+    #     return patterns('',  # NOQA
+    #         url(r'^get-dates/$', event_dates, name='get-calendar-dates'),
+    #         url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
+    #             event_dates, name='get-calendar-dates'),
+    #     )
 
 
 plugin_pool.register_plugin(CalendarPlugin)

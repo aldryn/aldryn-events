@@ -1,45 +1,29 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName".
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
-        for event in orm.Event.objects.all():
-            first = True
-            for tr in event.translations.all():
-                if first:
-                    event.description_new_id = tr.description_id
-                    event.save()
-                    first = False
-                else:
-                    plugins = tr.description.cmsplugin_set.filter(
-                        language=tr.language_code,
-                    )
-                    for plugin in plugins:
-                        plugin.placeholder_id = event.description_new_id
-                        plugin.save()
+        # Adding field 'EventsConfig.show_ongoing_first'
+        db.add_column(u'aldryn_events_eventsconfig', 'show_ongoing_first',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        for event in orm.Event.objects.all():
-            for tr in event.translations:
-                tr.description_id = event.description_new_id
-                tr.save()
+        # Deleting field 'EventsConfig.show_ongoing_first'
+        db.delete_column(u'aldryn_events_eventsconfig', 'show_ongoing_first')
 
 
     models = {
         u'aldryn_events.event': {
             'Meta': {'ordering': "('start_date', 'start_time', 'end_date', 'end_time')", 'object_name': 'Event'},
             'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']"}),
-            'description_new': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
+            'description': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
             'detail_link': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'enable_registration': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
@@ -77,6 +61,7 @@ class Migration(DataMigration):
             'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'namespace': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '100'}),
+            'show_ongoing_first': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'aldryn_events.eventsconfigtranslation': {
@@ -88,7 +73,6 @@ class Migration(DataMigration):
         },
         u'aldryn_events.eventtranslation': {
             'Meta': {'unique_together': "[('language_code', 'slug'), (u'language_code', u'master')]", 'object_name': 'EventTranslation', 'db_table': "u'aldryn_events_event_translation'"},
-            'description': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
             'flyer': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'event_flyers'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['filer.File']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'event_images'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': "orm['filer.Image']"}),
@@ -232,4 +216,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['aldryn_events']
-    symmetrical = True

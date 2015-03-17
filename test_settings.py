@@ -14,10 +14,19 @@ class DisableMigrations(dict):
         return "notmigrations"
 
 
+class DisableMigrations(dict):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
+
 gettext = lambda s: s
+
 HELPER_SETTINGS = {
     'ROOT_URLCONF': 'aldryn_events.tests.urls',
-    'TIME_ZONE': 'Europe/Zurich',
+    'TIME_ZONE': 'UTC',
     'INSTALLED_APPS': [
         'mptt',
         'parler',
@@ -75,6 +84,8 @@ HELPER_SETTINGS = {
     # 'MIGRATION_MODULES ': {
     #     'filer': 'filer.migrations_django',
     # },
+    # Disable migrations so tests runs really faster
+    # Source: https://gist.github.com/c-rhodes/cebe9d4619125949dff8
     'MIGRATION_MODULES': DisableMigrations(),  # disable migration for DJ 1.7 in tests
     'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
     # 'DEBUG': True,
@@ -87,16 +98,6 @@ HELPER_SETTINGS = {
         }
     }
 }
-
-# if '1.6' <= get_version() < '1.7' and 'test' in sys.argv:
-#     HELPER_SETTINGS['DATABASES'] = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': ':memory:',
-#             'TEST_NAME': ':memory:',
-#             'ATOMIC_REQUESTS': True
-#         }
-#     }
 
 
 def run():

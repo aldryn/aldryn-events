@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-import datetime
-from aldryn_apphooks_config.utils import get_app_instance
+from dateutil.relativedelta import relativedelta
 
 from django import forms
+from django.db.models.query import Q
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -14,14 +16,16 @@ from django.views.generic import (
 )
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
-from aldryn_events import request_events_event_identifier
+from aldryn_apphooks_config.utils import get_app_instance
+from datetime import date, datetime
 
+from . import request_events_event_identifier
+from .forms import EventRegistrationForm
+from .models import Event, Registration, EventCalendarPlugin
+from .templatetags.aldryn_events import build_calendar_context
 from .utils import (
     build_events_by_year,
-    build_calendar,
 )
-from .models import Event, Registration, EventCalendarPlugin
-from .forms import EventRegistrationForm
 
 
 class NavigationMixin(object):
@@ -55,6 +59,11 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
     template_name = 'aldryn_events/events_list.html'
     archive = False
 
+    def get_paginate_by(self, queryset):
+        return getattr(
+            settings, 'ALDRYN_EVENTS_PAGINATE_BY', self.paginate_by
+        )
+
     def get_queryset(self):
         qs = (super(EventListView, self).get_queryset()
                                         .namespace(self.namespace))
@@ -62,23 +71,77 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         language = get_language_from_request(self.request, check_path=True)
         qs = qs.translated(language).language(language)
 
-        if self.archive:
-            qs = qs.archive()
-        else:
-            qs = qs.future()
-
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
 
-        if year:
-            qs = qs.filter(start_date__year=year)
-        if month:
-            qs = qs.filter(start_date__month=month)
-        if day:
-            qs = qs.filter(start_date__day=day)
+        if year or month or day:
+            tz = get_current_timezone()
+            if year and month and day:
+                year, month, day = map(int, [year, month, day])
+                _date = date(year, month, day)
+                last_datetime = datetime(
+                    year, month, day, 23, 59, 59, tzinfo=tz
+                )
+
+                qs = qs.filter(
+                    Q(start_date=_date, end_date__isnull=True) |
+                    Q(start_date__lte=_date, end_date__gte=_date)
+                ).published(last_datetime)
+            elif year and month:
+                year, month = map(int, [year, month])
+                date_start = date(year, month, 1)
+                date_end = date_start + relativedelta(months=1, days=-1)
+                last_datetime = datetime(
+                    tzinfo=tz, *(date_end.timetuple()[:3])
+                ) + relativedelta(days=1, minutes=-1)
+
+                qs = qs.filter(
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__isnull=True) |
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__lte=date_end) |
+                    Q(start_date__lt=date_start,
+                      end_date__range=(date_start, date_end)) |
+                    Q(start_date__lt=date_start,
+                      end_date__gte=date_end)
+                ).published(last_datetime)
+            else:
+                year = int(year)
+                date_start = date(year, 1, 1)
+                date_end = date_start + relativedelta(years=1, days=-1)
+                last_datetime = datetime(
+                    tzinfo=tz, *(date_end.timetuple()[:3])
+                ) + relativedelta(days=1, minutes=-1)
+
+                qs = qs.filter(
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__isnull=True) |
+                    Q(start_date__range=(date_start, date_end),
+                      end_date__lte=date_end) |
+                    Q(start_date__lt=date_start,
+                      end_date__range=(date_start, date_end))
+                ).published(last_datetime)
+
+        else:
+            if self.archive:
+                qs = qs.archive()
+            else:
+                qs = qs.future()
 
         return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
+
+    def get_context_data(self, **kwargs):
+        if self.config and self.config.app_data.config.show_ongoing_first:
+            ongoing_objects = self.object_list.ongoing()
+            object_list = self.object_list.exclude(
+                pk__in=ongoing_objects.values_list('pk', flat=True)
+            )
+            kwargs.update({
+                'object_list': object_list,
+                'ongoing_objects': ongoing_objects
+            })
+        return super(EventListView, self).get_context_data(**kwargs)
 
 
 class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
@@ -89,12 +152,16 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        self.event = (Event.objects.namespace(self.namespace)
-                                   .published()
-                                   .translated(language, slug=kwargs['slug'])
-                                   .language(language).get())
+        try:
+            self.event = (Event.objects.namespace(self.namespace)
+                                       .published()
+                                       .translated(language, slug=kwargs['slug'])
+                                       .language(language).get())
+        except:
+            import ipdb;ipdb.set_trace()
 
-        setattr(self.request, request_events_event_identifier, self.event)
+
+        setattr(self.request, request_events_event_identifier,  self.event)
 
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
@@ -169,33 +236,27 @@ class EventDatesView(AppConfigMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super(EventDatesView, self).get_context_data(**kwargs)
 
-        if 'year' not in ctx or 'month' not in ctx:
-            today = timezone.now().date()
-            ctx['month'] = today.month
-            ctx['year'] = today.year
+        today = timezone.now().date()
+        year = ctx.get('year', today.year)
+        month = ctx.get('month', today.month)
 
-        current_date = datetime.date(
-            day=1, month=int(ctx['month']), year=int(ctx['year'])
-        )
-
-        # Get namespace from plugin instead view
+        # Get plugin if possible so we can use language and namespace from
+        # plugin, if not possible get namespace from view, language from
+        # request
         try:
-            pk = self.request.GET.get('plugin_pk')
-            if pk:
-                plugin = EventCalendarPlugin.objects.get(pk=pk)
-        except EventCalendarPlugin.DoesNotExist:
-            namespace = None
+            pk = self.request.GET['plugin_pk'] or None
+            plugin = EventCalendarPlugin.objects.get(pk=pk)
+        except (EventCalendarPlugin.DoesNotExist, KeyError):
+            namespace = self.namespace
             language = get_language_from_request(self.request, check_path=True)
         else:
             namespace = plugin.app_config.namespace
             language = plugin.language
 
-        ctx['days'] = build_calendar(
-            ctx['year'], ctx['month'], language, namespace or self.namespace
+        # calendar is the calendar tag
+        ctx['calendar_tag'] = build_calendar_context(
+            year, month, language, namespace
         )
-        ctx['current_date'] = current_date
-        ctx['last_month'] = current_date + datetime.timedelta(days=-1)
-        ctx['next_month'] = current_date + datetime.timedelta(days=35)
         return ctx
 
 event_dates = EventDatesView.as_view()

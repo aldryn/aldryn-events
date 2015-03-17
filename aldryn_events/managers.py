@@ -2,16 +2,12 @@
 from django.db.models import Q
 from django.utils import timezone
 
-from parler.managers import TranslatableManager, TranslatableQuerySet
+from aldryn_apphooks_config.managers.parler import (
+    AppHookConfigTranslatableManager, AppHookConfigTranslatableQueryset
+)
 
 
-class EventQuerySet(TranslatableQuerySet):
-
-    def namespace(self, namespace):
-        """
-        Filter by app_config namespace
-        """
-        return self.filter(app_config__namespace=namespace)
+class EventQuerySet(AppHookConfigTranslatableQueryset):
 
     def upcoming(self, count, now=None):
         now = now or timezone.now()
@@ -53,12 +49,21 @@ class EventQuerySet(TranslatableQuerySet):
         now = now or timezone.now()
         return self.filter(is_published=True, publish_at__lte=now)
 
+    def ongoing(self, now=None):
+        now = now or timezone.now()
+        _date = now.date()
+        return self.published(now).filter(
+            Q(end_date__isnull=True, start_date=_date) |
+            Q(start_date__lte=_date, end_date__gte=_date)
+        )
 
-class EventManager(TranslatableManager):
-    queryset_class = EventQuerySet
 
-    def namespace(self, namespace):
-        return self.get_queryset().namespace(namespace)
+class EventManager(AppHookConfigTranslatableManager):
+
+    def get_queryset(self):
+        return EventQuerySet(self.model, using=self.db)
+
+    get_query_set = get_queryset
 
     def upcoming(self, count, now=None):
         return self.get_queryset().upcoming(count, now=now)
@@ -74,3 +79,6 @@ class EventManager(TranslatableManager):
 
     def published(self, now=None):
         return self.get_queryset().published(now=now)
+
+    def ongoing(self, now=None):
+        return self.get_queryset().ongoing(now=now)

@@ -41,6 +41,8 @@ class EventsIndex(get_index_base()):
         for base_plugin in plugins:
             instance, plugin_type = base_plugin.get_plugin_instance()
             if instance is not None:
-                content = strip_tags(instance.render_plugin(context=RequestContext(request)))
+                content = strip_tags(
+                    instance.render_plugin(context=RequestContext(request))
+                )
                 text_bits.append(content)
         return ' '.join(text_bits)

@@ -3,8 +3,8 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from aldryn_apphooks_config.admin import BaseAppHookConfig
-from cms.admin.placeholderadmin import PlaceholderAdmin
-from cms.admin.placeholderadmin import FrontendEditableAdmin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 
@@ -12,7 +12,8 @@ from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
-class EventAdmin(TranslatableAdmin, FrontendEditableAdmin, PlaceholderAdmin):
+class EventAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin,
+                 TranslatableAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
@@ -77,11 +78,9 @@ class RegistrationAdmin(TablibAdmin):
 
 
 class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
-    pass
-    # We can use something like this in the future to configure
-    # each app instance.
-    # def get_config_fields(self):
-    #     return ('config.some_field', )
+
+    def get_config_fields(self):
+        return ('config.show_ongoing_first',)
 
 
 admin.site.register(Event, EventAdmin)

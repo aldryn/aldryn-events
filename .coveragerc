@@ -1,5 +1,5 @@
 [run]
-source = aldryn_jobs
+source = aldryn_events
 omit = *migrations*
 
 [report]

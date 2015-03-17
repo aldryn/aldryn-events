@@ -123,6 +123,14 @@ class UpcomingPluginForm(forms.ModelForm):
 
 
 class EventOptionForm(AppDataForm):
-    pass
+    show_ongoing_first = forms.BooleanField(
+        required=False,
+        help_text=_(
+            "When flagged will add an ongoing_objects to the context and "
+            "exclude these objects from the normal list. If you are using "
+            "the default template it's rendered as 'Current events'. Note: "
+            "ongoing objects are not paginated."
+        )
+    )
 
 setup_config(EventOptionForm, EventsConfig)

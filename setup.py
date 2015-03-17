@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import sys
 from setuptools import setup, find_packages
@@ -21,7 +20,8 @@ REQUIREMENTS = [
     'django-hvad',
     'django-sortedm2m',
     'django-parler',
-    'aldryn-apphooks-config'
+    'aldryn-apphooks-config',
+    'python-dateutil'
 ]
 
 if py26:
@@ -37,7 +37,7 @@ if py27:
     ]
 
 DEPENDENCY_LINKS = [
-    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'
+    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
 ]
 
 CLASSIFIERS = [
@@ -52,6 +52,7 @@ CLASSIFIERS = [
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
 ]
+
 
 setup(
     name='aldryn-events',
