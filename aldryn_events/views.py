@@ -61,7 +61,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
 
     def get_paginate_by(self, queryset):
         return getattr(
-            settings, 'ALDRYN_NEWSBLOG_PAGINATE_BY', self.paginate_by
+            settings, 'ALDRYN_EVENTS_PAGINATE_BY', self.paginate_by
         )
 
     def get_queryset(self):
