@@ -157,13 +157,14 @@ def get_additional_styles():
         if isinstance(raw, basestring):
             raw = raw.split(',')
         for choice in raw:
-            if not isinstance(choice, basestring):
-                raise TypeError(
-                    "Somehow the choice isn't a string or unicode, "
-                    "but a {0}: {1}".format(type(choice), choice)
-                )
-            clean = choice.strip()
-            choices.append((clean.lower(), clean.title()))
+            try:
+                # Happened on aldryn to choice be a tuple with two
+                # empty strings and this break the deployment. To avoid that
+                # kind of issue if something fais we just ignore.
+                clean = choice.strip()
+                choices.append((clean.lower(), clean.title()))
+            except Exception:
+                pass
     return choices
 
 
