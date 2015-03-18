@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime, timedelta
 import calendar
-from itertools import groupby
-from operator import attrgetter
 
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
@@ -156,9 +154,14 @@ def get_additional_styles():
     raw = getattr(settings, 'ALDRYN_EVENTS_PLUGIN_STYLES', False)
 
     if raw:
-        if isinstance(raw, str) or isinstance(raw, unicode):
+        if isinstance(raw, basestring):
             raw = raw.split(',')
         for choice in raw:
+            if not isinstance(choice, basestring):
+                raise TypeError(
+                    "Somehow the choice isn't a string or unicode, "
+                    "but a {0}: {1}".format(type(choice), choice)
+                )
             clean = choice.strip()
             choices.append((clean.lower(), clean.title()))
     return choices
