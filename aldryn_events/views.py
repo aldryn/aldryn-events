@@ -152,14 +152,10 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        try:
-            self.event = (Event.objects.namespace(self.namespace)
-                                       .published()
-                                       .translated(language, slug=kwargs['slug'])
-                                       .language(language).get())
-        except:
-            import ipdb;ipdb.set_trace()
-
+        self.event = (Event.objects.namespace(self.namespace)
+                                   .published()
+                                   .translated(language, slug=kwargs['slug'])
+                                   .language(language).get())
 
         setattr(self.request, request_events_event_identifier,  self.event)
 
