@@ -37,6 +37,7 @@ HELPER_SETTINGS = {
         'sortedm2m',
         'standard_form',
         'aldryn_events',
+        'aldryn_apphooks_config'
     ],
     'LANGUAGES': (
         ('en', 'English'),
