@@ -25,7 +25,7 @@ class DisableMigrations(dict):
 gettext = lambda s: s
 
 HELPER_SETTINGS = {
-    'ROOT_URLCONF': 'aldryn_events.tests.urls',
+    # 'ROOT_URLCONF': 'aldryn_events.tests.urls',
     'TIME_ZONE': 'UTC',
     'INSTALLED_APPS': [
         'mptt',

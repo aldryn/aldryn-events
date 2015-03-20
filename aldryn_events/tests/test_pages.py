@@ -16,23 +16,40 @@ from .base import EventBaseTestCase, tz_datetime
 
 class EventPagesTestCase(EventBaseTestCase):
 
+    def create_base_pages(self):
+        root_page = self.create_root_page(
+            publication_date=tz_datetime(2014, 6, 8)
+        )
+        page = api.create_page(
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            parent=root_page,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 6, 8)
+        )
+        api.create_title('de', 'Events de', page, slug='eventsapp')
+        page.publish('en')
+        page.publish('de')
+        return page.reload()
+
     @mock.patch('aldryn_events.managers.timezone')
     def test_event_detail_page(self, timezone_mock):
         """
         Test if proper url and event page are created
         """
         timezone_mock.now.return_value = tz_datetime(2014, 9, 11, 12)
+        import ipdb;ipdb.set_trace()
+        self.create_base_pages()
         event = self.create_default_event()
-
-        # '/events/' came from tests/urls.py, '/open-air/' from the event slug
-        self.assertEqual(event.get_absolute_url(), '/en/events/open-air/')
+        self.assertEqual(event.get_absolute_url(), '/en/eventsapp/open-air/')
         with force_language('en'):
             response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
 
         event.set_current_language('de')
-        # '/events/' came from tests/urls.py, '/im-freien/' from the event slug
-        self.assertEqual(event.get_absolute_url(), '/de/events/im-freien/')
+
+        self.assertEqual(event.get_absolute_url(), '/de/eventsapp/im-freien/')
         with force_language('de'):
             response = self.client.get(event.get_absolute_url())
         self.assertContains(response, event.title)
@@ -100,6 +117,7 @@ class EventPagesTestCase(EventBaseTestCase):
     def test_unattached_namespace(self, timezone_mock, tag_timezone_mock):
         timezone_mock.now.return_value = tz_datetime(2015, 2, 2, 10)
         tag_timezone_mock.now.return_value = tz_datetime(2015, 2, 2, 10)
+        self.create_base_pages()
         event1 = self.create_event(
             title='Event2015 current namespace',
             slug='open-air',
@@ -243,6 +261,7 @@ class EventPagesTestCase(EventBaseTestCase):
         ]
 
     def test_event_list_page_by_day(self):
+        self.create_base_pages()
         ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
         url = reverse(
             "aldryn_events:events_list-by-day",
@@ -260,6 +279,7 @@ class EventPagesTestCase(EventBaseTestCase):
             self.assertContains(response, ev1.get_absolute_url())
 
     def test_event_list_page_by_month(self):
+        self.create_base_pages()
         ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
         url = reverse(
             "aldryn_events:events_list-by-month",
@@ -278,6 +298,7 @@ class EventPagesTestCase(EventBaseTestCase):
             self.assertContains(response, ev6.get_absolute_url())
 
     def test_event_list_page_by_year(self):
+        self.create_base_pages()
         ev1, ev2, ev3, ev4, ev5, ev6, ev7 = self.setUpForEventListPages()
         url = reverse(
             "aldryn_events:events_list-by-year",

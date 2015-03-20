@@ -189,9 +189,15 @@ class Event(TranslatableModel):
 
     def get_absolute_url(self):
         slug = self.safe_translation_getter('slug')
+
+        try:
+            url_name = '{0}:events_detail'.format(self.app_config.namespace)
+        except Exception:
+            url_name = 'aldryn_events:events_detail'
+
         with override(self.get_current_language()):
             return reverse(
-                'aldryn_events:events_detail', kwargs={'slug': slug},
+                url_name, kwargs={'slug': slug},
                 current_app=self.app_config.namespace
             )
 

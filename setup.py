@@ -7,7 +7,10 @@ py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
 py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
 
 if not py26 and not py27:
-    raise ValueError("Aldryn Events currently support only python 2.6 and 2.7")
+    raise ValueError(
+        "Aldryn Events currently support only python 2.6 to 2.7, "
+        "not {0}".format(sys.version_info)
+    )
 
 REQUIREMENTS = [
     'South<1.1,>=1.0.2',
@@ -20,24 +23,23 @@ REQUIREMENTS = [
     'django-hvad',
     'django-sortedm2m',
     'django-parler',
-    'aldryn-apphooks-config',
+    'aldryn-apphooks-config>=0.1.4',
     'python-dateutil'
 ]
 
 if py26:
     REQUIREMENTS += [
-        'Django<1.6,>=1.5',
+        'Django<1.7,>=1.6',
         'django-tablib<3.0'
     ]
 
 if py27:
     REQUIREMENTS += [
-        'Django<1.8,>=1.5',
+        'Django<1.8,>=1.6',
         'django-tablib>=3.1.1'
     ]
 
 DEPENDENCY_LINKS = [
-    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
 ]
 
 CLASSIFIERS = [
