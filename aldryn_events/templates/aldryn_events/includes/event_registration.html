@@ -1,5 +1,4 @@
-{% load i18n cms_tags standard_form sekizai_tags %}
-
+{% load i18n cms_tags standard_form sekizai_tags apphooks_config_tags %}
 {% if event.enable_registration %}
 <div class="event-registration">
 	<h3>{% trans "Registration" %}</h3>
@@ -9,7 +8,7 @@
 	{% if already_registered and not event.is_registration_deadline_passed %}
 	<p>{% trans "Thank you for your registration!" %}</p>
 	{% block event_registration %}{% static_placeholder "events_registration" %}{% endblock %}
-	<form action="{% url 'aldryn_events:events_registration_reset' event.slug %}" method="post" class="form form-eventss" role="form">
+	<form action="{% namespace_url 'events_registration_reset' event.slug namespace=view.namespace %}" method="post" class="form form-events" role="form">
 		{% csrf_token %}
 		<fieldset>
 			<ol>

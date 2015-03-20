@@ -47,7 +47,8 @@ def build_calendar_context(year, month, language, namespace):
         'current_date': current_date,
         'last_month': current_date - timedelta(days=1),
         'next_month': (current_date + timedelta(days=31)).replace(day=1),
-        'label': u"{0} {1}".format(MONTHS.get(int(month)), year)
+        'label': u"{0} {1}".format(MONTHS.get(int(month)), year),
+        'namespace': namespace
     }
 
     # add css classes here instead in template

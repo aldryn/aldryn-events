@@ -14,7 +14,8 @@
         "easy_thumbnails",
         "hvad",
         "sortedm2m",
-		"aldryn_events"
+        "aldryn_apphooks_config",
+		"aldryn_events",
 	],
 	"author": {
 		"name": "Divio AG",
