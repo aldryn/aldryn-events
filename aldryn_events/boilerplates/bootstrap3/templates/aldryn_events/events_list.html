@@ -1,16 +1,35 @@
 {% extends "aldryn_events/base.html" %}
-{% load i18n aldryn_events %}
+{% load i18n aldryn_events cms_tags %}
 
-{% block content_events %}
-{% if view.config.app_data.config.show_ongoing_first %}
-<h2>{% trans "Ongoing events" %}</h2>
-{% include "aldryn_events/includes/ongoing_event_items.html" %}
-{% endif %}
-<h2>{% trans "Events" %}</h2>
-{% include "aldryn_events/includes/event_items.html" %}
-{% endblock content_events %}
+{% block events_content %}
+    {# INFO: if configuration is set, show ongoing events first #}
+    {% if view.config.app_data.config.show_ongoing_first %}
+        {% static_placeholder "events_list_top_ongoing" %}
+        <div class="aldryn-events-list aldryn-events-list-ongoing">
+            {% for event in ongoing_objects %}
+                {% include "aldryn_events/includes/event_item.html" %}
+            {% empty %}
+                <p class="well">{% trans "No items available" %}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-{% block content_sidebar %}
-{% get_current_language as language %}
-{% calendar event_year event_month language view.namespace %}
-{% endblock content_sidebar %}
+    {# INFO: show upcoming events #}
+    {% static_placeholder "events_list_top" %}
+    <div class="aldryn-events-list">
+        {% for event in page_obj.object_list|default:object_list %}
+            {% include "aldryn_events/includes/event_item.html" %}
+        {% empty %}
+            <p class="well">{% trans "No items available" %}</p>
+        {% endfor %}
+    </div>
+
+    {% include "aldryn_events/includes/pagination.html" %}
+{% endblock events_content %}
+
+{% block events_sidebar %}
+    {% get_current_language as language %}
+    <div class="aldryn-events-calendar">
+        {% calendar event_year event_month language view.namespace %}
+    </div>
+{% endblock events_sidebar %}
