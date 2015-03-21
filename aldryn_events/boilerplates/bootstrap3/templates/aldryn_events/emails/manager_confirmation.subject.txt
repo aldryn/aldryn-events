@@ -1,1 +1,1 @@
-{% load i18n %}{% blocktrans %}new registration for "{{ event_name }}"{% endblocktrans %}
+{% load i18n %}{% blocktrans %}New registration for "{{ event_name }}"{% endblocktrans %}
