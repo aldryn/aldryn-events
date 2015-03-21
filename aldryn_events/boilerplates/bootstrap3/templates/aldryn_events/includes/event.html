@@ -4,15 +4,25 @@
     {% block event_visual %}
         {% if event.image %}
             <p class="visual">
-                <a href="{{ event.get_absolute_url }}">
-                    <img src="{% thumbnail event.image 800x450 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
-                </a>
+                {% if not detail_view %}
+                    <a href="{{ event.get_absolute_url }}">
+                {% endif %}
+                <img src="{% thumbnail event.image 800x450 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
+                {% if not detail_view %}
+                    </a>
+                {% endif %}
             </p>
         {% endif %}
     {% endblock %}
 
     {% block events_title %}
-        <h2><a href="{{ event.get_absolute_url }}">{{ event.title }}</a></h2>
+        <h2>
+            {% if not detail_view %}
+                <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+            {% else %}
+                {{ event.title }}
+            {% endif %}
+        </h2>
     {% endblock events_title %}
 
     {% block events_meta %}

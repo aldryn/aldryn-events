@@ -5,9 +5,6 @@
     {% render_placeholder view.config.detail_view_placeholder %}
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
-	    {% if event.enable_registration %}
-	        {% include "aldryn_events/includes/registration.html" %}
-        {% endif %}
     </div>
     {% static_placeholder "events_detail_view" %}
 {% endblock events_content %}
@@ -28,4 +25,12 @@
         </ul>
     </div>
     {% static_placeholder "events_detail_footer" %}
+
+    {% if event.enable_registration %}
+        <div class="row">
+            <div class="col-md-16 col-md-push-4">
+                {% include "aldryn_events/includes/registration.html" %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock events_footer %}
