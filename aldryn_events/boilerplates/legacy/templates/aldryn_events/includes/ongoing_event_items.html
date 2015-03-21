@@ -1,0 +1,8 @@
+{% load i18n  %}
+<ul class="event-items ongoing-events">
+	{% for event in ongoing_objects %}
+    {% include "aldryn_events/includes/event_item.html" %}
+    {% empty %}
+    <li>{% trans "No events found." %}</li>
+	{% endfor %}
+</ul>

@@ -1,0 +1,19 @@
+{% extends "aldryn_events/plugins/upcoming/base.html" %}
+{% load i18n %}
+
+{% block plugin %}
+<div class="plugin plugin-events">
+	<ul class="events-upcoming">
+        {% if instance.past_events %}{% trans "Past events" %}{% else %}{% trans "Upcoming events" %}{% endif %}
+		{% for event in events %}
+		<li>
+			<p>
+				<a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start }}</span>
+			</p>
+		</li>
+		{% empty %}
+		<li><p>{% trans "No upcoming events." %}</p></li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock plugin %}

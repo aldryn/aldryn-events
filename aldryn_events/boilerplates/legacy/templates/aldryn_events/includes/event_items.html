@@ -1,0 +1,9 @@
+{% load i18n thumbnail cms_tags %}
+<ul class="event-items {% if is_ongoing_events %}ongoing-events{% endif %}">
+	{% for event in page_obj.object_list|default:object_list %}
+    {% include "aldryn_events/includes/event_item.html" %}
+    {% empty %}
+    <li>{% trans "No events found." %}</li>
+	{% endfor %}
+</ul>
+{% include "aldryn_events/includes/pagination.html" %}

@@ -1,0 +1,27 @@
+{% extends "aldryn_events/base.html" %}
+{% load i18n thumbnail cms_tags apphooks_config_tags %}
+
+{% block content_events %}
+<div class="events-detail">
+	<h2>{{ event.title }}</h2>
+	{% if event.image %}<p class="events-visual"><img src="{% thumbnail event.image 700x200 crop %}" alt="" /></p>{% endif %}
+	<p class="events-date">
+		<strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
+		{% if event.start_time %} {% trans "at" %} {{ event.start_time|date:"H:i" }}{% endif %}
+		{% if event.end_date %}
+			<br /><strong>{% trans "End:" %}</strong> {{ event.end_date|date:"l, d.m.y" }}
+			{% if event.end_time %} {% trans "at" %} {{ event.end_time|date:"H:i" }}{% endif %}
+		{% endif %}
+	</p>
+	{% if event.location %}
+	<div class="events-venue">{{ event.location|safe }}</div>
+	{% endif %}
+
+	{% if event.short_description %}<div class="events-lead">{{ event.short_description|safe }}</div>{% endif %}
+	<div class="events-content">{% render_placeholder event.description %}</div>
+
+	{% include "aldryn_events/includes/event_registration.html" %}
+
+	<p class="events-back"><a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back" %}</a></p>
+</div>
+{% endblock content_events %}

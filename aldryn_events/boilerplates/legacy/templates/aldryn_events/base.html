@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="app app-events">
+            {% block content_events %}{% endblock %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="sidebar">
+            {% block content_sidebar %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

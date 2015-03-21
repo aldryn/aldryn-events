@@ -16,6 +16,7 @@ REQUIREMENTS = [
     'django-standard-form>=1.1.1',
     'djangocms-text-ckeditor',
     'aldryn-common>=0.0.6',
+    'aldryn-boilerplates',
     'django-filer',
     'django-hvad',
     'django-sortedm2m',

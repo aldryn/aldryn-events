@@ -1,0 +1,16 @@
+{% extends "aldryn_events/base.html" %}
+{% load i18n aldryn_events %}
+
+{% block content_events %}
+{% if view.config.app_data.config.show_ongoing_first %}
+<h2>{% trans "Ongoing events" %}</h2>
+{% include "aldryn_events/includes/ongoing_event_items.html" %}
+{% endif %}
+<h2>{% trans "Events" %}</h2>
+{% include "aldryn_events/includes/event_items.html" %}
+{% endblock content_events %}
+
+{% block content_sidebar %}
+{% get_current_language as language %}
+{% calendar event_year event_month language view.namespace %}
+{% endblock content_sidebar %}

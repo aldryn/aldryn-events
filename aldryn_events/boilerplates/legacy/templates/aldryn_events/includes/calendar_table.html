@@ -1,0 +1,25 @@
+{% load apphooks_config_tags %}
+{% spaceless %}
+<table class="table-calendar" data-month-numeric="{{ calendar_tag.current_date|date:'n' }}" data-month="{{ calendar_tag.current_date|date:'F' }}" data-year="{{ calendar_tag.current_date|date:'Y' }}">
+<tr class="header">
+  <th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
+  <th class="weekend">S</th>
+  <th class="weekend">S</th>
+</tr>
+<tr>
+  {% for day, events, css_classes in calendar_tag.calendar %}
+  {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:'7' %}
+</tr>
+<tr>
+  {% endif %}
+  <td class="{{ css_classes }}">
+    {% if events %}
+    <a href="{% namespace_url 'events_list-by-day' namespace=calendar_tag.namespace year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
+    {% else %}
+    <span>{{ day|date:'d' }}</span>
+    {% endif %}
+  </td>
+  {% endfor %}
+</tr>
+</table>
+{% endspaceless %}

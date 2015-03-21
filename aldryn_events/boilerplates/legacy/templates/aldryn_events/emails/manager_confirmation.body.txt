@@ -1,0 +1,4 @@
+{% load i18n %}{% blocktrans %}There is a new registration for "{{ event_name }}" ({{ event_url }}).
+
+Details: {{ registration_admin_url }}
+{% endblocktrans %}

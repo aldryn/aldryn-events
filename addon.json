@@ -5,6 +5,7 @@
 	"package-name": "aldryn-events",
 	"installed-apps": [
         "extended_choices",
+        "aldryn_boilerplates",
         "django_tablib",
         "appconf",
         "standard_form",
