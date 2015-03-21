@@ -15,7 +15,7 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def calendar(context, year, month, language, namespace):
-    template_name = 'aldryn_events/tags/calendar.html'
+    template_name = 'aldryn_events/includes/calendar.html'
 
     t = get_template(template_name)
     context['calendar_tag'] = build_calendar_context(year, month, language,
