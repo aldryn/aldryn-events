@@ -1,58 +1,44 @@
-{% load i18n cms_tags standard_form sekizai_tags apphooks_config_tags %}
-{% if event.enable_registration %}
-<div class="event-registration">
-	<h3>{% trans "Registration" %}</h3>
+{% load i18n cms_tags sekizai_tags apphooks_config_tags bootstrap3 %}
 
-	{% if event.is_registration_deadline_passed %}<p>{% trans "The registration deadline for this event has passed, registration is closed." %}</p>{% endif %}
+<div class="aldryn-events-registration">
+	{% static_placeholder "events_registration" %}
 
-	{% if already_registered and not event.is_registration_deadline_passed %}
-	<p>{% trans "Thank you for your registration!" %}</p>
-	{% block event_registration %}{% static_placeholder "events_registration" %}{% endblock %}
-	<form action="{% namespace_url 'events_registration_reset' event.slug namespace=view.namespace %}" method="post" class="form form-events" role="form">
-		{% csrf_token %}
-		<fieldset>
-			<ol>
-				<li><label><input type="submit" class="button" value="{% trans 'Reset your registration' %}"></label></li>
-			</ol>
-		</fieldset>
-	</form>
-	{% endif %}
+    {# INFO: shown when registration is closed #}
+	{% if event.is_registration_deadline_passed %}
+	    <p class="alert alert-warning">{% trans "The registration deadline for this event has passed, registration is closed." %}</p>
+    {% endif %}
 
-	{% if not already_registered and not event.is_registration_deadline_passed %}
-	<p><a href="#events-registration" id="events-trigger">{% trans "Register for this event" %}</a></p>
-	<form action="." method="post" class="form form-events" id="events-registration" role="form" hidden="hidden">
-		{% if form.errors %}
-		<ul class="messages text-error list-reset">
-			{% for field in form %}{% if field.errors %}{% for error in field.errors %}
-			<li><strong>{{ field.label }}</strong>: {{ error }}</li>
-			{% endfor %}{% endif %}{% endfor %}
-		</ul>
-		{% endif %}
-		<fieldset class="align-horizontal">
-			{% csrf_token %}
-			{% standard_form form %}
-			{% standard_submit %}
-		</fieldset>
-	</form>
-	{% endif %}
+    {# INFO: shown when successfully registered #}
+    {% if already_registered and not event.is_registration_deadline_passed %}
+        <p class="alert alert-success">{% trans "Thank you for your registration!" %}</p>
+        <form action="{% namespace_url 'events_registration_reset' event.slug namespace=view.namespace %}" method="post" class="form" role="form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">{% trans "Reset your registration" %}</button>
+        </form>
+    {% endif %}
 
+    {# INFO: shown when registration is open #}
+    {% if not already_registered and not event.is_registration_deadline_passed %}
+        <form action="." method="post" class="form" role="form">
+            {% csrf_token %}
+            {% bootstrap_form_errors form %}
+            <div class="row">
+                <div class="col-md-4">{% bootstrap_field form.salutation %}</div>
+                <div class="col-md-10">{% bootstrap_field form.first_name %}</div>
+                <div class="col-md-10">{% bootstrap_field form.last_name %}</div>
+                <div class="col-md-24">{% bootstrap_field form.company %}</div>
+                <div class="col-md-24">{% bootstrap_field form.email %}</div>
+                <div class="col-md-10">{% bootstrap_field form.address %}</div>
+                <div class="col-md-4">{% bootstrap_field form.address_zip %}</div>
+                <div class="col-md-10">{% bootstrap_field form.address_city %}</div>
+                <div class="col-md-12">{% bootstrap_field form.phone %}</div>
+                <div class="col-md-12">{% bootstrap_field form.mobile %}</div>
+                <div class="col-md-24">{% bootstrap_field form.message %}</div>
+            </div>
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
 </div>
-{% endif %}
 
-{% addtoblock "js" %}
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-	var trigger = $('#events-trigger');
-	var container = $('#events-registration');
-
-	trigger.on('click', function () {
-		trigger.parent().hide();
-		container.slideDown(300);
-	});
-
-	{% if form.errors %}
-	trigger.trigger('click');
-	{% endif %}
-});
-</script>
-{% endaddtoblock %}

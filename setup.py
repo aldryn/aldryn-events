@@ -22,7 +22,8 @@ REQUIREMENTS = [
     'django-sortedm2m',
     'django-parler',
     'aldryn-apphooks-config',
-    'python-dateutil'
+    'python-dateutil',
+    'django-bootstrap3'
 ]
 
 if py26:

@@ -1,9 +1,9 @@
 {
-	"name": "Aldryn Events",
-	"description": "An events app for aldryn",
-	"url": "https://github.com/aldryn/aldryn-events",
-	"package-name": "aldryn-events",
-	"installed-apps": [
+    "name": "Aldryn Events",
+    "description": "An events app for aldryn",
+    "url": "https://github.com/aldryn/aldryn-events",
+    "package-name": "aldryn-events",
+    "installed-apps": [
         "extended_choices",
         "aldryn_boilerplates",
         "django_tablib",
@@ -16,14 +16,15 @@
         "hvad",
         "sortedm2m",
         "aldryn_apphooks_config",
-		"aldryn_events"
-	],
-	"author": {
-		"name": "Divio AG",
-		"url": "divio.ch"
-	},
-	"license": {
-		"name": "BSD",
-		"text": "!literal-include LICENSE.txt"
-	}
+        "aldryn_events",
+        "bootstrap3"
+    ],
+    "author": {
+        "name": "Divio AG",
+        "url": "divio.ch"
+    },
+    "license": {
+        "name": "BSD",
+        "text": "!literal-include LICENSE.txt"
+    }
 }
