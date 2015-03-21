@@ -1,27 +1,31 @@
-{% extends "aldryn_events/base.html" %}
+{% extends "aldryn_events/fullwidth.html" %}
 {% load i18n thumbnail cms_tags apphooks_config_tags %}
 
-{% block content_events %}
-<div class="events-detail">
-	<h2>{{ event.title }}</h2>
-	{% if event.image %}<p class="events-visual"><img src="{% thumbnail event.image 700x200 crop %}" alt="" /></p>{% endif %}
-	<p class="events-date">
-		<strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
-		{% if event.start_time %} {% trans "at" %} {{ event.start_time|date:"H:i" }}{% endif %}
-		{% if event.end_date %}
-			<br /><strong>{% trans "End:" %}</strong> {{ event.end_date|date:"l, d.m.y" }}
-			{% if event.end_time %} {% trans "at" %} {{ event.end_time|date:"H:i" }}{% endif %}
-		{% endif %}
-	</p>
-	{% if event.location %}
-	<div class="events-venue">{{ event.location|safe }}</div>
-	{% endif %}
+{% block events_content %}
+    {% render_placeholder view.config.detail_view_placeholder %}
+    <div class="aldryn-events-detail">
+        {% include "aldryn_events/includes/event.html" with detail_view="true" %}
+	    {% if event.enable_registration %}
+	        {% include "aldryn_events/includes/registration.html" %}
+        {% endif %}
+    </div>
+    {% static_placeholder "events_detail_view" %}
+{% endblock events_content %}
 
-	{% if event.short_description %}<div class="events-lead">{{ event.short_description|safe }}</div>{% endif %}
-	<div class="events-content">{% render_placeholder event.description %}</div>
-
-	{% include "aldryn_events/includes/registration.html" %}
-
-	<p class="events-back"><a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back" %}</a></p>
-</div>
-{% endblock content_events %}
+{% block events_footer %}
+    <div class="aldryn-events-pager">
+        <ul class="pager">
+            {% if prev_article %}
+                <li class="previous"><a href="{{ prev_article.get_absolute_url }}"><span aria-hidden="true">&larr;</span> {% trans "Previous Article" %}</a></li>
+            {% endif %}
+            <li>
+                <span class="pager-back">– <a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back to Overview" %}</a> –</span>
+                {% static_placeholder "events_pager_footer" %}
+            </li>
+            {% if next_article %}
+                <li class="next"><a href="{{ next_article.get_absolute_url }}">{% trans "Next Article" %} <span aria-hidden="true">&rarr;</span></a></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% static_placeholder "events_detail_footer" %}
+{% endblock events_footer %}
