@@ -7,7 +7,7 @@
         {% static_placeholder "events_list_top_ongoing" %}
         <div class="aldryn-events-list aldryn-events-list-ongoing">
             {% for event in ongoing_objects %}
-                {% include "aldryn_events/includes/event_item.html" %}
+                {% include "aldryn_events/includes/event.html" %}
             {% empty %}
                 <p class="well">{% trans "No items available" %}</p>
             {% endfor %}
@@ -18,7 +18,7 @@
     {% static_placeholder "events_list_top" %}
     <div class="aldryn-events-list">
         {% for event in page_obj.object_list|default:object_list %}
-            {% include "aldryn_events/includes/event_item.html" %}
+            {% include "aldryn_events/includes/event.html" %}
         {% empty %}
             <p class="well">{% trans "No items available" %}</p>
         {% endfor %}

@@ -20,7 +20,7 @@
 	{% if event.short_description %}<div class="events-lead">{{ event.short_description|safe }}</div>{% endif %}
 	<div class="events-content">{% render_placeholder event.description %}</div>
 
-	{% include "aldryn_events/includes/event_registration.html" %}
+	{% include "aldryn_events/includes/registration.html" %}
 
 	<p class="events-back"><a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back" %}</a></p>
 </div>
