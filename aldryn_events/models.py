@@ -192,7 +192,7 @@ class Event(TranslatableModel):
 
         try:
             url_name = '{0}:events_detail'.format(self.app_config.namespace)
-        except Exception:
+        except AttributeError:
             url_name = 'aldryn_events:events_detail'
 
         with override(self.get_current_language()):

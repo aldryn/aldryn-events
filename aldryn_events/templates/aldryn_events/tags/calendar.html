@@ -1,4 +1,4 @@
-{% load i18n sekizai_tags %}
+{% load i18n sekizai_tags apphooks_config_tags %}
 {% block calendar_tag_content %}
 {% addtoblock "js" %}
 <script type="text/javascript">
@@ -18,7 +18,7 @@
       } else if (direction == 'back') {
         if (month == 1) { month = 12; year -= 1; } else { month -= 1; }
       }
-      $.get("{% url 'aldryn_events:get-calendar-dates' %}" + year + "/" + month + "/?plugin_pk={{ plugin.instance.pk }}" ,
+      $.get("{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}" + year + "/" + month + "/?plugin_pk={{ plugin.instance.pk }}" ,
         function(data) {
           $(table).replaceWith(data);
           $(title).html($(data).data('month') + ' ' + $(data).data('year'));

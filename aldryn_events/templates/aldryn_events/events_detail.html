@@ -1,6 +1,5 @@
 {% extends "aldryn_events/base.html" %}
-{% load url from future %}
-{% load i18n thumbnail cms_tags %}
+{% load i18n thumbnail cms_tags apphooks_config_tags %}
 
 {% block content_events %}
 <div class="events-detail">
@@ -23,6 +22,6 @@
 
 	{% include "aldryn_events/includes/event_registration.html" %}
 
-	<p class="events-back"><a href="{% url 'aldryn_events:events_list' %}">{% trans "Back" %}</a></p>
+	<p class="events-back"><a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back" %}</a></p>
 </div>
 {% endblock content_events %}
