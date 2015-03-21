@@ -112,7 +112,6 @@ class CalendarPlugin(CMSPluginBase):
         context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
         context['calendar_namespace'] = namespace
         context['calendar_language'] = language
-        context['instance'] = instance
         return context
 
     # def get_plugin_urls(self):
