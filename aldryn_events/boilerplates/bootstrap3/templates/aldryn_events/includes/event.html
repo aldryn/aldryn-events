@@ -35,7 +35,7 @@
                 </p>
             {% endif %}
             <p class="date">
-                <a href="#" class="addthisevent" title="{% trans 'Create calendar entry' %}">
+                <a href="#" class="addthisevent" title="{% trans 'Create Calendar Event' %}">
                     {% if not detail_view %}
                         {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
                         {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
