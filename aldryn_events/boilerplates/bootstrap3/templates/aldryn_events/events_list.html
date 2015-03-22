@@ -24,7 +24,9 @@
         {% endfor %}
     </div>
 
-    {% include "aldryn_events/includes/pagination.html" %}
+    <div class="aldryn-events-pagination">
+        {% include "aldryn_events/includes/pagination.html" %}
+    </div>
 {% endblock events_content %}
 
 {% block events_sidebar %}
