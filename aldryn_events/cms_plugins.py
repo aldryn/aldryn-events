@@ -114,12 +114,4 @@ class CalendarPlugin(CMSPluginBase):
         context['calendar_language'] = language
         return context
 
-    # def get_plugin_urls(self):
-    #     return patterns('',  # NOQA
-    #         url(r'^get-dates/$', event_dates, name='get-calendar-dates'),
-    #         url(r'^get-dates/(?P<year>[0-9]+)/(?P<month>[0-9]+)/$',
-    #             event_dates, name='get-calendar-dates'),
-    #     )
-
-
 plugin_pool.register_plugin(CalendarPlugin)

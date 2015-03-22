@@ -23,13 +23,20 @@ REQUIREMENTS = [
     'django-parler',
     'aldryn-apphooks-config',
     'python-dateutil',
-    'django-bootstrap3'
+    'django-bootstrap3',
 ]
 
+
+DEPENDENCY_LINKS = [
+    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
+]
 if py26:
     REQUIREMENTS += [
-        'Django<1.6,>=1.5',
-        'django-tablib<3.0'
+        'Django<1.7,>=1.5',
+        'django-tablib==3.0.2'
+    ]
+    DEPENDENCY_LINKS += [
+        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2'
     ]
 
 if py27:
@@ -37,10 +44,6 @@ if py27:
         'Django<1.8,>=1.5',
         'django-tablib>=3.1.1'
     ]
-
-DEPENDENCY_LINKS = [
-    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
-]
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
