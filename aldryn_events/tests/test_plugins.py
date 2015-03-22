@@ -40,22 +40,27 @@ class EventPluginsTestCase(EventBaseTestCase):
         """
         We add an event to the Event Plugin and look it up
         """
-        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12),
-
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
         # default event start_date='2014-09-10' publish_at='2014-01-01 12:00'
-        event1 = self.create_default_event()
-        with force_language('en'):
-            event2 = Event.objects.create(
-                title='Event2014 only english',
-                start_date=tz_datetime(2014, 1, 29),
-                publish_at=tz_datetime(2014, 1, 1, 12),
-                app_config=self.app_config
-            )
+        event1 = self.create_event(
+            title='Event2014',
+            slug='open-air',
+            start_date=tz_datetime(2014, 9, 10),
+            publish_at=tz_datetime(2014, 1, 1, 9),
+            de={'title': 'Ereignis', 'slug': 'im-freien'}
+        )
+        event2 = self.create_event(
+            title='Event2014 only english',
+            start_date=tz_datetime(2014, 1, 29),
+            publish_at=tz_datetime(2014, 1, 1, 12)
+        )
 
         root_page = self.create_root_page()
         page = api.create_page(
-            'Events en', self.template, 'en', published=True,
-            parent=root_page,
+            'Events en', self.template, 'en', published=True, parent=root_page,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 1, 8)
         )
         api.create_title('de', 'Events de', page)
         ph = page.placeholders.get(slot='content')
@@ -96,11 +101,22 @@ class EventPluginsTestCase(EventBaseTestCase):
         """
         Test the upcoming events plugin
         """
-
         timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-
+        evpage = api.create_page(
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            parent=self.create_root_page(),
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 1, 1)
+        )
+        api.create_title('de', 'Events de', evpage, slug='eventsapp')
+        evpage.publish('en')
+        evpage.publish('de')
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
+            publication_date=tz_datetime(2014, 1, 1)
+
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
@@ -125,19 +141,17 @@ class EventPluginsTestCase(EventBaseTestCase):
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
         with force_language('en'):
-            request = get_page_request(None, path='/en/home/', language='en')
-            context = RequestContext(request, {})
-            rendered['en'] = plugin_en.render_plugin(context, ph)
+            response = self.client.get(page.get_absolute_url('en'))
+            rendered['en'] = response.content
         with force_language('de'):
-            request = get_page_request(None, path='/de/home/', language='de')
-            context = RequestContext(request, {})
-            rendered['de'] = plugin_de.render_plugin(context, ph)
+            response = self.client.get(page.get_absolute_url('de'))
+            rendered['de'] = response.content
 
         for i in range(1, 6):
             for lang in ['en', 'de']:
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
+                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
                 self.assertIn(
                     name, rendered[lang],
                     'Title "{0}" not found in rendered plugin for '
@@ -177,10 +191,19 @@ class EventPluginsTestCase(EventBaseTestCase):
         Test the upcoming events plugin for past entries
         """
         timezone_mock.now.return_value = tz_datetime(2014, 7, 6, 12)
+        evpage = api.create_page(
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            apphook='EventListAppHook',
+            parent=self.create_root_page(),
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 1, 1)
+        )
+        api.create_title('de', 'Events de', evpage, slug='eventsapp')
+        evpage.publish('en')
+        evpage.publish('de')
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
@@ -206,19 +229,17 @@ class EventPluginsTestCase(EventBaseTestCase):
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
         with force_language('en'):
-            request = get_page_request(None, path='/en/home/', language='en')
-            context = RequestContext(request, {})
-            rendered['en'] = plugin_en.render_plugin(context, ph)
+            response = self.client.get(page.get_absolute_url('en'))
+            rendered['en'] = response.content
         with force_language('de'):
-            request = get_page_request(None, path='/de/home/', language='de')
-            context = RequestContext(request, {})
-            rendered['de'] = plugin_de.render_plugin(context, ph)
+            response = self.client.get(page.get_absolute_url('de'))
+            rendered['de'] = response.content
 
         for i in range(1, 6):
             for lang in ['en', 'de']:
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/events/{0}-{1}-{2}/'.format(text, i, lang)
+                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
                 self.assertIn(
                     name, rendered[lang],
                     'Title "{0}" not found in rendered plugin for '
@@ -260,6 +281,7 @@ class EventPluginsTestCase(EventBaseTestCase):
         """
         timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
         plugin_timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
+        self.create_base_pages()
         page = api.create_page(
             'Home en', self.template, 'en', published=True, slug='home',
             publication_date=tz_datetime(2014, 1, 2)
@@ -314,9 +336,9 @@ class EventPluginsTestCase(EventBaseTestCase):
                 ).content
             }
 
-        html_p1 = ('<td class="events"><a href="/{0}/events/2014/1/29/">'
+        html_p1 = ('<td class="events"><a href="/{0}/eventsapp/2014/1/29/">'
                    '29</a></td>')
-        html_p2 = ('<td class="events"><a href="/{0}/events/2014/2/10/">'
+        html_p2 = ('<td class="events"><a href="/{0}/eventsapp/2014/2/10/">'
                    '10</a></td>')
         self.assertIn(
             html_p1.format('de'), rendered['de']['p1'],

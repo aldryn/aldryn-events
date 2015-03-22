@@ -37,7 +37,8 @@ HELPER_SETTINGS = {
         'sortedm2m',
         'standard_form',
         'aldryn_events',
-        'aldryn_apphooks_config'
+        'aldryn_apphooks_config',
+        'aldryn_apphook_reload'
     ],
     'LANGUAGES': (
         ('en', 'English'),
@@ -56,7 +57,7 @@ HELPER_SETTINGS = {
         'default': {
             'public': True,
             'hide_untranslated': False,
-            'redirect_on_fallback': True,
+
         },
         1: [
             {
@@ -89,7 +90,7 @@ HELPER_SETTINGS = {
     # Source: https://gist.github.com/c-rhodes/cebe9d4619125949dff8
     'MIGRATION_MODULES': DisableMigrations(),  # disable migration for DJ 1.7 in tests
     'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
-    # 'DEBUG': True,
+    'DEBUG': False,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
@@ -97,7 +98,22 @@ HELPER_SETTINGS = {
             'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
             'LOCATION': '/var/tmp/aldryn_events_test_cache',
         }
-    }
+    },
+    'MIDDLEWARE_CLASSES': [
+        'aldryn_apphook_reload.middleware.ApphookReloadMiddleware',
+        'django.middleware.http.ConditionalGetMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.doc.XViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware'
+    ]
 }
 
 

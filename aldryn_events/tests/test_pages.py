@@ -39,9 +39,9 @@ class EventPagesTestCase(EventBaseTestCase):
         Test if proper url and event page are created
         """
         timezone_mock.now.return_value = tz_datetime(2014, 9, 11, 12)
-        import ipdb;ipdb.set_trace()
         self.create_base_pages()
         event = self.create_default_event()
+
         self.assertEqual(event.get_absolute_url(), '/en/eventsapp/open-air/')
         with force_language('en'):
             response = self.client.get(event.get_absolute_url())
@@ -321,26 +321,19 @@ class RegistrationTestCase(EventBaseTestCase):
 
     @mock.patch('aldryn_events.models.timezone')
     def test_submit_registration(self, timezone_mock):
-        app_config, created = (
-            EventsConfig.objects.get_or_create(namespace='aldryn_events')
-        )
-        app_config = EventsConfig.objects.create(namespace='aldryn_events')
         timezone_mock.now.return_value = tz_datetime(2015, 2, 5, 9)
-
-        with force_language('en'):
-            event = Event.objects.create(
-                id=5,
-                title='Event2014', slug='open-air',
-                start_date=tz_datetime(2015, 2, 7),
-                publish_at=tz_datetime(2015, 2, 2, 9),
-                registration_deadline_at=tz_datetime(2015, 2, 7),
-                enable_registration=True,
-                app_config=app_config
-            )
+        self.create_base_pages()
+        event = self.create_event(
+            id=5,
+            title='Event2014', slug='open-air',
+            start_date=tz_datetime(2015, 2, 7),
+            publish_at=tz_datetime(2015, 2, 2, 9),
+            registration_deadline_at=tz_datetime(2015, 2, 7),
+            enable_registration=True,
+            de={'title': 'Ereignis', 'slug': 'im-freien'}
+        )
         event.event_coordinators.create(name='The big boss',
                                         email='theboss@gmail.com')
-        event.create_translation('de', title='Ereignis', slug='im-freien')
-        event.set_current_language('en')
         data = {
             'salutation': 'mrs',
             'company': 'any',
@@ -380,19 +373,16 @@ class RegistrationTestCase(EventBaseTestCase):
 
     @mock.patch('aldryn_events.models.timezone')
     def test_reset_registration(self, timezone_mock):
-        app_config = EventsConfig.objects.create(namespace='aldryn_events')
         timezone_mock.now.return_value = tz_datetime(2015, 2, 5, 9)
-
-        with force_language('en'):
-            event = Event.objects.create(
-                title='Event2014', slug='open-air',
-                start_date=tz_datetime(2015, 2, 7),
-                publish_at=tz_datetime(2015, 2, 2, 9),
-                registration_deadline_at=tz_datetime(2015, 2, 7),
-                enable_registration=True,
-                app_config=app_config
-            )
-        event.create_translation('de', title='Ereignis2014', slug='im-freien')
+        self.create_base_pages()
+        event = self.create_event(
+            title='Event2014', slug='open-air',
+            start_date=tz_datetime(2015, 2, 7),
+            publish_at=tz_datetime(2015, 2, 2, 9),
+            registration_deadline_at=tz_datetime(2015, 2, 7),
+            enable_registration=True,
+            de={'title': 'Ereignis2014', 'slug': 'im-freien'}
+        )
         event.event_coordinators.create(name='The big boss',
                                         email='theboss@gmail.com')
         event.registration_set.create(
@@ -412,7 +402,7 @@ class RegistrationTestCase(EventBaseTestCase):
             reset_url = reverse(
                 'aldryn_events:events_registration_reset',
                 kwargs={'slug': event.slug},
-                current_app=app_config.namespace
+                current_app=self.app_config.namespace
             )
         custom_settings = {
             'SESSION_ENGINE': 'django.contrib.sessions.backends.db'

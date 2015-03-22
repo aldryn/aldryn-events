@@ -150,7 +150,6 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     form_class = EventRegistrationForm
 
     def dispatch(self, request, *args, **kwargs):
-        import ipdb;ipdb.set_trace()
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
         self.event = (Event.objects.namespace(self.namespace)
