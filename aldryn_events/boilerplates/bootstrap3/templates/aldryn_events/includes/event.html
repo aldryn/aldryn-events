@@ -29,7 +29,11 @@
         <div class="aldryn-events-meta">
             {% if event.location %}
                 <p class="location">
-                    <a href="https://www.google.com/maps/place/{{ event.location|slugify }}" target="_blank">
+                    {% if event.location_lat and event.location_lng %}
+                    <a href="http://maps.google.com?q={{ event.location_lat }},{{ event.location_lng }}" target="_blank">
+                    {% else %}
+                    <a href="http://maps.google.com?q={{ event.location|slugify }}" target="_blank">
+                    {% endif %}
                         {{ event.location }}
                     </a>
                 </p>
