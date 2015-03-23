@@ -191,7 +191,7 @@ class Event(TranslatableModel):
         slug = self.safe_translation_getter('slug')
 
         try:
-            url_name = '{}:events_detail'.format(self.app_config.namespace)
+            url_name = '{0}:events_detail'.format(self.app_config.namespace)
         except AttributeError:
             url_name = 'aldryn_events:events_detail'
 
