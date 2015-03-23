@@ -2,18 +2,18 @@
 from cms import api
 from cms.utils.i18n import force_language
 from django.core.urlresolvers import reverse
-from django.template import RequestContext
 import mock
 from aldryn_events.models import Event
 from aldryn_events.tests.base import (
-    EventBaseTestCase, tz_datetime, get_page_request
+    EventBaseTestCase, tz_datetime
 )
 
 
 def calendar_url(year, month, language):
     with force_language(language):
         url = reverse(
-            'aldryn_events:get-calendar-dates', kwargs={'year': year, 'month': month}
+            'aldryn_events:get-calendar-dates',
+            kwargs={'year': year, 'month': month}
         )
     return url
 

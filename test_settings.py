@@ -28,17 +28,18 @@ HELPER_SETTINGS = {
     # 'ROOT_URLCONF': 'aldryn_events.tests.urls',
     'TIME_ZONE': 'UTC',
     'INSTALLED_APPS': [
+        'aldryn_apphook_reload',
+        'aldryn_apphooks_config',
+        'aldryn_boilerplates',
+        'aldryn_events',
+        'django_tablib',
+        'easy_thumbnails',
+        'filer',
+        'hvad',
         'mptt',
         'parler',
-        'hvad',
-        'filer',
-        'easy_thumbnails',
-        'django_tablib',
         'sortedm2m',
         'standard_form',
-        'aldryn_events',
-        'aldryn_apphooks_config',
-        'aldryn_apphook_reload'
     ],
     'LANGUAGES': (
         ('en', 'English'),
@@ -113,7 +114,35 @@ HELPER_SETTINGS = {
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware'
-    ]
+    ],
+    'ALDRYN_BOILERPLATE_NAME': 'legacy',
+    'STATICFILES_FINDERS': [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        # important! place right before django.contrib.staticfiles.finders.AppDirectoriesFinder
+        'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ],
+    'TEMPLATE_CONTEXT_PROCESSORS': (
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+        'django.core.context_processors.i18n',
+        'django.core.context_processors.debug',
+        'django.core.context_processors.request',
+        'django.core.context_processors.media',
+        'django.core.context_processors.csrf',
+        'django.core.context_processors.tz',
+        'sekizai.context_processors.sekizai',
+        'django.core.context_processors.static',
+        'cms.context_processors.cms_settings',
+        'aldryn_boilerplates.context_processors.boilerplate'
+    ),
+    'TEMPLATE_LOADERS': (
+        'django.template.loaders.filesystem.Loader',
+        # important! place right before django.template.loaders.app_directories.Loader
+        'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
+        'django.template.loaders.app_directories.Loader',
+        'django.template.loaders.eggs.Loader'
+    )
 }
 
 

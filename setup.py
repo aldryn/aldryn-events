@@ -27,6 +27,7 @@ REQUIREMENTS = [
     'djangocms-text-ckeditor',
     'python-dateutil',
     'South<1.1,>=1.0.2',
+    'django-tablib'
 ]
 
 
@@ -37,16 +38,14 @@ DEPENDENCY_LINKS = [
 if py26:
     REQUIREMENTS += [
         'Django<1.7,>=1.6',
-        'django-tablib==3.0.2'
     ]
     DEPENDENCY_LINKS += [
-        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2'
+        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2.1'  # NOQA
     ]
 
 if py27:
     REQUIREMENTS += [
         'Django<1.8,>=1.6',
-        'django-tablib>=3.1.1'
     ]
 
 CLASSIFIERS = [

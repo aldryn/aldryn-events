@@ -6,12 +6,12 @@ from django import template
 from django.template.loader import get_template
 from django.utils.dates import MONTHS
 from django.utils import timezone
-from sekizai.context import SekizaiContext
 
 from ..models import EventsConfig
 from ..utils import build_calendar
 
 register = template.Library()
+
 
 @register.simple_tag(takes_context=True)
 def calendar(context, year, month, language, namespace):
@@ -22,6 +22,7 @@ def calendar(context, year, month, language, namespace):
                                                      namespace)
     rendered = t.render(context)
     return rendered
+
 
 def build_calendar_context(year, month, language, namespace):
     # if not have a selected date
@@ -35,7 +36,7 @@ def build_calendar_context(year, month, language, namespace):
 
     if namespace:
         try:
-            app_config = EventsConfig.objects.get(namespace=namespace)
+            EventsConfig.objects.get(namespace=namespace)
         except EventsConfig.DoesNotExist:
             raise template.TemplateSyntaxError(
                 "'namespace' must be a existent EventConfig namespace, "
