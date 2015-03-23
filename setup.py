@@ -13,24 +13,34 @@ if not py26 and not py27:
     )
 
 REQUIREMENTS = [
-    'South<1.1,>=1.0.2',
-    'django-extended-choices',
-    'django-appconf',
-    'django-standard-form>=1.1.1',
-    'djangocms-text-ckeditor',
+    'aldryn-apphooks-config>=0.1.4',
+    'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
+    'django-appconf',
+    'django-bootstrap3',
+    'django-extended-choices',
     'django-filer',
     'django-hvad',
-    'django-sortedm2m',
     'django-parler',
-    'aldryn-apphooks-config>=0.1.4',
-    'python-dateutil'
+    'django-sortedm2m',
+    'django-standard-form>=1.1.1',
+    'djangocms-text-ckeditor',
+    'python-dateutil',
+    'South<1.1,>=1.0.2',
+]
+
+
+DEPENDENCY_LINKS = [
+    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
 ]
 
 if py26:
     REQUIREMENTS += [
         'Django<1.7,>=1.6',
-        'django-tablib<3.0'
+        'django-tablib==3.0.2'
+    ]
+    DEPENDENCY_LINKS += [
+        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2'
     ]
 
 if py27:
@@ -38,9 +48,6 @@ if py27:
         'Django<1.8,>=1.6',
         'django-tablib>=3.1.1'
     ]
-
-DEPENDENCY_LINKS = [
-]
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',

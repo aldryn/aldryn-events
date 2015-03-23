@@ -1,0 +1,45 @@
+{% load i18n cms_tags sekizai_tags apphooks_config_tags bootstrap3 %}
+
+<div class="aldryn-events-registration">
+	{% static_placeholder "events_registration" %}
+
+    {# INFO: shown when registration is closed #}
+	{% if event.is_registration_deadline_passed %}
+	    <p class="alert alert-warning">{% trans "The registration deadline for this event has passed, registration is closed." %}</p>
+    {% endif %}
+
+    {# INFO: shown when successfully registered #}
+    {% if already_registered and not event.is_registration_deadline_passed %}
+        <p class="alert alert-success">{% trans "Thank you for your registration!" %}</p>
+        <form action="{% namespace_url 'events_registration_reset' event.slug namespace=view.namespace %}" method="post" class="form" role="form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">{% trans "Reset your registration" %}</button>
+        </form>
+    {% endif %}
+
+    {# INFO: shown when registration is open #}
+    {% if not already_registered and not event.is_registration_deadline_passed %}
+        <form action="." method="post" class="form" role="form">
+            {% csrf_token %}
+            {% bootstrap_form_errors form %}
+            <div class="row">
+                <div class="col-md-4">{% bootstrap_field form.salutation %}</div>
+                <div class="col-md-10">{% bootstrap_field form.first_name %}</div>
+                <div class="col-md-10">{% bootstrap_field form.last_name %}</div>
+                <div class="col-md-24">{% bootstrap_field form.company %}</div>
+                <div class="col-md-24">{% bootstrap_field form.email %}</div>
+                <div class="col-md-10">{% bootstrap_field form.address %}</div>
+                <div class="col-md-4">{% bootstrap_field form.address_zip %}</div>
+                <div class="col-md-10">{% bootstrap_field form.address_city %}</div>
+                <div class="col-md-12">{% bootstrap_field form.phone %}</div>
+                <div class="col-md-12">{% bootstrap_field form.mobile %}</div>
+                <div class="col-md-24">{% bootstrap_field form.message %}</div>
+            </div>
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
+</div>
+
+{% static_placeholder "events_registration_footer" %}

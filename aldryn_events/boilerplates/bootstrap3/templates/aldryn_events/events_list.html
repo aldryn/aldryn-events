@@ -1,0 +1,41 @@
+{% extends "aldryn_events/base.html" %}
+{% load i18n aldryn_events cms_tags %}
+
+{% block events_content %}
+    {# INFO: if configuration is set, show ongoing events first #}
+    {% if view.config.app_data.config.show_ongoing_first %}
+        {% static_placeholder "events_list_top_ongoing" %}
+        <div class="aldryn-events-list aldryn-events-list-ongoing">
+            {% for event in ongoing_objects %}
+                {# TODO: we need to group the title and show the subsequent events #}
+                <h2>{{ event.start_date|date:"l, j F o" }}</h2>
+                {% include "aldryn_events/includes/event.html" %}
+            {% empty %}
+                <p class="well">{% trans "No items available" %}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# INFO: show upcoming events #}
+    {% static_placeholder "events_list_top" %}
+    <div class="aldryn-events-list">
+        {% for event in page_obj.object_list|default:object_list %}
+            {# TODO: we need to group the title and show the subsequent events #}
+            <h2>{{ event.start_date|date:"l, j F o" }}</h2>
+            {% include "aldryn_events/includes/event.html" %}
+        {% empty %}
+            <p class="well">{% trans "No items available" %}</p>
+        {% endfor %}
+    </div>
+
+    <div class="aldryn-events-pagination">
+        {% include "aldryn_events/includes/pagination.html" %}
+    </div>
+{% endblock events_content %}
+
+{% block events_sidebar %}
+    {% get_current_language as language %}
+    <div class="aldryn-events-calendar">
+        {% calendar event_year event_month language view.namespace %}
+    </div>
+{% endblock events_sidebar %}

@@ -1,0 +1,14 @@
+{% extends "aldryn_events/plugins/upcoming/base.html" %}
+{% load i18n %}
+
+{% block plugin %}
+<div class="aldryn aldryn-events aldryn-events-upcoming">
+    <ul class="list-unstyled">
+        {% for event in events %}
+            <li><a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start|date }}</span></li>
+        {% empty %}
+            <li class="well">{% trans "No items available" %}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock plugin %}

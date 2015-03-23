@@ -47,7 +47,10 @@ class EventRegistrationForm(forms.ModelForm):
         super(EventRegistrationForm, self).__init__(*args, **kwargs)
 
         if 'address' in self.fields:
-            self.fields['address'].widget = forms.Textarea(attrs={'rows': 2})
+            self.fields['address'].widget = forms.Textarea(attrs={'rows': 1})
+
+        if 'message' in self.fields:
+            self.fields['message'].widget = forms.Textarea(attrs={'rows': 5})
 
     def clean(self):
         if self.event.is_registration_deadline_passed:
