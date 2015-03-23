@@ -1,0 +1,7 @@
+https://github.com/aldryn/aldryn-apphook-reload/archive/develop.zip
+coverage
+djangocms-helper
+importlib
+mock
+pyquery
+pysqlite

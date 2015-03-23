@@ -7,42 +7,45 @@ py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
 py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
 
 if not py26 and not py27:
-    raise ValueError("Aldryn Events currently support only python 2.6 and 2.7")
+    raise ValueError(
+        "Aldryn Events currently support only python 2.6 to 2.7, "
+        "not {0}".format(sys.version_info)
+    )
 
 REQUIREMENTS = [
-    'South<1.1,>=1.0.2',
-    'django-extended-choices',
-    'django-appconf',
-    'django-standard-form>=1.1.1',
-    'djangocms-text-ckeditor',
-    'aldryn-common>=0.0.6',
+    'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
+    'aldryn-common>=0.0.6',
+    'django-appconf',
+    'django-bootstrap3',
+    'django-extended-choices',
     'django-filer',
     'django-hvad',
-    'django-sortedm2m',
     'django-parler',
-    'aldryn-apphooks-config',
+    'django-sortedm2m',
+    'django-standard-form>=1.1.1',
+    'djangocms-text-ckeditor',
     'python-dateutil',
-    'django-bootstrap3',
+    'South<1.1,>=1.0.2',
+    'django-tablib'
 ]
 
 
 DEPENDENCY_LINKS = [
     'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
 ]
+
 if py26:
     REQUIREMENTS += [
-        'Django<1.7,>=1.5',
-        'django-tablib==3.0.2'
+        'Django<1.7,>=1.6',
     ]
     DEPENDENCY_LINKS += [
-        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2'
+        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2.1'  # NOQA
     ]
 
 if py27:
     REQUIREMENTS += [
-        'Django<1.8,>=1.5',
-        'django-tablib>=3.1.1'
+        'Django<1.8,>=1.6',
     ]
 
 CLASSIFIERS = [

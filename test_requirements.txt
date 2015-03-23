@@ -1,6 +1,0 @@
-importlib
-djangocms-helper
-pysqlite
-coverage
-pyquery
-mock

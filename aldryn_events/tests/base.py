@@ -45,7 +45,6 @@ def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
 
 
 class EventBaseTestCase(TransactionTestCase):
-    reset_sequences = True
 
     def setUp(self):
         super(EventBaseTestCase, self).setUp()
@@ -69,6 +68,23 @@ class EventBaseTestCase(TransactionTestCase):
         root_page.publish('en')
         root_page.publish('de')
         return root_page.reload()
+
+    def create_base_pages(self):
+        root_page = self.create_root_page(
+            publication_date=tz_datetime(2014, 6, 8)
+        )
+        page = api.create_page(
+            title='Events en', template=self.template, language='en',
+            slug='eventsapp', published=True,
+            parent=root_page,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 6, 8)
+        )
+        api.create_title('de', 'Events de', page, slug='eventsapp')
+        page.publish('en')
+        page.publish('de')
+        return page.reload()
 
     def create_event(self, de={}, **en):
         """

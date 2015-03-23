@@ -15,15 +15,15 @@
       if (direction == 'next') {
         if (month == 12) { month = 1; year += 1; } else { month += 1; }
 
-      } else if (direction == 'back') {
+      } else if (direction == 'oback') {
         if (month == 1) { month = 12; year -= 1; } else { month -= 1; }
       }
       $.get("{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}" + year + "/" + month + "/?plugin_pk={{ plugin.instance.pk }}" ,
         function(data) {
           $(table).replaceWith(data);
+      );
           $(title).html($(data).data('month') + ' ' + $(data).data('year'));
         }
-      );
     }
 
   });

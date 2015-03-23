@@ -1,6 +1,5 @@
 import datetime
 
-from django.conf.urls import patterns, url
 from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
@@ -10,7 +9,6 @@ from django.utils.translation import (
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .views import event_dates
 from .utils import build_calendar
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
