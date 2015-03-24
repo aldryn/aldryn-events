@@ -129,7 +129,10 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
             else:
                 qs = qs.future()
 
-        return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
+        return qs.order_by(
+            'start_date', 'start_time', 'end_date', 'end_time',
+            'translations__title'
+        )
 
     def get_context_data(self, **kwargs):
         if self.config and self.config.app_data.config.show_ongoing_first:
