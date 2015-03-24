@@ -141,11 +141,11 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        object_list = list(self.object_list)
+        object_list = self.object_list
 
         if self.config and self.config.app_data.config.show_ongoing_first:
             ongoing_objects = self.object_list.ongoing()
-            object_list = self.object_list.exclude(
+            object_list = object_list.exclude(
                 pk__in=ongoing_objects.values_list('pk', flat=True)
             )
             kwargs['ongoing_objects'] = ongoing_objects
