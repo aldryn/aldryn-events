@@ -2,11 +2,11 @@
 {% load i18n thumbnail cms_tags apphooks_config_tags %}
 
 {% block events_content %}
-    {% render_placeholder view.config.detail_view_placeholder %}
+    {% static_placeholder "events_detail_top" %}
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
-    {% static_placeholder "events_detail_view" %}
+    {% static_placeholder "events_detail_bottom" %}
 {% endblock events_content %}
 
 {% block events_footer %}
@@ -17,10 +17,7 @@
             {% else %}
                 <li class="previous"><span class="text-muted"><span aria-hidden="true">&larr;</span> {% trans "Previous Event" %}</span></li>
             {% endif %}
-            <li>
-                <span class="pager-back">– <a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back to Overview" %}</a> –</span>
-                {% static_placeholder "events_pager_footer" %}
-            </li>
+            <li><span class="pager-back">– <a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back to Overview" %}</a> –</span></li>
             {% if next_article %}
                 <li class="next"><a href="{{ next_article.get_absolute_url }}">{% trans "Next Event" %} <span aria-hidden="true">&rarr;</span></a></li>
             {% else %}
