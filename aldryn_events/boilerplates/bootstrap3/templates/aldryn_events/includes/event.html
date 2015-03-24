@@ -1,6 +1,6 @@
 {% load i18n cms_tags sekizai_tags thumbnail tz %}
 
-<article{% if is_ongoing_events %} class="aldryn-events-ongoing"{% endif %}>
+<article class="{% if is_ongoing_events %}aldryn-events-ongoing{% endif %} {% if event.is_outdated %}events-outdated{% endif %}">
     {% block event_visual %}
         {% if event.image %}
             <p class="visual">

@@ -75,6 +75,8 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
 
+        self.archive_qs = []
+
         if year or month or day:
             tz = get_current_timezone()
             if year and month and day:
@@ -127,6 +129,10 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
             if self.archive:
                 qs = qs.archive()
             else:
+                self.archive_qs = qs.archive().order_by(
+                    'start_date', 'start_time', 'end_date', 'end_time',
+                    'translations__title'
+                )
                 qs = qs.future()
 
         return qs.order_by(
@@ -135,15 +141,23 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
+        object_list = list(self.object_list)
+
         if self.config and self.config.app_data.config.show_ongoing_first:
             ongoing_objects = self.object_list.ongoing()
             object_list = self.object_list.exclude(
                 pk__in=ongoing_objects.values_list('pk', flat=True)
             )
-            kwargs.update({
-                'object_list': object_list,
-                'ongoing_objects': ongoing_objects
-            })
+            kwargs['ongoing_objects'] = ongoing_objects
+
+        # add outdated events to end of list
+        def make_outdated(obj):
+            obj.is_outdated = True
+            return obj
+
+        object_list = list(object_list) + map(make_outdated, self.archive_qs)
+        kwargs['object_list'] = object_list
+
         return super(EventListView, self).get_context_data(**kwargs)
 
 
