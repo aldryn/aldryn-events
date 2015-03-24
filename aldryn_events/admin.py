@@ -33,27 +33,22 @@ class EventAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin,
             ('title', 'slug'),
             'short_description',
             'image',
-            'flyer',
-            ('location', 'location_lat', 'location_lng'),
-        )}),
-        (None, {'fields': (
+            'location',
             ('start_date', 'start_time',),
             ('end_date', 'end_time',),
         )}),
-        (None, {'fields': (
-            'register_link',
-            'detail_link',
-        )}),
-        (_('registration'), {'fields': (
-            ('enable_registration', 'registration_deadline_at'),
-            'event_coordinators',
-        )}),
-        (_('publishing'), {'fields': (
-            ('is_published', 'publish_at',)
-        )}),
-        (None, {'fields': (
-            ('app_config',)
-        )}),
+        (_('Advanced'), {
+            'classes': ('collapse',),
+            'fields': (
+                ('location_lat', 'location_lng'),
+                ('enable_registration', 'registration_deadline_at'),
+                'register_link',
+                'event_coordinators',
+                'detail_link',
+                ('is_published', 'publish_at',),
+                'app_config'
+            )
+        })
     )
 
     def get_prepopulated_fields(self, request, obj=None):

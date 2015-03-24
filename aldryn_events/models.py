@@ -94,10 +94,6 @@ class Event(TranslatableModel):
             verbose_name=_('image'), null=True, blank=True,
             related_name='event_images', on_delete=models.SET_NULL
         ),
-        flyer=FilerFileField(
-            verbose_name=_('flyer'), null=True, blank=True,
-            related_name='event_flyers', on_delete=models.SET_NULL
-        ),
         meta={'unique_together': (('language_code', 'slug'),)}
     )
     app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
