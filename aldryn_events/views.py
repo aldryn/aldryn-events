@@ -75,6 +75,8 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
 
+        self.archive_qs = []
+
         if year or month or day:
             tz = get_current_timezone()
             if year and month and day:
@@ -127,20 +129,35 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
             if self.archive:
                 qs = qs.archive()
             else:
+                self.archive_qs = qs.archive().order_by(
+                    'start_date', 'start_time', 'end_date', 'end_time',
+                    'translations__title'
+                )
                 qs = qs.future()
 
-        return qs.order_by('start_date', 'start_time', 'end_date', 'end_time')
+        return qs.order_by(
+            'start_date', 'start_time', 'end_date', 'end_time',
+            'translations__title'
+        )
 
     def get_context_data(self, **kwargs):
+        object_list = self.object_list
+
         if self.config and self.config.app_data.config.show_ongoing_first:
             ongoing_objects = self.object_list.ongoing()
-            object_list = self.object_list.exclude(
+            object_list = object_list.exclude(
                 pk__in=ongoing_objects.values_list('pk', flat=True)
             )
-            kwargs.update({
-                'object_list': object_list,
-                'ongoing_objects': ongoing_objects
-            })
+            kwargs['ongoing_objects'] = ongoing_objects
+
+        # add outdated events to end of list
+        def make_outdated(obj):
+            obj.is_outdated = True
+            return obj
+
+        object_list = list(object_list) + map(make_outdated, self.archive_qs)
+        kwargs['object_list'] = object_list
+
         return super(EventListView, self).get_context_data(**kwargs)
 
 
@@ -152,17 +169,43 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         language = get_language_from_request(request, check_path=True)
-        self.event = (Event.objects.namespace(self.namespace)
-                                   .published()
-                                   .translated(language, slug=kwargs['slug'])
-                                   .language(language).get())
-
+        self.queryset = (
+            Event.objects.namespace(self.namespace)
+                         .published()
+                         .language(language)
+                         .order_by(
+                            'start_date', 'start_time', 'end_date',
+                            'end_time', 'translations__title'
+                         )
+        )
+        self.event = (
+            self.queryset.translated(language, slug=kwargs['slug']).get()
+        )
         setattr(self.request, request_events_event_identifier,  self.event)
 
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
 
         return super(EventDetailView, self).dispatch(request, *args, **kwargs)
+
+    def get_neighbors_events(self):
+        qs = list(self.queryset)
+        length = len(qs)
+        _prev, _next = None, None
+
+        try:
+            index = qs.index(self.event)
+        except ValueError:
+            # That should not happen, but since this method just help populate
+            # the context, we don't allow it to fail
+            pass
+        else:
+            if index - 1 >= 0:
+                _prev = qs[index - 1]
+            if index + 1 < length:
+                _next = qs[index + 1]
+
+        return _prev, _next
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
@@ -171,6 +214,8 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
         )
         context['event'] = self.event
         context['already_registered'] = self.event.id in registered_events
+        _prev, _next = self.get_neighbors_events()
+        context.update({'prev_event': _prev, 'next_event': _next})
         return context
 
     def form_valid(self, form):

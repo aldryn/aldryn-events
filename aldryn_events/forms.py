@@ -37,6 +37,10 @@ class EventAdminForm(TranslatableModelForm):
                 self.fields[key].help_text = (
                     help_text % ({'format_list': format_list})
                 )
+        if 'app_config' in self.fields:
+            # if has only one choice, select it by default
+            if self.fields['app_config'].queryset.count() == 1:
+                self.fields['app_config'].empty_label = None
 
 
 class EventRegistrationForm(forms.ModelForm):

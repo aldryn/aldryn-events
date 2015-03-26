@@ -1,4 +1,4 @@
-{% extends "aldryn_events/base.html" %}
+{% extends "aldryn_events/two_column.html" %}
 {% load i18n aldryn_events cms_tags %}
 
 {% block events_content %}
@@ -6,7 +6,8 @@
     {% if view.config.app_data.config.show_ongoing_first %}
         {% static_placeholder "events_list_top_ongoing" %}
         <div class="aldryn-events-list aldryn-events-list-ongoing">
-            {% for event in ongoing_objects %}
+            {% regroup ongoing_objects by start_date as ongoing_objects_grouped %}
+            {% for event in ongoing_objects_grouped %}
                 {# TODO: we need to group the title and show the subsequent events #}
                 <h2>{{ event.start_date|date:"l, j F o" }}</h2>
                 {% include "aldryn_events/includes/event.html" %}
@@ -19,10 +20,13 @@
     {# INFO: show upcoming events #}
     {% static_placeholder "events_list_top" %}
     <div class="aldryn-events-list">
-        {% for event in page_obj.object_list|default:object_list %}
+        {% regroup page_obj.object_list|default:object_list by start_date as event_list_grouped %}
+        {% for ev_group in event_list_grouped %}
             {# TODO: we need to group the title and show the subsequent events #}
-            <h2>{{ event.start_date|date:"l, j F o" }}</h2>
-            {% include "aldryn_events/includes/event.html" %}
+            <h2>{{ ev_group.grouper|date:"l, j F o" }}</h2>
+            {% for event in ev_group.list %}
+                {% include "aldryn_events/includes/event.html" %}
+            {% endfor %}
         {% empty %}
             <p class="well">{% trans "No items available" %}</p>
         {% endfor %}
