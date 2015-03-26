@@ -207,7 +207,7 @@ class EventPagesTestCase(EventBaseTestCase):
             context['ongoing_objects'], ['ev2', 'ev3'], transform=str
         )
         self.assertQuerysetEqual(
-            context['object_list'], ['ev4'], transform=str
+            context['object_list'], ['ev4', 'ev1'], transform=str
         )
         ongoing_list = PyQuery(response.content)('ul.ongoing-events')
         links = ongoing_list.find('h3 a')

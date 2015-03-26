@@ -20,14 +20,12 @@ REQUIREMENTS = [
     'django-bootstrap3',
     'django-extended-choices',
     'django-filer',
-    'django-hvad',
     'django-parler',
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
+    'django-tablib',
     'djangocms-text-ckeditor',
     'python-dateutil',
-    'South<1.1,>=1.0.2',
-    'django-tablib'
 ]
 
 
@@ -38,6 +36,7 @@ DEPENDENCY_LINKS = [
 if py26:
     REQUIREMENTS += [
         'Django<1.7,>=1.6',
+        'South<1.1,>=1.0.2'
     ]
     DEPENDENCY_LINKS += [
         'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2.1'  # NOQA
