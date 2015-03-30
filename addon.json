@@ -1,7 +1,4 @@
 {
-    "name": "Aldryn Events",
-    "description": "An events app for aldryn",
-    "url": "https://github.com/aldryn/aldryn-events",
     "package-name": "aldryn-events",
     "installed-apps": [
         "aldryn_apphooks_config",
