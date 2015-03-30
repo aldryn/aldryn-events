@@ -1,7 +1,11 @@
-{% load i18n sekizai_tags apphooks_config_tags %}
+{% load i18n static sekizai_tags apphooks_config_tags %}
 
 {% block events_calendar %}
-<div class="events-calendar">
+<div class="events-calendar js-events-calendar"
+    data-url="{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}"
+    data-pk="{{ plugin.instance.pk }}"
+    data-error="{% trans 'There was a problem accessing the calendar, please try again.'|escapejs %}">
+
     <h3>{{ calendar_tag.label }}</h3>
     <p class="controls clearfix">
         <a href="#" class="pull-left js-trigger" data-direction="previous">{% trans "Previous month" %}</a>
@@ -12,56 +16,4 @@
 </div>
 {% endblock %}
 
-{% addtoblock "js" %}
-<script>
-jQuery(document).ready(function () {
-    var controls = $('.events-calendar .controls .js-trigger');
-    // attach events
-    controls.on('click', function (e) {
-        e.preventDefault();
-        var calendar = $(this).closest('.events-calendar');
-        var direction = $(this).data('direction');
-        var table = calendar.find('.table-calendar');
-        var month = parseInt(table.data('month-numeric'));
-        var year = parseInt(table.data('year'));
-        var title = calendar.find('h3');
-
-        // cancel if no direction is provided
-        if (!direction) {
-            return false;
-        }
-
-        // handle first and last bound
-        if (direction === 'next') {
-            if (month === 12) {
-                month = 1;
-                year += 1;
-            } else {
-                month += 1;
-            }
-        }
-        if (direction === 'previous') {
-            if (month === 1) {
-                month = 12;
-                year -= 1;
-            } else {
-                month -= 1;
-            }
-        }
-
-        // send proper ajax request
-        $.ajax({
-            'type': 'get',
-            'url': '{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}' + year + '/' + month + '/?plugin_pk={{ plugin.instance.pk }}',
-            'success': function (data) {
-                table.replaceWith(data);
-                title.html($(data).data('month') + ' ' + $(data).data('year'));
-            },
-            'error': function () {
-                alert('{% trans "There was a problem accessing the calendar, please try again." %}');
-            }
-        });
-    });
-});
-</script>
-{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'js/addons/cl.events.js' %}"></script>{% endaddtoblock %}
