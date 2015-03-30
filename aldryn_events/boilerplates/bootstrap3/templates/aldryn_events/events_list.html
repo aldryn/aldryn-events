@@ -29,6 +29,7 @@
             <p class="well">{% trans "No items available" %}</p>
         {% endfor %}
     </div>
+    {% static_placeholder "events_list_bottom" %}
 
     <div class="aldryn-events-pagination">
         {% include "aldryn_events/includes/pagination.html" %}
