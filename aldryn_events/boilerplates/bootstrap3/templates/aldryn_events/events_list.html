@@ -8,7 +8,6 @@
         <div class="aldryn-events-list aldryn-events-list-ongoing">
             {% regroup ongoing_objects by start_date as ongoing_objects_grouped %}
             {% for event in ongoing_objects_grouped %}
-                {# TODO: we need to group the title and show the subsequent events #}
                 <h2>{{ event.start_date|date:"l, j F o" }}</h2>
                 {% include "aldryn_events/includes/event.html" %}
             {% empty %}
@@ -22,7 +21,6 @@
     <div class="aldryn-events-list">
         {% regroup page_obj.object_list|default:object_list by start_date as event_list_grouped %}
         {% for ev_group in event_list_grouped %}
-            {# TODO: we need to group the title and show the subsequent events #}
             <h2>{{ ev_group.grouper|date:"l, j F o" }}</h2>
             {% for event in ev_group.list %}
                 {% include "aldryn_events/includes/event.html" %}
