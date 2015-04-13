@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.core.urlresolvers import NoReverseMatch
 from django.template import RequestContext
 
 from aldryn_search.utils import get_index_base, strip_tags
@@ -19,7 +20,14 @@ class EventsIndex(get_index_base()):
         return obj.short_description
 
     def get_title(self, obj):
-        return obj.title
+        language = self.prepared_data['language']
+        return obj.safe_translation_getter('title', language_code=language)
+
+    def get_url(self, obj):
+        try:
+            return obj.get_absolute_url()
+        except NoReverseMatch:
+            return ''
 
     def get_index_kwargs(self, language):
         return {'translations__language_code': language}
