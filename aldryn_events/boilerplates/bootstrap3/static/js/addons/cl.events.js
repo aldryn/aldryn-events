@@ -26,10 +26,9 @@ var Cl = window.Cl || {};
         // INFO: handle calendar
         calendar: function (calendar) {
             var settings = calendar.data();
-            var controls = calendar.find('.controls .js-trigger');
 
             // attach events
-            controls.on('click', function (e) {
+            calendar.on('click', '.controls .js-trigger', function (e) {
                 e.preventDefault();
                 var calendar = $(this).closest('.events-calendar');
                 var direction = $(this).data('direction');
