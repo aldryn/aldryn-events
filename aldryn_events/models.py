@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
-
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _, override
+from django.utils.translation import ugettext_lazy as _
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
+from cms.utils.i18n import get_current_language, force_language
 
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
 from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from parler.models import TranslatableModel, TranslatedFields
+from parler.utils.context import switch_language
 from sortedm2m.fields import SortedManyToManyField
 from uuid import uuid4
-
 from .conf import settings
 from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
@@ -183,18 +183,52 @@ class Event(TranslatableModel):
         return not (self.registration_deadline_at and
                     self.registration_deadline_at > timezone.now())
 
-    def get_absolute_url(self):
-        slug = self.safe_translation_getter('slug')
+    def get_url_name(self):
         try:
             url_name = '{0}:events_detail'.format(self.app_config.namespace)
         except AttributeError:
             url_name = 'aldryn_events:events_detail'
 
-        with override(self.get_current_language()):
-            return reverse(
-                url_name, kwargs={'slug': slug},
-                current_app=self.app_config.namespace
-            )
+        return url_name
+
+    def get_absolute_url(self, language=None):
+
+        def return_reverse(language):
+            """
+            Switch object to desired language and return it's URL.
+            This method not check if language exists for object before
+            and so trust you.
+            """
+            with switch_language(self, language):
+                return reverse(
+                    self.get_url_name(), kwargs={'slug': self.slug},
+                    current_app=self.app_config.namespace
+                )
+
+        if not language:
+            language = get_current_language()
+
+        available_languages = self.get_available_languages()
+
+        # Get the fallbacks. Parler accept only one fallback while
+        # django-cms can have many fallbacks for each language so we use
+        # django-cms fallbacks and ignore parler fallback.
+        site = Site.objects.get_current()
+        fallbacks = settings.CMS_LANGUAGES['default']['fallbacks']
+        for ldict in settings.CMS_LANGUAGES[site.id]:
+            if ldict['code'] == language:
+                fallbacks = ldict['fallbacks']
+                break
+
+        for language in [language] + fallbacks:
+            if language in available_languages:
+                try:
+                    return return_reverse(language)
+                except NoReverseMatch:
+                    pass
+
+        # maybe is better to raise NoReverseMatch or something else?
+        return None
 
 
 def set_event_slug(instance, **kwargs):
