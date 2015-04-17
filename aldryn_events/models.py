@@ -10,7 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
-from cms.utils.i18n import get_current_language, force_language
+from cms.utils.i18n import (
+    get_current_language, force_language, get_fallback_languages
+)
 
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
@@ -214,10 +216,10 @@ class Event(TranslatableModel):
         # django-cms can have many fallbacks for each language so we use
         # django-cms fallbacks and ignore parler fallback.
         site = Site.objects.get_current()
-        fallbacks = settings.CMS_LANGUAGES['default']['fallbacks']
+        fallbacks = settings.CMS_LANGUAGES['default'].get('fallbacks', [])
         for ldict in settings.CMS_LANGUAGES[site.id]:
             if ldict['code'] == language:
-                fallbacks = ldict['fallbacks']
+                fallbacks = get_fallback_languages(language, site.id)
                 break
 
         for language in [language] + fallbacks:
