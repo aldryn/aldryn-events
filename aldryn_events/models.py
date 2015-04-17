@@ -230,7 +230,7 @@ class Event(TranslatableModel):
                     pass
 
         # maybe is better to raise NoReverseMatch or something else?
-        return None
+        return ''
 
 
 def set_event_slug(instance, **kwargs):
