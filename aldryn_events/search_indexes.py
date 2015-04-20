@@ -17,11 +17,11 @@ class EventsIndex(get_index_base()):
         return obj.publish_at
 
     def get_description(self, obj):
-        with switch_language(obj, self.get_current_language()):
+        with switch_language(obj):
             return obj.safe_translation_getter('short_description')
 
     def get_title(self, obj):
-        with switch_language(obj, self.get_current_language()):
+        with switch_language(obj):
             return obj.safe_translation_getter('title')
 
     def get_url(self, obj):
