@@ -4,7 +4,7 @@ from django.core.urlresolvers import NoReverseMatch
 from django.template import RequestContext
 
 from aldryn_search.utils import get_index_base, strip_tags
-
+from parler.utils.context import switch_language
 from .models import Event
 
 
@@ -17,17 +17,15 @@ class EventsIndex(get_index_base()):
         return obj.publish_at
 
     def get_description(self, obj):
-        return obj.short_description
+        with switch_language(obj, self.get_current_language()):
+            return obj.safe_translation_getter('short_description')
 
     def get_title(self, obj):
-        language = self.prepared_data['language']
-        return obj.safe_translation_getter('title', language_code=language)
+        with switch_language(obj, self.get_current_language()):
+            return obj.safe_translation_getter('title')
 
     def get_url(self, obj):
-        try:
-            return obj.get_absolute_url()
-        except NoReverseMatch:
-            return ''
+        return obj.get_absolute_url()
 
     def get_index_kwargs(self, language):
         return {'translations__language_code': language}
@@ -35,22 +33,27 @@ class EventsIndex(get_index_base()):
     def get_index_queryset(self, language):
         return (
             self.get_model().objects.published()
-                                    .translated(language)
                                     .language(language)
+                                    .active_translations(language)
         )
 
     def get_model(self):
         return Event
 
     def get_search_data(self, obj, language, request):
-        description = self.get_description(obj)
+        description = self.get_description(obj) or ''
         text_bits = [strip_tags(description)]
         plugins = obj.description.cmsplugin_set.filter(language=language)
         for base_plugin in plugins:
-            instance, plugin_type = base_plugin.get_plugin_instance()
-            if instance is not None:
-                content = strip_tags(
-                    instance.render_plugin(context=RequestContext(request))
-                )
-                text_bits.append(content)
+            try:
+                instance, plugin_type = base_plugin.get_plugin_instance()
+                if instance is not None:
+                    content = strip_tags(
+                        instance.render_plugin(context=RequestContext(request))
+                    )
+                    text_bits.append(content)
+            except Exception:
+                # avoid that bad plugins breaks entire indexer
+                # TODO: logging
+                pass
         return ' '.join(text_bits)
