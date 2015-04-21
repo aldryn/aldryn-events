@@ -14,7 +14,7 @@ from django.conf import settings
 
 def build_months(year, is_archive_view=False):
     months = SortedDict()
-    month_numbers = range(1, 12+1)
+    month_numbers = range(1, 12 + 1)
 
     if is_archive_view:
         month_numbers = list(reversed(month_numbers))
