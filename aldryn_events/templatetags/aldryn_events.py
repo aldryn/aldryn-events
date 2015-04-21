@@ -59,7 +59,12 @@ def build_calendar_context(year, month, language, namespace):
     for day, events in _calendar.items():
         css = []
         if events:
-            css.append('events')
+            for event in events:
+                if event.start_date == day:
+                    css.append('events')
+                    break
+            else:
+                css.append('multiday-events')
         if day.weekday() in [5, 6]:
             css.append('weekend')
         if day == today:
