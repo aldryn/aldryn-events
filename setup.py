@@ -16,6 +16,7 @@ REQUIREMENTS = [
     'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
+    'aldryn-translation-tools',
     'django-appconf',
     'django-bootstrap3',
     'django-extended-choices',

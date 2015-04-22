@@ -44,12 +44,16 @@ class EventPagesTestCase(EventBaseTestCase):
         event = self.create_default_event()
 
         with switch_language(event, 'en'):
-            self.assertEqual(event.get_absolute_url(), '/en/eventsapp/open-air/')
+            self.assertEqual(
+                event.get_absolute_url(), '/en/eventsapp/open-air/'
+            )
             response = self.client.get(event.get_absolute_url())
             self.assertContains(response, event.title)
 
         with switch_language(event, 'de'):
-            self.assertEqual(event.get_absolute_url(), '/de/eventsapp/im-freien/')
+            self.assertEqual(
+                event.get_absolute_url(), '/de/eventsapp/im-freien/'
+            )
             response = self.client.get(event.get_absolute_url())
             self.assertContains(response, event.title)
 
