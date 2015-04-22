@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _, override
+from django.utils.translation import override, ugettext_lazy as _
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
+from aldryn_translation_tools.models import TranslationHelperMixin
 from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
-from filer.fields.file import FilerFileField
 from filer.fields.image import FilerImageField
 from parler.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
@@ -34,7 +33,7 @@ class EventsConfig(TranslatableModel, AppHookConfig):
     )
 
 
-class Event(TranslatableModel):
+class Event(TranslationHelperMixin, TranslatableModel):
 
     start_date = models.DateField(_('start date'))
     start_time = models.TimeField(_('start time'), null=True, blank=True)
@@ -183,18 +182,26 @@ class Event(TranslatableModel):
         return not (self.registration_deadline_at and
                     self.registration_deadline_at > timezone.now())
 
-    def get_absolute_url(self):
-        slug = self.safe_translation_getter('slug')
+    def get_url_name(self):
         try:
             url_name = '{0}:events_detail'.format(self.app_config.namespace)
         except AttributeError:
             url_name = 'aldryn_events:events_detail'
 
-        with override(self.get_current_language()):
-            return reverse(
-                url_name, kwargs={'slug': slug},
-                current_app=self.app_config.namespace
-            )
+        return url_name
+
+    def get_absolute_url(self, language=None):
+        slug, language = self.known_translation_getter(
+            'slug', default=None, language_code=language)
+        kwargs = {'slug': slug}
+
+        if self.app_config_id and self.app_config.namespace:
+            namespace = '{0}:'.format(self.app_config.namespace)
+        else:
+            namespace = ''
+
+        with override(language):
+            return reverse('{0}events_detail'.format(namespace), kwargs=kwargs)
 
 
 def set_event_slug(instance, **kwargs):

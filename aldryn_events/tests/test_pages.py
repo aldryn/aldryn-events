@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from importlib import import_module
 from cms import api
 from cms.utils.i18n import force_language
+from parler.utils.context import switch_language
 from pyquery import PyQuery
 
 from aldryn_events.models import Event, EventsConfig
@@ -42,17 +43,15 @@ class EventPagesTestCase(EventBaseTestCase):
         self.create_base_pages()
         event = self.create_default_event()
 
-        self.assertEqual(event.get_absolute_url(), '/en/eventsapp/open-air/')
-        with force_language('en'):
+        with switch_language(event, 'en'):
+            self.assertEqual(event.get_absolute_url(), '/en/eventsapp/open-air/')
             response = self.client.get(event.get_absolute_url())
-        self.assertContains(response, event.title)
+            self.assertContains(response, event.title)
 
-        event.set_current_language('de')
-
-        self.assertEqual(event.get_absolute_url(), '/de/eventsapp/im-freien/')
-        with force_language('de'):
+        with switch_language(event, 'de'):
+            self.assertEqual(event.get_absolute_url(), '/de/eventsapp/im-freien/')
             response = self.client.get(event.get_absolute_url())
-        self.assertContains(response, event.title)
+            self.assertContains(response, event.title)
 
     @mock.patch('aldryn_events.managers.timezone')
     @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')

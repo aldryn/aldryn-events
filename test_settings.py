@@ -51,8 +51,8 @@ HELPER_SETTINGS = {
     ),
     'PARLER_LANGUAGES': {
         1: (
-            {'code': 'en',},
-            {'code': 'de',},
+            {'code': 'en'},
+            {'code': 'de'},
         ),
         'default': {
             'hide_untranslated': False,
@@ -62,6 +62,7 @@ HELPER_SETTINGS = {
         'default': {
             'public': True,
             'hide_untranslated': False,
+            'fallbacks': ['en']
 
         },
         1: [
