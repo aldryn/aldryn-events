@@ -17,7 +17,7 @@ class EventsMenu(CMSAttachMenu):
     def get_nodes(self, request):
         nodes = []
         language = get_language_from_request(request, check_path=True)
-        events = Event.objects.translated(language)
+        events = Event.objects.language(language).translated(language)
 
         if hasattr(self, 'instance') and self.instance:
             # If self has a property `instance`, then we're using django CMS
@@ -30,7 +30,7 @@ class EventsMenu(CMSAttachMenu):
 
         for event in events:
             node = NavigationNode(
-                event.safe_translation_getter('title', language_code=language),
+                event.title,
                 event.get_absolute_url(language=language),
                 event.pk,
             )
