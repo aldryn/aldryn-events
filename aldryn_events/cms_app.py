@@ -5,12 +5,14 @@ from aldryn_apphooks_config.app_base import CMSConfigApp
 from cms.apphook_pool import apphook_pool
 
 from .models import EventsConfig
+from .menu import EventsMenu
 
 
 class EventListAppHook(CMSConfigApp):
-    name = _('Events')
     app_name = 'aldryn_events'
-    urls = ['aldryn_events.urls']
     app_config = EventsConfig
+    menus = [EventsMenu]
+    name = _('Events')
+    urls = ['aldryn_events.urls']
 
 apphook_pool.register(EventListAppHook)
