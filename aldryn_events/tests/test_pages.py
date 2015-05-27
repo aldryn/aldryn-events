@@ -112,8 +112,8 @@ class EventPagesTestCase(EventBaseTestCase):
             response = self.client.get(page.get_absolute_url('de'))
             self.assertContains(response, event1.title)
             self.assertContains(response, event1.get_absolute_url())
-            self.assertNotContains(response, event2.title)
-            self.assertNotContains(response, event2.get_absolute_url())
+            self.assertContains(response, event2.title)
+            self.assertContains(response, event2.get_absolute_url())
 
     @mock.patch('aldryn_events.managers.timezone')
     @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')

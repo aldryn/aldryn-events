@@ -2,6 +2,9 @@
 from django.core.exceptions import ValidationError
 from cms.utils.i18n import force_language
 from aldryn_events.models import Event
+from parler.tests.utils import override_parler_settings
+from parler.utils.conf import add_default_language_settings
+
 from .base import EventBaseTestCase, tz_datetime
 
 
@@ -68,13 +71,38 @@ class EventTestCase(EventBaseTestCase):
                 publish_at=tz_datetime(2014, 9, 9),
                 app_config=self.app_config
             )
-        self.assertEqual(Event.objects.translated('en').count(), 1)
-        self.assertEqual(Event.objects.translated('de').count(), 0)
+        self.assertEqual(Event.objects.active_translations('en').count(), 1)
+        self.assertEqual(Event.objects.active_translations('de').count(), 1)
 
         event.create_translation('de', title='Konzert', slug='offene-konzert')
 
-        self.assertEqual(Event.objects.translated('en').count(), 1)
-        self.assertEqual(Event.objects.translated('de').count(), 1)
+        self.assertEqual(Event.objects.active_translations('en').count(), 1)
+        self.assertEqual(Event.objects.active_translations('de').count(), 1)
+
+    def test_behaviour_of_active_translations_and_hide_untranslated(self):
+        self.create_event(title='test event', start_date='2015-01-01')
+
+        self.assertEqual(Event.objects.active_translations('en').count(), 1)
+        self.assertEqual(Event.objects.active_translations('de').count(), 1)
+
+        parler_languages = add_default_language_settings({
+            1: (
+                {'code': 'en'},
+                {'code': 'de'},
+            ),
+            'default': {
+                'fallback': 'en',
+                'hide_untranslated': True,
+            }
+        })
+
+        with override_parler_settings(PARLER_LANGUAGES=parler_languages):
+            self.assertEqual(
+                Event.objects.active_translations('en').count(), 1
+            )
+            self.assertEqual(
+                Event.objects.active_translations('de').count(), 0
+            )
 
     def test_event_fill_slug_with_manager_create(self):
         event = Event.objects.create(

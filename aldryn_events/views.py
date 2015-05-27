@@ -19,7 +19,7 @@ from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_apphooks_config.utils import get_app_instance
 from datetime import date, datetime
 
-from . import request_events_event_identifier
+from . import request_events_event_identifier, ORDERING_FIELDS
 from .forms import EventRegistrationForm
 from .models import Event, Registration, EventCalendarPlugin
 from .templatetags.aldryn_events import build_calendar_context
@@ -34,16 +34,20 @@ class NavigationMixin(object):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
         language = get_language_from_request(self.request, check_path=True)
         events_by_year = build_events_by_year(
-            events=Event.objects.namespace(self.namespace)
-                                .future()
-                                .translated(language).language(language)
+            events=(
+                Event.objects.namespace(self.namespace)
+                             .future()
+                             .active_translations(language)
+                             .language(language)
+            )
         )
         context['events_by_year'] = events_by_year
         archived_events_by_year = build_events_by_year(
             events=(
                 Event.objects.namespace(self.namespace)
                              .archive()
-                             .translated(language).language(language)
+                             .active_translations(language)
+                             .language(language)
             ),
             is_archive_view=True,
         )
@@ -68,8 +72,9 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         qs = (super(EventListView, self).get_queryset()
                                         .namespace(self.namespace))
 
-        language = get_language_from_request(self.request, check_path=True)
-        qs = qs.translated(language).language(language)
+        if not self.request.GET.get('all_languages', False):
+            language = get_language_from_request(self.request, check_path=True)
+            qs = qs.active_translations(language).language(language)
 
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
@@ -129,16 +134,10 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
             if self.archive:
                 qs = qs.archive()
             else:
-                self.archive_qs = qs.archive().order_by(
-                    'start_date', 'start_time', 'end_date', 'end_time',
-                    'translations__title'
-                )
+                self.archive_qs = qs.archive().order_by(*ORDERING_FIELDS)
                 qs = qs.future()
 
-        return qs.order_by(
-            'start_date', 'start_time', 'end_date', 'end_time',
-            'translations__title'
-        )
+        return qs.order_by(*ORDERING_FIELDS).distinct()
 
     def get_context_data(self, **kwargs):
         object_list = self.object_list
@@ -173,13 +172,12 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
             Event.objects.namespace(self.namespace)
                          .published()
                          .language(language)
-                         .order_by(
-                            'start_date', 'start_time', 'end_date',
-                            'end_time', 'translations__title'
-                         )
+                         .order_by(*ORDERING_FIELDS)
         )
         self.event = (
-            self.queryset.translated(language, slug=kwargs['slug']).get()
+            self.queryset.active_translations(
+                language, slug=kwargs['slug']
+            ).get()
         )
         setattr(self.request, request_events_event_identifier,  self.event)
 
@@ -249,7 +247,7 @@ class ResetEventRegistration(AppConfigMixin, FormView):
         language = get_language_from_request(request, check_path=True)
         self.event = (
             Event.objects.namespace(self.namespace)
-                         .translated(language, slug=kwargs['slug'])
+                         .active_translations(language, slug=kwargs['slug'])
                          .language(language)
                          .get()
         )

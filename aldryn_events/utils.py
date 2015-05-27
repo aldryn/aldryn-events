@@ -212,7 +212,7 @@ def build_calendar(year, month, language, namespace=None):
     )
     events = (Event.objects.namespace(namespace)
               .published()
-              .translated(language)
+              .active_translations(language)
               .language(language)
               .filter(filter_args)
               .order_by('start_date'))
