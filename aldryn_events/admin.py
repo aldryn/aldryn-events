@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from aldryn_apphooks_config.admin import BaseAppHookConfig
+from aldryn_reversion.admin import VersionedPlaceholderAdminMixin
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from django_tablib.admin import TablibAdmin
@@ -12,8 +13,12 @@ from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
-class EventAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin,
-                 TranslatableAdmin):
+class EventAdmin(
+    VersionedPlaceholderAdminMixin,
+    FrontendEditableAdminMixin,
+    PlaceholderAdminMixin,
+    TranslatableAdmin
+):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
@@ -58,7 +63,7 @@ class EventAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin,
         return self._fieldsets
 
 
-class EventCoordinatorAdmin(admin.ModelAdmin):
+class EventCoordinatorAdmin(VersionedPlaceholderAdminMixin, admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 

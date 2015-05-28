@@ -14,6 +14,7 @@ from cms.utils.i18n import get_current_language, get_redirect_on_fallback
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
 from aldryn_translation_tools.models import TranslationHelperMixin
+from aldryn_reversion.core import version_controlled_content
 from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
 from filer.fields.image import FilerImageField
@@ -33,7 +34,7 @@ class EventsConfig(TranslatableModel, AppHookConfig):
         app_title=models.CharField(_('application title'), max_length=234),
     )
 
-
+@version_controlled_content
 class Event(TranslationHelperMixin, TranslatableModel):
 
     start_date = models.DateField(_('start date'))
@@ -228,7 +229,7 @@ def set_event_slug(instance, **kwargs):
 
 post_save.connect(set_event_slug, sender=Event)
 
-
+@version_controlled_content
 class EventCoordinator(models.Model):
 
     name = models.CharField(max_length=200, blank=True)
