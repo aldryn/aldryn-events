@@ -18,6 +18,7 @@ from django.views.generic import (
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_apphooks_config.utils import get_app_instance
 from datetime import date, datetime
+from menus.utils import set_language_changer
 
 from . import request_events_event_identifier, ORDERING_FIELDS
 from .forms import EventRegistrationForm
@@ -179,6 +180,7 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
                 language, slug=kwargs['slug']
             ).get()
         )
+        set_language_changer(request, self.event.get_absolute_url)
         setattr(self.request, request_events_event_identifier,  self.event)
 
         if hasattr(request, 'toolbar'):

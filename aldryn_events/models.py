@@ -9,6 +9,7 @@ from django.utils.translation import override, ugettext_lazy as _
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
+from cms.utils.i18n import get_current_language, get_redirect_on_fallback
 
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
@@ -191,9 +192,19 @@ class Event(TranslationHelperMixin, TranslatableModel):
         return url_name
 
     def get_absolute_url(self, language=None):
-        slug, language = self.known_translation_getter(
+
+        if not language:
+            language = get_current_language()
+
+        kwargs = {}
+        slug, lang = self.known_translation_getter(
             'slug', default=None, language_code=language)
-        kwargs = {'slug': slug}
+
+        if slug and lang:
+            site_id = getattr(settings, 'SITE_ID', None)
+            if get_redirect_on_fallback(language, site_id):
+                language = lang
+            kwargs.update(slug=slug)
 
         if self.app_config_id and self.app_config.namespace:
             namespace = '{0}:'.format(self.app_config.namespace)
