@@ -47,7 +47,7 @@ class ReversionTestCase(EventBaseTestCase):
             with reversion.create_revision():
                 if content:
                     plugins = event.description.get_plugins()
-                    plugin = plugins[0].get_plufin_instance()[0]
+                    plugin = plugins[0].get_plugin_instance()[0]
                     plugin.body = content
                     plugin.save()
                 event.save()

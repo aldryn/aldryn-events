@@ -28,13 +28,14 @@ from .utils import get_additional_styles, date_or_datetime
 
 STANDARD = 'standard'
 
-
+@version_controlled_content
 class EventsConfig(TranslatableModel, AppHookConfig):
     translations = TranslatedFields(
         app_title=models.CharField(_('application title'), max_length=234),
     )
 
-@version_controlled_content
+
+@version_controlled_content(follow=['event_coordinators'])
 class Event(TranslationHelperMixin, TranslatableModel):
 
     start_date = models.DateField(_('start date'))
@@ -229,7 +230,7 @@ def set_event_slug(instance, **kwargs):
 
 post_save.connect(set_event_slug, sender=Event)
 
-@version_controlled_content
+@version_controlled_content(follow=['user'])
 class EventCoordinator(models.Model):
 
     name = models.CharField(max_length=200, blank=True)
