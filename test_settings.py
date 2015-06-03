@@ -33,6 +33,8 @@ HELPER_SETTINGS = {
         'aldryn_boilerplates',
         'aldryn_common',
         'aldryn_events',
+        'aldryn_reversion',
+        'reversion',
         'appconf',
         'aldryn_bootstrap3',
         'django_tablib',

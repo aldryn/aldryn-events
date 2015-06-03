@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import reversion
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -27,6 +29,14 @@ from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
 
 STANDARD = 'standard'
+
+# check if user model is registered, since we're following on that relation
+# for EventCoordinator model, if not - register it to avoid RegistrationError
+actual_user_model = get_user_model()
+revision_manager = reversion.default_revision_manager
+if actual_user_model not in revision_manager.get_registered_models():
+    reversion.register(actual_user_model)
+
 
 @version_controlled_content
 class EventsConfig(TranslatableModel, AppHookConfig):

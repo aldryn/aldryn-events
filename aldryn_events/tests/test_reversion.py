@@ -38,13 +38,11 @@ class ReversionTestCase(EventBaseTestCase):
         }
 
     def create_revision(self, event, content=None, **kwargs):
-
-        # populate event with new values
-        for property, value in six.iteritems(kwargs):
-            setattr(event, property, value)
-
         with transaction.atomic():
             with reversion.create_revision():
+                # populate event with new values
+                for property, value in six.iteritems(kwargs):
+                    setattr(event, property, value)
                 if content:
                     plugins = event.description.get_plugins()
                     plugin = plugins[0].get_plugin_instance()[0]
@@ -52,11 +50,14 @@ class ReversionTestCase(EventBaseTestCase):
                     plugin.save()
                 event.save()
 
-    def revert_to(self, object_with_revision, revision):
+    def revert_to(self, object_with_revision, revision_id):
         """
-        Revert <object with revision> to <revision> number.
+        Revert <object with revision> to <revision_id> number.
         """
-        reversion.get_for_object(object_with_revision)[revision].revision.revert()
+        # since get_for_object returns a queryset - use qyeryset methods to
+        # get desired revision
+        revision = reversion.get_for_object(object_with_revision).get(revision_id=revision_id)
+        revision.revert()
 
     def create_default_event(self, translated=False):
 
@@ -80,11 +81,17 @@ class ReversionTestCase(EventBaseTestCase):
         """
         new_dict = {}
         for key, value in values_dict.items():
-            if type(value) == datetime:
-                new_val = value + timedelta(days=int(replace_with))
+            if key in ('start_date', 'end_date'):
+                new_val = value + timedelta(days=replace_with)
+                if type(new_val) != datetime.date:
+                    new_val = new_val.date()
+            elif key in ('start_time', 'end_time'):
+                new_val = value + timedelta(hours=replace_with)
+            elif key in ('publish_at',):
+                new_val = value + timedelta(days=replace_with)
             else:
                 new_val = value.format(replace_with)
-            new_dict['key'] = new_val
+            new_dict[key] = new_val
         return new_dict
 
     def test_revert_revision(self):
@@ -102,6 +109,7 @@ class ReversionTestCase(EventBaseTestCase):
         event = self.create_default_event()
         # revision 1
         revision_1_values = self.make_new_values(values_raw, 1)
+        event.set_current_language('en')
         self.create_revision(event, content=content1, **revision_1_values)
         # revision 2
         revision_2_values = self.make_new_values(values_raw, 2)
@@ -121,9 +129,12 @@ class ReversionTestCase(EventBaseTestCase):
         # test revert for event
         self.revert_to(event, 1)
         # test urls, since slug was changed they shouldn't be the same.
+
         url_revision_1 = event.get_absolute_url('en')
-        self.assertNotEqual(url_revision_2, url_revision_1,
-                            "Slug shouldn't be the same after reversion!")
+        self.assertNotEqual(
+            url_revision_2, url_revision_1,
+            "Slug shouldn't be the same after reversion!\n expected {0}, got {1}".format(
+                url_revision_2, url_revision_1))
 
         response = self.client.get(url_revision_1)
 
@@ -214,7 +225,9 @@ class ReversionTestCase(EventBaseTestCase):
             self.assertContains(response, content1_en)
 
             # test that en version in last revision doesn't contains german content (placeholder)
-            self.assertNotContains(response, content1_de)
+            self.assertNotContains(
+                response, content1_de,
+                "No content '{0}' , instead got \n{1}".format(content1_de, response))
             self.assertNotContains(response, content2_de)
 
             # compare with default (initial) urls.
@@ -402,7 +415,3 @@ class ReversionTestCase(EventBaseTestCase):
     # def test_edit_plugin_directly(self):
     #     pass
     #
-    # def test_reversion_restore_with_deleted_fk_to_revisionned_model(self):
-    #     # what if event coordinator would be deleted but he will was registered in one of
-    #     # the revisions ? - integrity error. need to test that and avoid.
-    #     pass
