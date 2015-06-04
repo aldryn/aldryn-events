@@ -38,17 +38,16 @@ class ReversionTestCase(EventBaseTestCase):
         }
 
     def create_revision(self, event, content=None, **kwargs):
-        with transaction.atomic():
-            with reversion.create_revision():
-                # populate event with new values
-                for property, value in six.iteritems(kwargs):
-                    setattr(event, property, value)
-                if content:
-                    plugins = event.description.get_plugins()
-                    plugin = plugins[0].get_plugin_instance()[0]
-                    plugin.body = content
-                    plugin.save()
-                event.save()
+        with transaction.atomic(), reversion.create_revision():
+            # populate event with new values
+            for property, value in six.iteritems(kwargs):
+                setattr(event, property, value)
+            if content:
+                plugins = event.description.get_plugins()
+                plugin = plugins[0].get_plugin_instance()[0]
+                plugin.body = content
+                plugin.save()
+            event.save()
 
     def revert_to(self, object_with_revision, revision_id):
         """
@@ -56,8 +55,8 @@ class ReversionTestCase(EventBaseTestCase):
         """
         # since get_for_object returns a queryset - use qyeryset methods to
         # get desired revision
-        revision = reversion.get_for_object(object_with_revision).get(revision_id=revision_id)
-        revision.revert()
+        version = reversion.get_for_object(object_with_revision).get(revision_id=revision_id)
+        version.revision.revert()
 
     def create_default_event(self, translated=False):
 
@@ -113,10 +112,14 @@ class ReversionTestCase(EventBaseTestCase):
         self.create_revision(event, content=content1, **revision_1_values)
         # revision 2
         revision_2_values = self.make_new_values(values_raw, 2)
+
+        event = Event.objects.get(pk=event.pk)
+        event.set_current_language('en')
         self.create_revision(event, content=content2, **revision_2_values)
 
         # check that latest revision values are used
-        url_revision_2 = event.get_absolute_url('en')
+        with switch_language(event, 'en'):
+            url_revision_2 = event.get_absolute_url()
         response = self.client.get(url_revision_2)
         self.assertContains(response, revision_2_values['title'])
         self.assertContains(response, content2)
@@ -129,12 +132,10 @@ class ReversionTestCase(EventBaseTestCase):
         # test revert for event
         self.revert_to(event, 1)
         # test urls, since slug was changed they shouldn't be the same.
-
-        url_revision_1 = event.get_absolute_url('en')
-        self.assertNotEqual(
-            url_revision_2, url_revision_1,
-            "Slug shouldn't be the same after reversion!\n expected {0}, got {1}".format(
-                url_revision_2, url_revision_1))
+        event = Event.objects.get(pk=event.pk)
+        with switch_language(event, 'en'):
+            url_revision_1 = event.get_absolute_url()
+        self.assertNotEqual(url_revision_2, url_revision_1)
 
         response = self.client.get(url_revision_1)
 
@@ -185,6 +186,7 @@ class ReversionTestCase(EventBaseTestCase):
         event.set_current_language('en')
         self.create_revision(event, content=content1_en, **revision_1_values_en)
         # revision 2 de
+        event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
         self.create_revision(event, content=content1_de, **revision_1_values_de)
 
@@ -212,6 +214,7 @@ class ReversionTestCase(EventBaseTestCase):
 
         # revision 2a (3) change only german translation
         revision_2_values_de = self.make_new_values(values_raw_de, 2)
+        event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
         self.create_revision(event, content=content2_de, **revision_2_values_de)
 
@@ -265,6 +268,7 @@ class ReversionTestCase(EventBaseTestCase):
 
         # revision 2b (4) english translation update
         revision_2_values_en = self.make_new_values(values_raw_en, 2)
+        event = Event.objects.get(pk=event.pk)
         event.set_current_language('en')
         self.create_revision(event, content=content2_en, **revision_2_values_en)
 
@@ -334,7 +338,8 @@ class ReversionTestCase(EventBaseTestCase):
         # finaly the revert part.
         # rever to 1, EN=1 DE=1
         self.revert_to(event, 2)
-
+        # get latest state instead of in memory
+        event = Event.objects.get(pk=event.pk)
         with switch_language(event, 'en'):
             revision_1_reverted_url_en = event.get_absolute_url()
             response = self.client.get(revision_1_reverted_url_en)
@@ -363,7 +368,7 @@ class ReversionTestCase(EventBaseTestCase):
         # revert to 3, EN=1 DE=2
         self.revert_to(event, 3)
         # test latest (rev 2a atm) revision with respect to languages
-
+        event = Event.objects.get(pk=event.pk)
         with switch_language(event, 'en'):
             revision_2_reversed_url_en = event.get_absolute_url()
             response = self.client.get(revision_2_reversed_url_en)
@@ -412,6 +417,32 @@ class ReversionTestCase(EventBaseTestCase):
             # test against the other translation
             self.assertNotEqual(revision_2_reversed_url_de, revision_2_url_en)
 
-    # def test_edit_plugin_directly(self):
-    #     pass
-    #
+    def test_edit_plugin_directly(self):
+        content1 = 'Content 1 text'
+        content2 = 'Content 2 text'
+
+        event = self.create_default_event()
+        # revision 1
+        self.create_revision(event, content1)
+
+        self.assertEqual(len(reversion.get_for_object(event)), 1)
+
+        # revision 2
+        with transaction.atomic(), reversion.create_revision():
+            plugins = event.description.get_plugins()
+            plugin = plugins[0].get_plugin_instance()[0]
+            plugin.body = content2
+            plugin.save()
+            create_revision_with_placeholders(event)
+
+        self.assertEqual(len(reversion.get_for_object(event)), 2)
+
+        response = self.client.get(event.get_absolute_url())
+        self.assertContains(response, content2)
+        self.assertNotContains(response, content1)
+
+        self.revert_to(event, 1)
+        event = Event.objects.get(pk=event.pk)
+        response = self.client.get(event.get_absolute_url())
+        self.assertContains(response, content1)
+        self.assertNotContains(response, content2)
