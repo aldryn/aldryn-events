@@ -12,8 +12,8 @@ guidelines.
 Divio AG
 ********
 
-Aldryn Events was created at `Divio AG <https://divio.ch/>`_ of Zürich,
-Switzerland and is released under a BSD licence.
+Aldryn Events was created by `Divio AG <https://divio.ch/>`_ and is released
+under a BSD licence.
 
 Aldryn Events is compatible with Divio's `Aldryn <http://aldryn.com>`_
 cloud-based `django CMS <http://django-cms.org>`_ hosting platform, and
