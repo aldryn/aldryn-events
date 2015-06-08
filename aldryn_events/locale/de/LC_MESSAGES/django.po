@@ -196,7 +196,7 @@ msgid "Event"
 msgstr "Event"
 
 #: models.py:146 models.py:150
-msgid "start should be before end"
+msgid "Start date should be before end date."
 msgstr "Start sollte vor dem Ende sein"
 
 #: models.py:154
