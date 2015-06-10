@@ -71,19 +71,20 @@ class EventTestCase(EventBaseTestCase):
                 publish_at=tz_datetime(2014, 9, 9),
                 app_config=self.app_config
             )
-        self.assertEqual(Event.objects.active_translations('en').count(), 1)
-        self.assertEqual(Event.objects.active_translations('de').count(), 1)
+        self.assertEqual(Event.objects.translated('en').count(), 1)
+        self.assertEqual(Event.objects.translated('de').count(), 0)
 
         event.create_translation('de', title='Konzert', slug='offene-konzert')
 
-        self.assertEqual(Event.objects.active_translations('en').count(), 1)
-        self.assertEqual(Event.objects.active_translations('de').count(), 1)
+        self.assertEqual(Event.objects.translated('en').count(), 1)
+        self.assertEqual(Event.objects.translated('de').count(), 1)
 
     def test_behaviour_of_active_translations_and_hide_untranslated(self):
         self.create_event(title='test event', start_date='2015-01-01')
 
         self.assertEqual(Event.objects.active_translations('en').count(), 1)
         self.assertEqual(Event.objects.active_translations('de').count(), 1)
+        self.assertEqual(Event.objects.active_translations('jp').count(), 1)
 
         parler_languages = add_default_language_settings({
             1: (
@@ -102,6 +103,9 @@ class EventTestCase(EventBaseTestCase):
             )
             self.assertEqual(
                 Event.objects.active_translations('de').count(), 0
+            )
+            self.assertEqual(
+                Event.objects.active_translations('jp').count(), 0
             )
 
     def test_event_fill_slug_with_manager_create(self):

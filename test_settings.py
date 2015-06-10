@@ -34,7 +34,7 @@ HELPER_SETTINGS = {
         'aldryn_common',
         'aldryn_events',
         'appconf',
-        'bootstrap3',
+        'aldryn_bootstrap3',
         'django_tablib',
         'djangocms_text_ckeditor',
         'easy_thumbnails',

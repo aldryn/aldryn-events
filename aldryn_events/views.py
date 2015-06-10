@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from dateutil.relativedelta import relativedelta
 
+from functools import update_wrapper
+
 from django import forms
 from django.db.models.query import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.utils import timezone
+from django.utils.decorators import classonlymethod
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
@@ -175,13 +179,13 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
                          .language(language)
                          .order_by(*ORDERING_FIELDS)
         )
-        self.event = (
-            self.queryset.active_translations(
-                language, slug=kwargs['slug']
-            ).get()
-        )
+        self.event = self.queryset.active_translations(
+            language, slug=kwargs['slug']).first()
+        if not self.event:
+            raise Http404("Event not found")
+
         set_language_changer(request, self.event.get_absolute_url)
-        setattr(self.request, request_events_event_identifier,  self.event)
+        setattr(self.request, request_events_event_identifier, self.event)
 
         if hasattr(request, 'toolbar'):
             request.toolbar.set_object(self.event)
