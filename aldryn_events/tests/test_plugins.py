@@ -93,8 +93,8 @@ class EventPluginsTestCase(EventBaseTestCase):
             event1.set_current_language('de')
             self.assertContains(response, event1.title)
             self.assertContains(response, event1.get_absolute_url())
-            self.assertNotContains(response, event2.title)
-            self.assertNotContains(response, event2.get_absolute_url())
+            self.assertContains(response, event2.title)
+            self.assertContains(response, event2.get_absolute_url())
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_future(self, timezone_mock):

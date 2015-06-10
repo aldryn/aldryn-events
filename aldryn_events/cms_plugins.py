@@ -31,7 +31,7 @@ class UpcomingPlugin(CMSPluginBase):
         namespace = instance.app_config_id and instance.app_config.namespace
 
         events = (Event.objects.namespace(namespace)
-                               .translated(language)
+                               .active_translations(language)
                                .language(language))
 
         if instance.past_events:
@@ -70,7 +70,7 @@ class EventListCMSPlugin(CMSPluginBase):
         # DatabaseError:
         #   no such column: aldryn_events_eventlistplugin_events.sort_value
         events = (Event.objects.namespace(namespace)
-                               .translated(language)
+                               .active_translations(language)
                                .language(language)
                                .filter(eventlistplugin__pk=instance.pk))
 

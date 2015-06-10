@@ -57,7 +57,7 @@ class TagsTestCase(EventBaseTestCase):
         )
         html = t.render(SekizaiContext({}))
         table = PyQuery(html)('table.table-calendar')
-        links = table.find('td.events').find('a')
+        links = table.find('td.events, td.multiday-events').find('a')
 
         # test if tag rendered important elements
         self.assertEqual('1', table.attr('data-month-numeric'), )
