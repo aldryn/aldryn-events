@@ -44,6 +44,5 @@ class TestEventViews(EventBaseTestCase):
                 'is_published': True,
             })
         url = event.get_absolute_url(language="en")
-        print(inspect.getsourcefile(resolve(url).func))
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
