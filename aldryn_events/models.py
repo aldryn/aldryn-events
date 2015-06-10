@@ -200,11 +200,11 @@ class Event(TranslationHelperMixin, TranslatableModel):
         slug, slug_lang = self.known_translation_getter(
             'slug', default=None, language_code=language)
 
+        kwargs.update(slug=slug)
         if slug and slug_lang:
             site_id = getattr(settings, 'SITE_ID', None)
             if get_redirect_on_fallback(language, site_id):
                 language = slug_lang
-            kwargs.update(slug=slug)
 
         if self.app_config_id and self.app_config.namespace:
             namespace = '{0}:'.format(self.app_config.namespace)
