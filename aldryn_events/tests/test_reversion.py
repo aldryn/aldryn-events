@@ -37,17 +37,20 @@ class ReversionTestCase(EventBaseTestCase):
             'de': 'default german content'
         }
 
-    def create_revision(self, event, content=None, **kwargs):
-        with transaction.atomic(), reversion.create_revision():
-            # populate event with new values
-            for property, value in six.iteritems(kwargs):
-                setattr(event, property, value)
-            if content:
-                plugins = event.description.get_plugins()
-                plugin = plugins[0].get_plugin_instance()[0]
-                plugin.body = content
-                plugin.save()
-            event.save()
+    def create_revision(self, obj, content=None, **kwargs):
+        with transaction.atomic():
+            with reversion.create_revision():
+                # populate event with new values
+                for property, value in six.iteritems(kwargs):
+                    setattr(obj, property, value)
+                if content:
+                    # get correct plugin for language. do not update the same one.
+                    language = obj.get_current_language()
+                    plugins = obj.description.get_plugins().filter(language=language)
+                    plugin = plugins[0].get_plugin_instance()[0]
+                    plugin.body = content
+                    plugin.save()
+                obj.save()
 
     def revert_to(self, object_with_revision, revision_id):
         """
@@ -169,8 +172,8 @@ class ReversionTestCase(EventBaseTestCase):
         content1_en = 'Revision 1 content'
         content2_en = 'Revision 2 content, brand new one!'
 
-        content1_de = 'German Revision 1 content'
-        content2_de = 'German Revision 2 content, brand new one!'
+        content1_de = 'Revision German 1 content'
+        content2_de = 'Revision German 2 content, brand new one!'
 
         event = self.create_default_event(translated=True)
 
@@ -218,6 +221,7 @@ class ReversionTestCase(EventBaseTestCase):
         event.set_current_language('de')
         self.create_revision(event, content=content2_de, **revision_2_values_de)
 
+        event = Event.objects.get(pk=event.pk)
         # test latest (rev 2a atm) revision with respect to languages
         with switch_language(event, 'en'):
             revision_2_url_en = event.get_absolute_url()
@@ -228,9 +232,7 @@ class ReversionTestCase(EventBaseTestCase):
             self.assertContains(response, content1_en)
 
             # test that en version in last revision doesn't contains german content (placeholder)
-            self.assertNotContains(
-                response, content1_de,
-                "No content '{0}' , instead got \n{1}".format(content1_de, response))
+            self.assertNotContains(response, content1_de)
             self.assertNotContains(response, content2_de)
 
             # compare with default (initial) urls.
@@ -272,6 +274,7 @@ class ReversionTestCase(EventBaseTestCase):
         event.set_current_language('en')
         self.create_revision(event, content=content2_en, **revision_2_values_en)
 
+        event = Event.objects.get(pk=event.pk)
         # test latest (rev 2b atm) revision with respect to languages
         with switch_language(event, 'en'):
             revision_2b_url_en = event.get_absolute_url()
@@ -413,7 +416,7 @@ class ReversionTestCase(EventBaseTestCase):
             self.assertNotEqual(revision_2_reversed_url_de, default_event_url_en)
             self.assertNotEqual(revision_2_reversed_url_de, default_event_url_de)
             # test against previous revision
-            self.assertEqual(revision_2_reversed_url_de, revision_1_url_de)
+            self.assertNotEqual(revision_2_reversed_url_de, revision_1_url_de)
             # test against the other translation
             self.assertNotEqual(revision_2_reversed_url_de, revision_2_url_en)
 
