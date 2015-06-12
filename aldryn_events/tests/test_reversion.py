@@ -431,12 +431,14 @@ class ReversionTestCase(EventBaseTestCase):
         self.assertEqual(len(reversion.get_for_object(event)), 1)
 
         # revision 2
-        with transaction.atomic(), reversion.create_revision():
-            plugins = event.description.get_plugins()
-            plugin = plugins[0].get_plugin_instance()[0]
-            plugin.body = content2
-            plugin.save()
-            create_revision_with_placeholders(event)
+        with transaction.atomic():
+            with reversion.create_revision():
+                plugins = event.description.get_plugins().filter(
+                    language=event.get_current_language())
+                plugin = plugins[0].get_plugin_instance()[0]
+                plugin.body = content2
+                plugin.save()
+                create_revision_with_placeholders(event)
 
         self.assertEqual(len(reversion.get_for_object(event)), 2)
 
