@@ -1,2 +1,4 @@
+Django>=1.6,<1.7
+django-reversion<1.8.3
+South
 -r base.txt
-Django<1.7,>=1.6

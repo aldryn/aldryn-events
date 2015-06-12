@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 import reversion
+from reversion.revisions import RegistrationError
+from django.utils.importlib import import_module
+from distutils.version import StrictVersion
+
+from django import get_version
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
@@ -29,13 +34,63 @@ from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
 
 STANDARD = 'standard'
+strict_version = StrictVersion(get_version())
 
-# check if user model is registered, since we're following on that relation
-# for EventCoordinator model, if not - register it to avoid RegistrationError
-actual_user_model = get_user_model()
-revision_manager = reversion.default_revision_manager
-if actual_user_model not in revision_manager.get_registered_models():
-    reversion.register(actual_user_model)
+if strict_version < StrictVersion('1.7.0'):
+    # Prior to 1.7 it is pretty straight forward
+    user_model = get_user_model()
+    revision_manager = reversion.default_revision_manager
+    if user_model not in revision_manager.get_registered_models():
+        reversion.register(user_model)
+else:
+    # otherwise it is a pain, but thanks to solution of getting model from
+    # https://github.com/django-oscar/django-oscar/commit/c479a1983f326a9b059e157f85c32d06a35728dd
+    # we can do almost the same thing from the different side.
+    from django.apps import apps
+    from django.apps.config import MODELS_MODULE_NAME
+    from django.core.exceptions import AppRegistryNotReady
+
+    def get_model(app_label, model_name):
+        """
+        Fetches a Django model using the app registry.
+        This doesn't require that an app with the given app label exists,
+        which makes it safe to call when the registry is being populated.
+        All other methods to access models might raise an exception about the
+        registry not being ready yet.
+        Raises LookupError if model isn't found.
+        """
+        try:
+            return apps.get_model(app_label, model_name)
+        except AppRegistryNotReady:
+            if apps.apps_ready and not apps.models_ready:
+                # If this function is called while `apps.populate()` is
+                # loading models, ensure that the module that defines the
+                # target model has been imported and try looking the model up
+                # in the app registry. This effectively emulates
+                # `from path.to.app.models import Model` where we use
+                # `Model = get_model('app', 'Model')` instead.
+                app_config = apps.get_app_config(app_label)
+                # `app_config.import_models()` cannot be used here because it
+                # would interfere with `apps.populate()`.
+                import_module('%s.%s' % (app_config.name, MODELS_MODULE_NAME))
+                # In order to account for case-insensitivity of model_name,
+                # look up the model through a private API of the app registry.
+                return apps.get_registered_model(app_label, model_name)
+            else:
+                # This must be a different case (e.g. the model really doesn't
+                # exist). We just re-raise the exception.
+                raise
+
+    # now get the real user model
+    user_model = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+    model_app_name, model_model = user_model.split('.')
+    user_model_object = get_model(model_app_name, model_model)
+    # and try to register, if we have a registration error - that means that
+    # it has been registered already
+    try:
+        reversion.register(user_model_object)
+    except RegistrationError:
+        pass
 
 
 @version_controlled_content
