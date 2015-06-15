@@ -6,13 +6,14 @@ from aldryn_events import __version__
 py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
 py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
 
-if not py26 and not py27:
+if not py27:
     raise ValueError(
-        "Aldryn Events currently support only python 2.6 to 2.7, "
+        "Aldryn Events currently support only python 2.7, "
         "not {0}".format(sys.version_info)
     )
 
 REQUIREMENTS = [
+    'Django<1.8,>=1.6',
     'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
@@ -24,7 +25,7 @@ REQUIREMENTS = [
     'django-parler',
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
-    'django-tablib',
+    'django-tablib>=3.0',
     'djangocms-text-ckeditor',
     'python-dateutil',
 ]
@@ -35,18 +36,10 @@ DEPENDENCY_LINKS = [
 ]
 
 if py26:
-    REQUIREMENTS += [
-        'Django<1.7,>=1.6',
-        'South<1.1,>=1.0.2'
-    ]
-    DEPENDENCY_LINKS += [
-        'https://github.com/anrie/django-tablib/archive/master.zip#egg=django-tablib-3.0.2.1'  # NOQA
-    ]
-
-if py27:
-    REQUIREMENTS += [
-        'Django<1.8,>=1.6',
-    ]
+    raise ValueError(
+        "Aldryn Events currently support only python 2.7, "
+        "not {0}".format(sys.version_info)
+    )
 
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
