@@ -36,7 +36,7 @@ HELPER_SETTINGS = {
         'aldryn_reversion',
         'reversion',
         'appconf',
-        'aldryn_bootstrap3',
+        'bootstrap3',
         'django_tablib',
         'djangocms_text_ckeditor',
         'easy_thumbnails',
