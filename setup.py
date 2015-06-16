@@ -30,12 +30,6 @@ REQUIREMENTS = [
     'python-dateutil',
 ]
 
-if py26:
-    raise ValueError(
-        "Aldryn Events currently support only python 2.7, "
-        "not {0}".format(sys.version_info)
-    )
-
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
     'Environment :: Web Environment',
