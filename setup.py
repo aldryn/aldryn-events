@@ -30,11 +30,6 @@ REQUIREMENTS = [
     'python-dateutil',
 ]
 
-
-DEPENDENCY_LINKS = [
-    'https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip#egg=aldryn-apphooks-config'  # NOQA
-]
-
 if py26:
     raise ValueError(
         "Aldryn Events currently support only python 2.7, "
@@ -66,7 +61,6 @@ setup(
     license='LICENSE.txt',
     platforms=['OS Independent'],
     install_requires=REQUIREMENTS,
-    dependency_links=DEPENDENCY_LINKS,
     classifiers=CLASSIFIERS,
     include_package_data=True,
     zip_safe=False
