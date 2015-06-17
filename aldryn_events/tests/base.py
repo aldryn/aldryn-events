@@ -48,8 +48,10 @@ class EventBaseTestCase(TransactionTestCase):
 
     def setUp(self):
         super(EventBaseTestCase, self).setUp()
+        # since aldryn_events namespace is created inside of a migration 0016
+        # use something different for test purposes
         self.app_config = EventsConfig.objects.create(
-            namespace='aldryn_events'
+            namespace='events_test_namespace'
         )
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]

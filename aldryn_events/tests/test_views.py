@@ -27,6 +27,12 @@ class TestEventViews(EventBaseTestCase):
         page.publish('en')
         page.publish('de')
         page.reload()
+        # aldryn apphook reload needs some time to reload test
+        # server implementation so we will provide some time for him
+        # otherwise test_event_detail_view is too quick, and fails.
+        with override('en'):
+            page_url = page.get_absolute_url()
+        self.client.get(page_url)
 
     def test_event_list_view(self):
         url = reverse("{0}:events_list".format(self.app_config.namespace))
