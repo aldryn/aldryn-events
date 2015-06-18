@@ -52,13 +52,11 @@ class TagsTestCase(EventBaseTestCase):
             start_date=tz_datetime(2015, 1, 25),
         )
         # make use of default tests self.app_config namespace, instead of
-        # hard coding it, and since there are "{" and "}" symbols we cannot
-        # use .format method, so instead just use plain replace.
+        # hard coding it
         template_str = """
-        {% load aldryn_events %}
-        {% calendar 2015 1 'en' '$app_config' %}
-        """.replace('$app_config', self.app_config.namespace)
-
+        {%% load aldryn_events %%}
+        {%% calendar 2015 1 'en' '%s' %%}
+        """ % self.app_config.namespace
         t = Template(template_str)
         html = t.render(SekizaiContext({}))
         table = PyQuery(html)('table.table-calendar')
