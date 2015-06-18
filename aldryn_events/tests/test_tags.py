@@ -51,10 +51,13 @@ class TagsTestCase(EventBaseTestCase):
             title='ev6',
             start_date=tz_datetime(2015, 1, 25),
         )
-        t = Template(
-            "{% load aldryn_events %}"
-            "{% calendar 2015 1 'en' 'aldryn_events' %}"
-        )
+        # make use of default tests self.app_config namespace, instead of
+        # hard coding it
+        template_str = """
+        {%% load aldryn_events %%}
+        {%% calendar 2015 1 'en' '%s' %%}
+        """ % self.app_config.namespace
+        t = Template(template_str)
         html = t.render(SekizaiContext({}))
         table = PyQuery(html)('table.table-calendar')
         links = table.find('td.events, td.multiday-events').find('a')
