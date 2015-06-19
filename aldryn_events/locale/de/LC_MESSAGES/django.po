@@ -8,37 +8,33 @@ msgstr ""
 "Project-Id-Version: 0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-06-17 15:38+0200\n"
-"PO-Revision-Date: 2014-07-29 17:46+0100\n"
+"PO-Revision-Date: 2015-06-18 21:11+0100\n"
 "Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.6.4\n"
+"X-Generator: Poedit 1.7.6\n"
+"Language-Team: \n"
 
 #: admin.py:40
 msgid "Advanced"
-msgstr ""
+msgstr "Erweitert"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:16
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:18
-#, fuzzy
-#| msgid "Previous month"
 msgid "Previous Event"
-msgstr "letzter Monat"
+msgstr "Vorherige Veranstaltung"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:20
 msgid "Back to Overview"
-msgstr ""
+msgstr "Zurück zur Übersicht"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:22
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:24
-#, fuzzy
-#| msgid "Next month"
 msgid "Next Event"
-msgstr "nächsten Monat"
+msgstr "nächste Veranstaltung"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:33
 #: boilerplates/legacy/templates/aldryn_events/includes/event_registration.html:22
@@ -46,21 +42,20 @@ msgid "Register for this event"
 msgstr "Eventanmeldung"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_detail.html:36
-#, fuzzy
-#| msgid "registration"
 msgid "More information"
-msgstr "Registration"
+msgstr "Weitere Informationen"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/events_list.html:14
 #: boilerplates/bootstrap3/templates/aldryn_events/events_list.html:29
 #: boilerplates/bootstrap3/templates/aldryn_events/plugins/list/standard/list.html:10
 #: boilerplates/bootstrap3/templates/aldryn_events/plugins/upcoming/standard/upcoming.html:10
 msgid "No items available"
-msgstr ""
+msgstr "Keine vorhandenen Artikel"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:7
 msgid "There was a problem accessing the calendar, please try again."
 msgstr ""
+"Es gab ein Problem beim Zugriff auf den Kalender, versuchen Sie es erneut."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:11
 #: boilerplates/legacy/templates/aldryn_events/includes/calendar.html:34
@@ -69,7 +64,7 @@ msgstr "letzter Monat"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:12
 msgid "Today"
-msgstr ""
+msgstr "Heute"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:13
 #: boilerplates/legacy/templates/aldryn_events/includes/calendar.html:35
@@ -78,43 +73,39 @@ msgstr "nächsten Monat"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:10
 msgid "Mo"
-msgstr ""
+msgstr "Mont."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:11
 msgid "Tu"
-msgstr ""
+msgstr "Dien."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:12
 msgid "We"
-msgstr ""
+msgstr "Mitt."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:13
 msgid "Th"
-msgstr ""
+msgstr "Donnerst."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:14
-#, fuzzy
-#| msgid "Frau"
 msgid "Fr"
-msgstr "Frau"
+msgstr "Freit."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:15
 msgid "Sa"
-msgstr ""
+msgstr "Samst."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar_table.html:16
 msgid "Su"
-msgstr ""
+msgstr "Sonnt."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/event.html:42
 msgid "Create Calendar Event"
-msgstr ""
+msgstr "Kalender von Veranstaltungen erstellen"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/event.html:46
-#, fuzzy
-#| msgid "Calendar"
 msgid "Add to Calendar"
-msgstr "Kalender"
+msgstr "Zum Kalender hinzufügen"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/event.html:49
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/event.html:52
@@ -127,15 +118,13 @@ msgstr "um"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/pagination.html:6
 #: boilerplates/legacy/templates/aldryn_events/includes/pagination.html:4
-#, fuzzy
-#| msgid "Previous month"
 msgid "Previous"
-msgstr "letzter Monat"
+msgstr "vorherig"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/pagination.html:28
 #: boilerplates/legacy/templates/aldryn_events/includes/pagination.html:20
 msgid "Next"
-msgstr ""
+msgstr "Nächst"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/registration.html:8
 #: boilerplates/legacy/templates/aldryn_events/includes/event_registration.html:6
@@ -157,7 +146,7 @@ msgstr "Ihre Registration zurücksetzen"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/registration.html:39
 msgid "Submit"
-msgstr ""
+msgstr "Vorlegen"
 
 #: boilerplates/legacy/templates/aldryn_events/events_detail.html:9
 #: boilerplates/legacy/templates/aldryn_events/includes/event_item.html:7
@@ -174,9 +163,8 @@ msgid "Back"
 msgstr "Zurück"
 
 #: boilerplates/legacy/templates/aldryn_events/events_list.html:6
-#, fuzzy
 msgid "Ongoing events"
-msgstr "Keine Events in der Zukunft."
+msgstr "Laufende Veranstaltungen"
 
 #: boilerplates/legacy/templates/aldryn_events/events_list.html:9
 #: cms_app.py:15 cms_plugins.py:23 cms_plugins.py:54 cms_plugins.py:88
@@ -189,30 +177,27 @@ msgstr "Events"
 #: boilerplates/legacy/templates/aldryn_events/includes/ongoing_event_items.html:6
 #: boilerplates/legacy/templates/aldryn_events/plugins/list/standard/list.html:10
 msgid "No events found."
-msgstr ""
+msgstr "Keine  gefundenen Veranstaltungen"
 
 #: boilerplates/legacy/templates/aldryn_events/includes/event_registration.html:4
 msgid "Registration"
 msgstr "Registration"
 
 #: boilerplates/legacy/templates/aldryn_events/plugins/upcoming/standard/upcoming.html:7
-#, fuzzy
 msgid "Past events"
-msgstr "neueste Einträge"
+msgstr "Vergangene Veranstaltungen"
 
 #: boilerplates/legacy/templates/aldryn_events/plugins/upcoming/standard/upcoming.html:7
-#, fuzzy
 msgid "Upcoming events"
-msgstr "Keine Events in der Zukunft."
+msgstr "Bevorstehende Veranstaltungen"
 
 #: boilerplates/legacy/templates/aldryn_events/plugins/upcoming/standard/upcoming.html:15
 msgid "No upcoming events."
 msgstr "Keine Events in der Zukunft."
 
 #: cms_plugins.py:22
-#, fuzzy
 msgid "Upcoming or Past Events"
-msgstr "Keine Events in der Zukunft."
+msgstr "Bevorstehende oder vergangene Veranstaltungen"
 
 #: cms_plugins.py:55
 msgid "List"
@@ -253,11 +238,15 @@ msgid ""
 "objects from the normal list. If you are using the default template it's "
 "rendered as 'Current events'. Note: ongoing objects are not paginated."
 msgstr ""
+"Wenn es markiert wird, denn wird es ein aktueller_Artikel dem Kontext "
+"hinzufügen und solche diese Objekte aus der normalen Liste  ausschließen. "
+"Wenn Sie beim Verwenden der Standardvorlage sind, denn wird es als "
+"\"Aktuelle Ereignisse\" wiedergegeben. Hinweise: laufenden Objekte werden "
+"nicht paginiert."
 
 #: models.py:33
-#, fuzzy
 msgid "application title"
-msgstr "Ort Latitude"
+msgstr "Anwendungstitel"
 
 #: models.py:39
 msgid "start date"
@@ -297,7 +286,7 @@ msgstr "Externer link"
 
 #: models.py:55
 msgid "external link to details about this event"
-msgstr ""
+msgstr "externer Link, um Details zu dieser Veranstaltung zu erreichen"
 
 #: models.py:58
 msgid "registration link"
@@ -305,16 +294,15 @@ msgstr "Registrationslink"
 
 #: models.py:59
 msgid "link to an external registration system"
-msgstr ""
+msgstr "Link zu einem externen Registrierungssystem"
 
 #: models.py:62
 msgid "enable event registration"
 msgstr "Registration erlauben"
 
 #: models.py:65
-#, fuzzy
 msgid "allow registration until"
-msgstr "Registration erlauben bis"
+msgstr "erlauben Anmeldung bis zum"
 
 #: models.py:68
 msgid "event coordinators"
@@ -358,7 +346,7 @@ msgstr "Bild"
 
 #: models.py:99 models.py:318
 msgid "app_config"
-msgstr ""
+msgstr "App-Konfiguration"
 
 #: models.py:104
 msgid "Event"
@@ -417,7 +405,6 @@ msgid "First name"
 msgstr "Vorname"
 
 #: models.py:296
-#, fuzzy
 msgid "Last name"
 msgstr "Nachname"
 
@@ -455,17 +442,15 @@ msgstr "Standart"
 
 #: models.py:332
 msgid "future events"
-msgstr ""
+msgstr "künftige Veranstaltungen"
 
 #: models.py:333
-#, fuzzy
 msgid "past events"
-msgstr "neueste Einträge"
+msgstr "Vergangene Veranstaltungen"
 
 #: models.py:340
-#, fuzzy
 msgid "selection"
-msgstr "manuelle Auswahl"
+msgstr "Auswahl"
 
 #: models.py:345 models.py:368
 msgid "Style"
