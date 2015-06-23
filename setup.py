@@ -18,6 +18,7 @@ REQUIREMENTS = [
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
     'aldryn-translation-tools',
+    'aldryn-reversion>=0.0.2',
     'django-appconf',
     'django-bootstrap3',
     'django-extended-choices',

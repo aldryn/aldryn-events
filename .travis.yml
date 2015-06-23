@@ -4,8 +4,16 @@ python:
 
 sudo: false
 env:
-  - TOX_ENV=py27-django16
-  - TOX_ENV=py27-django17
+# commenting this out to save time because we know it would fail until python 2.6
+# support won't be restored.
+#  - TOX_ENV=py26-dj16-cms30
+#  - TOX_ENV=py26-dj16-cms31
+#  - TOX_ENV=py26-dj17-cms30
+#  - TOX_ENV=py26-dj17-cms31
+  - TOX_ENV=py27-dj16-cms30
+  - TOX_ENV=py27-dj16-cms31
+  - TOX_ENV=py27-dj17-cms30
+  - TOX_ENV=py27-dj17-cms31
   - TOX_ENV=pep8
 
 matrix:
