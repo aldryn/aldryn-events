@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
@@ -29,6 +30,22 @@ class UpcomingPlugin(CMSPluginBase):
         language = get_language_from_request(context['request'],
                                              check_path=True)
         namespace = instance.app_config_id and instance.app_config.namespace
+        self.render_template = (
+            'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
+        )
+        context['instance'] = instance
+        # check if we can reverse list view for configured namespace
+        # if no prepare a message to admin users.
+        try:
+            reverse('{0}:events_list'.format(namespace))
+        except (NoReverseMatch, AttributeError):
+            context['plugin_configuration_error'] = _(
+                'There is an error in plugin configuration: selected Evevnts '
+                'config is not available. Please switch to edit mode and '
+                'change plugin app_config settings to use valid config. '
+                'Also note that aldryn-events should be used at least once '
+                'as an apphook for that config.')
+            return context
 
         events = (Event.objects.namespace(namespace)
                                .active_translations(language)
@@ -40,10 +57,6 @@ class UpcomingPlugin(CMSPluginBase):
             events = events.upcoming(count=instance.latest_entries)
 
         context['events'] = events
-        context['instance'] = instance
-        self.render_template = (
-            'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
-        )
         return context
 
 plugin_pool.register_plugin(UpcomingPlugin)
@@ -63,8 +76,21 @@ class EventListCMSPlugin(CMSPluginBase):
             instance.language or
             get_language_from_request(context['request'], check_path=True)
         )
+        context['instance'] = instance
 
         namespace = instance.app_config_id and instance.app_config.namespace
+        # check if we can reverse list view for configured namespace
+        # if no prepare a message to admin users.
+        try:
+            reverse('{0}:events_list'.format(namespace))
+        except (NoReverseMatch, AttributeError):
+            context['plugin_configuration_error'] = _(
+                'There is an error in plugin configuration: selected Evevnts '
+                'config is not available. Please switch to edit mode and '
+                'change plugin app_config settings to use valid config. '
+                'Also note that aldryn-events should be used at least once '
+                'as an apphook for that config.')
+            return context
         # With Django 1.5 and because a bug in SortedManyToManyField
         # we can not use instance.events or we get a error like:
         # DatabaseError:
@@ -74,9 +100,7 @@ class EventListCMSPlugin(CMSPluginBase):
                                .language(language)
                                .filter(eventlistplugin__pk=instance.pk))
 
-        context['instance'] = instance
         context['events'] = events
-
         return context
 
 plugin_pool.register_plugin(EventListCMSPlugin)
