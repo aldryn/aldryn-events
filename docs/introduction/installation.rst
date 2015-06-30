@@ -23,7 +23,6 @@ In your project's ``settings.py`` make sure you have all of::
     'easy_thumbnails',
     'extended_choices',
     'filer',
-    'mptt',
     'parler',
     'sortedm2m',
     'standard_form',
