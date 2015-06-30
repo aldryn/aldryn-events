@@ -8,7 +8,7 @@ py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
 
 if not py27:
     raise ValueError(
-        "Aldryn Events currently support only python 2.7, "
+        "Aldryn Events currently support only python 2.7 at this time, "
         "not {0}".format(sys.version_info)
     )
 
@@ -31,14 +31,18 @@ REQUIREMENTS = [
     'python-dateutil',
 ]
 
+# https://pypi.python.org/pypi?%3Aaction=list_classifiers
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
     'Environment :: Web Environment',
     'Framework :: Django',
+    'Framework :: Django :: 1.6',
+    'Framework :: Django :: 1.7',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.7',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
