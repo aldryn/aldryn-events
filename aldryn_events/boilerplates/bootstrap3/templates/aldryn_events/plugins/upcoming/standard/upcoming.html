@@ -3,12 +3,18 @@
 
 {% block plugin %}
 <div class="aldryn aldryn-events aldryn-events-upcoming">
-    <ul class="list-unstyled">
-        {% for event in events %}
-            <li><a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start|date }}</span></li>
-        {% empty %}
-            <li class="well">{% trans "No items available" %}</li>
-        {% endfor %}
-    </ul>
+    {% if plugin_configuration_error %}
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <p class="config-errors">{{ plugin_configuration_error }}</p>
+        {% endif %}
+    {% else %}
+        <ul class="list-unstyled">
+            {% for event in events %}
+                <li><a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start|date }}</span></li>
+            {% empty %}
+                <li class="well">{% trans "No items available" %}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock plugin %}

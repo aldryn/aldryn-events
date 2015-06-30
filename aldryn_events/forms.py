@@ -2,6 +2,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.forms import DateTimeField, TimeField, DateField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -11,6 +12,7 @@ from django.template.loader import select_template
 from aldryn_apphooks_config.utils import setup_config
 from app_data import AppDataForm
 from parler.forms import TranslatableModelForm
+from cms.models import Page
 
 from .models import Registration, UpcomingPluginItem, Event, EventsConfig
 from .utils import (
@@ -37,6 +39,7 @@ class EventAdminForm(TranslatableModelForm):
                 self.fields[key].help_text = (
                     help_text % ({'format_list': format_list})
                 )
+        # FIXME: add a notification if user selects not apphooked Events config
         if 'app_config' in self.fields:
             # if has only one choice, select it by default
             if self.fields['app_config'].queryset.count() == 1:
@@ -114,6 +117,37 @@ class EventRegistrationForm(forms.ModelForm):
 
 class UpcomingPluginForm(forms.ModelForm):
     model = UpcomingPluginItem
+
+    def __init__(self, *args, **kwargs):
+        super(UpcomingPluginForm, self).__init__(*args, **kwargs)
+        # get available event configs, that have the same namespace
+        # as pages with namespaces. that will ensure that user wont
+        # select config that is not app hooked because that
+        # will lead to a 500 error until that config wont be used.
+        available_configs = EventsConfig.objects.filter(
+            namespace__in=Page.objects.exclude(
+                application_namespace__isnull=True).values_list(
+                'application_namespace', flat=True))
+        self.fields['app_config'].queryset = available_configs
+
+    def clean(self):
+        # since namespace is not a unique thing we need to validate it
+        # additionally because it is possible that there is a page with same
+        # namespace as a jobs config but which is using other app_config,
+        # which also would lead to same 500 error. The easiest way is to try
+        # to reverse, in case of success that would mean that the app_config
+        # is correct and can be used.
+        data = super(UpcomingPluginForm, self).clean()
+        try:
+            reverse('{0}:events_list'.format(
+                data['app_config'].namespace))
+        except NoReverseMatch:
+            raise ValidationError(
+                _('Seems that selected Job config is not plugged to any page, '
+                  'or maybe that page is not published.'
+                  'Please select Job config that is being used.'),
+                code='invalid')
+        return data
 
     def clean_style(self):
         style = self.cleaned_data.get('style')

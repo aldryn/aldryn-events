@@ -9,7 +9,7 @@
     <h3>{{ calendar_tag.label }}</h3>
     <p class="controls clearfix">
         <a href="#" class="pull-left js-trigger" data-direction="previous">{% trans "Previous month" %}</a>
-        <a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Today" %}</a>
+        <a href="{% namespace_url 'events_list' namespace=calendar_tag.namespace %}">{% trans "Today" %}</a>
         <a href="#" class="pull-right js-trigger" data-direction="next">{% trans "Next month" %}</a>
     </p>
     {% include "aldryn_events/includes/calendar_table.html" %}
