@@ -1,5 +1,11 @@
 |PyPI Version| |Build Status| |Coverage Status|
 
+
+NOTE: ::
+
+    This repository is undergoing a lot of changes at this time, clone/install
+    at your own risk at this time =)
+
 =============
 Aldryn-Events
 =============
