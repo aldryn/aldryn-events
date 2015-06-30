@@ -32,8 +32,8 @@ Aldryn Platform Users
 
 4) Redeploy the site.
 
-Manuall Installation
---------------------
+Manual Installation
+~~~~~~~~~~~~~~~~~~~
 
 1) Run `pip install aldryn-events`. Following packages will be installed: ::
 
