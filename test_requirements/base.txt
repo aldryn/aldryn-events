@@ -1,4 +1,4 @@
-https://github.com/aldryn/aldryn-apphook-reload/archive/develop.zip
+aldryn-apphook-reload>=0.2.1
 coverage
 djangocms-helper
 importlib
