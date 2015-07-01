@@ -21,11 +21,23 @@ env:
 #   allow_failures:
 #     - env: TOX_ENV=pep8
 
+before_install:
+  - npm install -g npm
+
 install:
   - pip install tox coveralls
 
+before_script:
+  - npm install -g gulp
+  - npm install -g codeclimate-test-reporter
+  - npm install
+
+after_script:
+  - codeclimate < tests/coverage/**/lcov.info
+
 script:
   - tox -e $TOX_ENV
+  - gulp tests
 
 after_success:
   - coveralls
