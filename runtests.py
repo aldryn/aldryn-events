@@ -8,7 +8,9 @@ import django
 _args = list(sys.argv)
 _args.pop(_args.index('runtests.py'))
 
-cmd = 'coverage run `which djangocms-helper` aldryn_events test --cms --extra-settings=test_settings %s'
+cmd = (
+    'coverage run `which djangocms-helper` aldryn_events test --cms '
+    '--extra-settings=test_settings %s')
 cmd = cmd % ' '.join(_args)
 
 if django.VERSION[:2] < (1, 6):

@@ -5,13 +5,8 @@ import sys
 from django import get_version
 
 
-class DisableMigrations(dict):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
+def noop_gettext(s):
+    return s
 
 
 class DisableMigrations(dict):
@@ -22,7 +17,16 @@ class DisableMigrations(dict):
     def __getitem__(self, item):
         return "notmigrations"
 
-gettext = lambda s: s
+
+class DisableMigrations(dict):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
+
+gettext = noop_gettext
 
 HELPER_SETTINGS = {
     # 'ROOT_URLCONF': 'aldryn_events.tests.urls',
@@ -96,8 +100,10 @@ HELPER_SETTINGS = {
     # },
     # Disable migrations so tests runs really faster
     # Source: https://gist.github.com/c-rhodes/cebe9d4619125949dff8
-    'MIGRATION_MODULES': DisableMigrations(),  # disable migration for DJ 1.7 in tests
-    'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
+    # disable migration for DJ 1.7 in tests
+    'MIGRATION_MODULES': DisableMigrations(),
+    # disable migration for DJ < 1.6 in tests
+    'SOUTH_TESTS_MIGRATE': False,
     'DEBUG': False,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
@@ -125,7 +131,8 @@ HELPER_SETTINGS = {
     'ALDRYN_BOILERPLATE_NAME': 'legacy',
     'STATICFILES_FINDERS': [
         'django.contrib.staticfiles.finders.FileSystemFinder',
-        # important! place right before django.contrib.staticfiles.finders.AppDirectoriesFinder
+        # important! place right before
+        # django.contrib.staticfiles.finders.AppDirectoriesFinder
         'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ],
@@ -145,7 +152,8 @@ HELPER_SETTINGS = {
     ),
     'TEMPLATE_LOADERS': (
         'django.template.loaders.filesystem.Loader',
-        # important! place right before django.template.loaders.app_directories.Loader
+        # important! place right before
+        # django.template.loaders.app_directories.Loader
         'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
         'django.template.loaders.app_directories.Loader',
         'django.template.loaders.eggs.Loader'
