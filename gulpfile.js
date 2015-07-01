@@ -11,6 +11,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var karma = require('karma').server;
 var protractor = require('gulp-protractor').protractor;
+var jshint = require('gulp-jshint');
+var jscs = require('gulp-jscs');
 // Download and update the selenium driver
 var webdriverUpdate = require('gulp-protractor').webdriver_update;
 
@@ -18,12 +20,36 @@ var webdriverUpdate = require('gulp-protractor').webdriver_update;
 // #SETTINGS#
 var PROJECT_ROOT = '.';
 var PROJECT_PATH = {
+    'js': PROJECT_ROOT + '/aldryn_events/boilerplates/bootstrap3/static/js/',
     'tests': PROJECT_ROOT + '/tests'
 };
 
+var PROJECT_PATTERNS = {
+    'jslint': [
+        PROJECT_PATH.js + '/addons/*.js',
+        PROJECT_ROOT + '/tests/*.js',
+        PROJECT_ROOT + '/tests/unit/*.js',
+        PROJECT_ROOT + '/tests/integration/*.js',
+        PROJECT_ROOT + '/gulpfile.js'
+    ]
+};
+
+// #####################################################################################################################
+// #LINTING#
+gulp.task('jslint', function () {
+    gulp.src(PROJECT_PATTERNS.jslint)
+        .pipe(jshint())
+        .pipe(jscs())
+        .on('error', function (error) {
+            gutil.log('\n' + error.message);
+        })
+        .pipe(jshint.reporter('jshint-stylish'));
+});
+
 // #########################################################
 // #TESTS#
-gulp.task('tests', ['tests:unit', 'tests:integration']);
+gulp.task('tests', ['tests:unit', 'tests:integration', 'tests:lint']);
+gulp.task('tests:lint', ['jslint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
     karma.start({
@@ -53,4 +79,4 @@ gulp.task('karma', function () {
 
 // #####################################################################################################################
 // #COMMANDS#
-gulp.task('default', ['tests']);
+gulp.task('default', ['jslint']);

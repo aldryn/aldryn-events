@@ -6,9 +6,12 @@
     },
     "devDependencies": {
         "gulp": "3.9.0",
+        "gulp-jscs": "1.6.0",
+        "gulp-jshint": "1.11.0",
         "gulp-protractor": "1.0.0",
         "gulp-util": "3.0.6",
         "jasmine-core": "2.3.4",
+        "jshint-stylish": "2.0.0",
         "karma": "0.12.37",
         "karma-coverage": "0.4.2",
         "karma-fixture": "0.2.5",
