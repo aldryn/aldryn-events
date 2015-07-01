@@ -6,11 +6,8 @@ from datetime import datetime, timedelta
 from django.db import transaction
 
 from cms import api
-from cms.utils.i18n import force_language
 from aldryn_events.models import Event
 from aldryn_reversion.core import create_revision_with_placeholders
-
-from aldryn_events.models import Event, EventsConfig
 
 from parler.utils.context import switch_language
 
@@ -44,9 +41,11 @@ class ReversionTestCase(EventBaseTestCase):
                 for property, value in six.iteritems(kwargs):
                     setattr(obj, property, value)
                 if content:
-                    # get correct plugin for language. do not update the same one.
+                    # get correct plugin for language. do not update the same
+                    # one.
                     language = obj.get_current_language()
-                    plugins = obj.description.get_plugins().filter(language=language)
+                    plugins = obj.description.get_plugins().filter(
+                        language=language)
                     plugin = plugins[0].get_plugin_instance()[0]
                     plugin.body = content
                     plugin.save()
@@ -58,28 +57,31 @@ class ReversionTestCase(EventBaseTestCase):
         """
         # get by position, since reversion_id is not reliable,
         version = list(reversed(
-            reversion.get_for_object(object_with_revision)))[revision_number - 1]
+            reversion.get_for_object(
+                object_with_revision)))[revision_number - 1]
         version.revision.revert()
 
     def create_default_event(self, translated=False):
 
         event = Event.objects.create(**self.default_en)
         with switch_language(event, 'en'):
-            api.add_plugin(event.description, 'TextPlugin', 'en', body=self.default_content['en'])
+            api.add_plugin(event.description, 'TextPlugin', 'en',
+                body=self.default_content['en'])
 
         # check if we need a translated event
         if translated:
             event.create_translation('de', **self.default_de)
             with switch_language(event, 'de'):
-                api.add_plugin(event.description, 'TextPlugin', 'de', body=self.default_content['de'])
+                api.add_plugin(event.description, 'TextPlugin', 'de',
+                    body=self.default_content['de'])
 
         return Event.objects.language('en').get(pk=event.pk)
 
     def make_new_values(self, values_dict, replace_with):
         """
-        Replace formating symbol {0} with replace_with param.
-        modifies dates by + timedelta(days=int(replace_with))
-        Returns new dictionnary with same keys and replaced symbols.
+        Replace formating symbol {0} with replace_with param. modifies dates by
+        + timedelta(days=int(replace_with)) Returns new dictionnary with same
+        keys and replaced symbols.
         """
         new_dict = {}
         for key, value in values_dict.items():
@@ -147,7 +149,6 @@ class ReversionTestCase(EventBaseTestCase):
         # test that there is no default content
         self.assertNotContains(response, self.default_content['en'])
         self.assertNotContains(response, self.default_en['title'])
-
 
         # test that there is no revision 2 content
         self.assertNotContains(response, revision_2_values['title'])

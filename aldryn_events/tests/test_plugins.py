@@ -120,12 +120,8 @@ class EventPluginsTestCase(EventBaseTestCase):
         )
         api.create_title('de', 'Home de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'UpcomingPlugin', 'en', app_config=self.app_config
-        )
-        plugin_de = api.add_plugin(
-            ph, 'UpcomingPlugin', 'de', app_config=self.app_config
-        )
+        api.add_plugin(ph, 'UpcomingPlugin', 'en', app_config=self.app_config)
+        api.add_plugin(ph, 'UpcomingPlugin', 'de', app_config=self.app_config)
         page.publish('en')
         page.publish('de')
 
@@ -182,24 +178,19 @@ class EventPluginsTestCase(EventBaseTestCase):
             'event-6-de', rendered,
             'URL "event-6-de" found in rendered plugin, but limit '
             'is 5 entries.'
-
         )
+
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_with_not_existing_ns(self, timezone_mock):
         timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-        apphooked_page = self.create_base_pages()
+        self.create_base_pages()
         new_config = EventsConfig.objects.create(namespace='new_namespace')
-        page = api.create_page(
-            'Plugin test en', self.template, 'en', published=True, slug='plugin-test-en',
-        )
+        page = api.create_page('Plugin test en', self.template, 'en',
+            published=True, slug='plugin-test-en')
         api.create_title('de', 'Plugin test de', page)
         ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'UpcomingPlugin', 'en', app_config=new_config
-        )
-        plugin_de = api.add_plugin(
-            ph, 'UpcomingPlugin', 'de', app_config=new_config
-        )
+        api.add_plugin(ph, 'UpcomingPlugin', 'en', app_config=new_config)
+        api.add_plugin(ph, 'UpcomingPlugin', 'de', app_config=new_config)
         page.publish('en')
         page.publish('de')
 

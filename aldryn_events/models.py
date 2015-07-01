@@ -209,7 +209,7 @@ class Event(TranslationHelperMixin, TranslatableModel):
 
                 # check time validity
                 if (self.end_time < self.start_time or
-                    self.start_time == self.end_time):
+                        self.start_time == self.end_time):
                     raise ValidationError(
                         _('For same start and end dates start time '
                           'should be before end time.'))
@@ -306,6 +306,7 @@ def set_event_slug(instance, **kwargs):
         )
 
 post_save.connect(set_event_slug, sender=Event)
+
 
 @version_controlled_content(follow=['user'])
 class EventCoordinator(models.Model):

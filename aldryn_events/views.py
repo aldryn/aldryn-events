@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 from dateutil.relativedelta import relativedelta
 
-from functools import update_wrapper
-
 from django import forms
 from django.db.models.query import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.utils import timezone
-from django.utils.decorators import classonlymethod
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
