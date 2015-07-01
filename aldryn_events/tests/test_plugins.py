@@ -186,7 +186,7 @@ class EventPluginsTestCase(EventBaseTestCase):
         self.create_base_pages()
         new_config = EventsConfig.objects.create(namespace='new_namespace')
         page = api.create_page('Plugin test en', self.template, 'en',
-            published=True, slug='plugin-test-en')
+                               published=True, slug='plugin-test-en')
         api.create_title('de', 'Plugin test de', page)
         ph = page.placeholders.get(slot='content')
         api.add_plugin(ph, 'UpcomingPlugin', 'en', app_config=new_config)
