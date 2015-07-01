@@ -16,9 +16,10 @@ env:
   - TOX_ENV=py27-dj17-cms31
   - TOX_ENV=pep8
 
-matrix:
-  allow_failures:
-    - env: TOX_ENV=pep8
+# PEP8 is mandatory
+# matrix:
+#   allow_failures:
+#     - env: TOX_ENV=pep8
 
 install:
   - pip install tox coveralls
