@@ -1,5 +1,11 @@
 |PyPI Version| |Build Status| |Coverage Status|
 
+
+NOTE: ::
+
+    This repository is undergoing a lot of changes at this time, clone/install
+    at your own risk at this time =)
+
 =============
 Aldryn-Events
 =============
@@ -18,7 +24,7 @@ Installation & Usage
 Django CMS Requirements
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This project requires Django CMS 3.0.12
+This project requires Django CMS 3.0.12 or later.
 
 
 Aldryn Platform Users
@@ -32,8 +38,8 @@ Aldryn Platform Users
 
 4) Redeploy the site.
 
-Manuall Installation
---------------------
+Manual Installation
+~~~~~~~~~~~~~~~~~~~
 
 1) Run `pip install aldryn-events`. Following packages will be installed: ::
 
@@ -77,13 +83,15 @@ Django 1.6, South will be installed: ::
         …
     ]
 
-If you are using Python 2.6, add ``south`` to installed apps.
+If you are using Django 1.6, add ``south`` to installed apps.
 
-3) Configure ``aldryn-boilerplates`` (https://pypi.python.org/pypi/aldryn-boilerplates/).
+3) Configure ``aldryn-boilerplates`` (https://pypi.python.org/pypi/aldryn-
+   boilerplates/).
 
-   To use the old templates, set ``ALDRYN_BOILERPLATE_NAME='legacy'``.
-   To use https://github.com/aldryn/aldryn-boilerplate-standard (recommended, will be renamed to
-   ``aldryn-boilerplate-bootstrap3``) set ``ALDRYN_BOILERPLATE_NAME='bootstrap3'``.
+   To use the old templates, set ``ALDRYN_BOILERPLATE_NAME='legacy'``. To use
+   https://github.com/aldryn/aldryn-boilerplate-standard (recommended, will be
+   renamed to ``aldryn-boilerplate-bootstrap3``) set
+   ``ALDRYN_BOILERPLATE_NAME='bootstrap3'``.
 
 4) Run migrations: ``python manage.py migrate aldryn_events``.
 
@@ -115,16 +123,17 @@ If you are using Python 2.6, add ``south`` to installed apps.
         # 'entercoms.apps.strategies.processors.reflect',
     )
 
-   For more information on this optional processor, see the `documentation for Django Filer`__.
+   For more information on this optional processor, see the
+   `documentation for Django Filer`__.
 
 __ http://django-filer.readthedocs.org/en/latest/installation.html#subject-location-aware-cropping
 
 6) (Re-)Start your application server.
 
 
-=============
+=====
 Notes
-=============
+=====
 
 Python 2.6 and django-tablib
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +142,6 @@ Aldryn Events supports Python 2.6 and Python 2.7 as expected, but there is `a
 bug in django-tablib with Python 2.6 that avoid to use last version of
 django-tablib`__, so we need to use a `patched version`__. setup.py installs
 that version for Python 2.6.
-
 
 
 Known Issues
