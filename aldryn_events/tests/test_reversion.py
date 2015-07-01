@@ -66,14 +66,14 @@ class ReversionTestCase(EventBaseTestCase):
         event = Event.objects.create(**self.default_en)
         with switch_language(event, 'en'):
             api.add_plugin(event.description, 'TextPlugin', 'en',
-                body=self.default_content['en'])
+                           body=self.default_content['en'])
 
         # check if we need a translated event
         if translated:
             event.create_translation('de', **self.default_de)
             with switch_language(event, 'de'):
                 api.add_plugin(event.description, 'TextPlugin', 'de',
-                    body=self.default_content['de'])
+                               body=self.default_content['de'])
 
         return Event.objects.language('en').get(pk=event.pk)
 
@@ -187,11 +187,13 @@ class ReversionTestCase(EventBaseTestCase):
         revision_1_values_en = self.make_new_values(values_raw_en, 1)
         revision_1_values_de = self.make_new_values(values_raw_de, 1)
         event.set_current_language('en')
-        self.create_revision(event, content=content1_en, **revision_1_values_en)
+        self.create_revision(event, content=content1_en,
+                             **revision_1_values_en)
         # revision 2 de
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
-        self.create_revision(event, content=content1_de, **revision_1_values_de)
+        self.create_revision(event, content=content1_de,
+                             **revision_1_values_de)
 
         # test latest revision with respect to languages
         with switch_language(event, 'en'):
@@ -199,7 +201,8 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_1_url_en)
 
             self.assertContains(response, revision_1_values_en['title'])
-            self.assertContains(response, revision_1_values_en['short_description'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
             self.assertNotEqual(revision_1_url_en, default_event_url_en)
             self.assertNotEqual(revision_1_url_en, default_event_url_de)
 
@@ -208,7 +211,8 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_1_url_de)
 
             self.assertContains(response, revision_1_values_de['title'])
-            self.assertContains(response, revision_1_values_de['short_description'])
+            self.assertContains(response,
+                                revision_1_values_de['short_description'])
             # test against the default urls
             self.assertNotEqual(revision_1_url_de, default_event_url_en)
             self.assertNotEqual(revision_1_url_de, default_event_url_de)
@@ -219,7 +223,8 @@ class ReversionTestCase(EventBaseTestCase):
         revision_2_values_de = self.make_new_values(values_raw_de, 2)
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
-        self.create_revision(event, content=content2_de, **revision_2_values_de)
+        self.create_revision(event, content=content2_de,
+                             **revision_2_values_de)
 
         event = Event.objects.get(pk=event.pk)
         # test latest (rev 2a atm) revision with respect to languages
@@ -228,10 +233,12 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2_url_en)
 
             self.assertContains(response, revision_1_values_en['title'])
-            self.assertContains(response, revision_1_values_en['short_description'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
             self.assertContains(response, content1_en)
 
-            # test that en version in last revision doesn't contains german content (placeholder)
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
             self.assertNotContains(response, content1_de)
             self.assertNotContains(response, content2_de)
 
@@ -247,17 +254,21 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2_url_de)
 
             self.assertContains(response, revision_2_values_de['title'])
-            self.assertContains(response, revision_2_values_de['short_description'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
             self.assertContains(response, content2_de)
-            # test that other translation content is not being served
-            # using revision_1_values_en since it is the only existing English values so far
+            # test that other translation content is not being served using
+            # revision_1_values_en since it is the only existing English values
+            # so far
             self.assertNotContains(response, revision_1_values_en['title'])
-            self.assertNotContains(response, revision_1_values_en['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
             self.assertNotContains(response, content1_en)
 
             # test that it doesnt contains previous revision data
             self.assertNotContains(response, revision_1_values_de['title'])
-            self.assertNotContains(response, revision_1_values_de['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
             self.assertNotContains(response, content1_de)
 
             # test against the default urls
@@ -272,7 +283,8 @@ class ReversionTestCase(EventBaseTestCase):
         revision_2_values_en = self.make_new_values(values_raw_en, 2)
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('en')
-        self.create_revision(event, content=content2_en, **revision_2_values_en)
+        self.create_revision(event, content=content2_en,
+                             **revision_2_values_en)
 
         event = Event.objects.get(pk=event.pk)
         # test latest (rev 2b atm) revision with respect to languages
@@ -281,13 +293,15 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2b_url_en)
             # test latest rev content
             self.assertContains(response, revision_2_values_en['title'])
-            self.assertContains(response, revision_2_values_en['short_description'])
+            self.assertContains(response,
+                                revision_2_values_en['short_description'])
             self.assertContains(response, content2_en)
 
             # test that there is no prev version content
             self.assertNotContains(response, content1_en)
 
-            # test that en version in last revision doesn't contains german content (placeholder)
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
             self.assertNotContains(response, content1_de)
             self.assertNotContains(response, content2_de)
 
@@ -307,21 +321,25 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2b_url_de)
 
             self.assertContains(response, revision_2_values_de['title'])
-            self.assertContains(response, revision_2_values_de['short_description'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
             self.assertContains(response, content2_de)
             # test that other translation content is not being served
             # previous en revision
             self.assertNotContains(response, revision_1_values_en['title'])
-            self.assertNotContains(response, revision_1_values_en['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
             self.assertNotContains(response, content1_en)
             # latest en revision
             self.assertNotContains(response, revision_2_values_en['title'])
-            self.assertNotContains(response, revision_2_values_en['short_description'])
+            self.assertNotContains(response,
+                                   revision_2_values_en['short_description'])
             self.assertNotContains(response, content2_en)
 
             # test that it doesnt contains previous revision data
             self.assertNotContains(response, revision_1_values_de['title'])
-            self.assertNotContains(response, revision_1_values_de['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
             self.assertNotContains(response, content1_de)
 
             # test against the default urls
@@ -348,9 +366,12 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_1_reverted_url_en)
 
             self.assertContains(response, revision_1_values_en['title'])
-            self.assertContains(response, revision_1_values_en['short_description'])
-            self.assertNotEqual(revision_1_reverted_url_en, default_event_url_en)
-            self.assertNotEqual(revision_1_reverted_url_en, default_event_url_de)
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
+            self.assertNotEqual(revision_1_reverted_url_en,
+                                default_event_url_en)
+            self.assertNotEqual(revision_1_reverted_url_en,
+                                default_event_url_de)
 
             # test that it is the same.
             self.assertEqual(revision_1_reverted_url_en, revision_1_url_en)
@@ -360,10 +381,13 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_1_reverted_url_de)
 
             self.assertContains(response, revision_1_values_de['title'])
-            self.assertContains(response, revision_1_values_de['short_description'])
+            self.assertContains(response,
+                                revision_1_values_de['short_description'])
             # test against the default urls
-            self.assertNotEqual(revision_1_reverted_url_de, default_event_url_en)
-            self.assertNotEqual(revision_1_reverted_url_de, default_event_url_de)
+            self.assertNotEqual(revision_1_reverted_url_de,
+                                default_event_url_en)
+            self.assertNotEqual(revision_1_reverted_url_de,
+                                default_event_url_de)
             # test against the other translation
             self.assertNotEqual(revision_1_reverted_url_de, revision_1_url_en)
             self.assertEqual(revision_1_reverted_url_de, revision_1_url_de)
@@ -377,16 +401,20 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2_reversed_url_en)
 
             self.assertContains(response, revision_1_values_en['title'])
-            self.assertContains(response, revision_1_values_en['short_description'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
             self.assertContains(response, content1_en)
 
-            # test that en version in last revision doesn't contains german content (placeholder)
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
             self.assertNotContains(response, content1_de)
             self.assertNotContains(response, content2_de)
 
             # compare with default (initial) urls.
-            self.assertNotEqual(revision_2_reversed_url_en, default_event_url_en)
-            self.assertNotEqual(revision_2_reversed_url_en, default_event_url_de)
+            self.assertNotEqual(revision_2_reversed_url_en,
+                                default_event_url_en)
+            self.assertNotEqual(revision_2_reversed_url_en,
+                                default_event_url_de)
 
             # check that url was not changed.
             self.assertEqual(revision_2_reversed_url_en, revision_2_url_en)
@@ -399,17 +427,21 @@ class ReversionTestCase(EventBaseTestCase):
             response = self.client.get(revision_2_reversed_url_de)
 
             self.assertContains(response, revision_2_values_de['title'])
-            self.assertContains(response, revision_2_values_de['short_description'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
             self.assertContains(response, content2_de)
-            # test that other translation content is not being served
-            # using revision_1_values_en since it is the only existing English values so far
+            # test that other translation content is not being served using
+            # revision_1_values_en since it is the only existing English values
+            # so far
             self.assertNotContains(response, revision_1_values_en['title'])
-            self.assertNotContains(response, revision_1_values_en['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
             self.assertNotContains(response, content1_en)
 
             # test that it doesnt contains previous revision data
             self.assertNotContains(response, revision_1_values_de['title'])
-            self.assertNotContains(response, revision_1_values_de['short_description'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
             self.assertNotContains(response, content1_de)
 
             # test against the default urls
