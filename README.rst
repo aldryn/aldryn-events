@@ -1,14 +1,8 @@
-|PyPI Version| |Build Status| |Coverage Status|
-
-
-NOTE: ::
-
-    This repository is undergoing a lot of changes at this time, clone/install
-    at your own risk at this time =)
-
 =============
 Aldryn-Events
 =============
+
+|PyPI Version| |Build Status| |Coverage Status| |codeclimate| |requires_io|
 
 Description
 ~~~~~~~~~~~
@@ -16,6 +10,13 @@ A events application for Aldryn and Django CMS.
 
 Aldryn Events support events with own start/end dates and has a simple
 registration proccess to events.
+
+
+NOTE: ::
+
+    This repository is undergoing a lot of changes at this time, clone/install
+    at your own risk at this time =)
+
 
 --------------------
 Installation & Usage
@@ -155,3 +156,16 @@ __ https://github.com/joshourisman/django-tablib/pull/37
 __ https://github.com/aldryn/aldryn-apphooks-config/archive/master.zip
 __ https://django-cms.readthedocs.org/en/support-3.0.x/how_to/apphooks.html#apphooks
 
+
+.. |PyPI Version| image:: http://img.shields.io/pypi/v/aldryn-events.svg
+   :target: https://pypi.python.org/pypi/aldryn-events
+.. |Build Status| image:: http://img.shields.io/travis/aldryn/aldryn-events/master.svg
+   :target: https://travis-ci.org/aldryn/aldryn-events
+.. |Coverage Status| image:: http://img.shields.io/coveralls/aldryn/aldryn-events/master.svg
+   :target: https://coveralls.io/r/aldryn/aldryn-events?branch=master
+.. |codeclimate| image:: https://codeclimate.com/github/aldryn/aldryn-events/badges/gpa.svg
+   :target: https://codeclimate.com/github/aldryn/aldryn-events
+   :alt: Code Climate
+.. |requires_io| image:: https://requires.io/github/aldryn/aldryn-events/requirements.svg?branch=master
+   :target: https://requires.io/github/aldryn/aldryn-events/requirements/?branch=master
+   :alt: Requirements Status
