@@ -197,7 +197,8 @@ class Event(TranslationHelperMixin, TranslatableModel):
         # there is a start date and end date
         if self.start_date and self.end_date:
             if self.end_date < self.start_date:
-                raise ValidationError(_('Start date should be before end date.'))
+                raise ValidationError(
+                    _('Start date should be before end date.'))
 
             # dates are equal, check time
             if self.start_date == self.end_date:
