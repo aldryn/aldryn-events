@@ -204,13 +204,13 @@ class Event(TranslationHelperMixin, TranslatableModel):
                 # check that time is provided
                 if not (self.end_time and self.start_time):
                     raise ValidationError(
-                        _('If you specify same dates for start and end of event'
-                          ' please provide also start and end time. OR you can'
-                          ' make end date to be different'))
+                        _('When specifying identical start and end dates, '
+                          'please also provide the start and end time. '
+                          'OR you can change end date to be different'))
 
                 # check time validity
                 if (self.end_time < self.start_time or
-                            self.start_time == self.end_time):
+                    self.start_time == self.end_time):
                     raise ValidationError(
                         _('For same start and end dates start time '
                           'should be before end time.'))
