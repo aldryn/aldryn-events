@@ -48,7 +48,7 @@ gulp.task('jslint', function () {
 
 // #########################################################
 // #TESTS#
-gulp.task('tests', ['tests:unit', 'tests:integration', 'tests:lint']);
+gulp.task('tests', ['tests:unit', 'tests:lint']);
 gulp.task('tests:lint', ['jslint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests

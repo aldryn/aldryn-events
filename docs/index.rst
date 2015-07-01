@@ -3,14 +3,9 @@ Aldryn Events
 ###############
 
 
-Aldryn Events is an `Aldryn <http://aldryn.com>`_-compatible events application for for `django CMS
-<http://django-cms.org>`_.
-
-Aldryn Events allows you to publish and manage a calendar of events - along with their start and
-end times, location and so on - on your django CMS website. It's easy to use and flexible, and
-includes advanced features such as registration.
-
-Aldryn Events is open-source software <link to https://github.com/aldryn/aldryn-events>
+Aldryn Events is an `Aldryn <http://aldryn.com>`_-compatible events application
+for `django CMS <http://django-cms.org>`_. It can be used for recording and
+displaying information about events.
 
 .. toctree::
    :maxdepth: 2
