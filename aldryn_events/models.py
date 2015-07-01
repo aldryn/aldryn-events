@@ -194,13 +194,25 @@ class Event(TranslationHelperMixin, TranslatableModel):
                 )
             )
 
-        if (self.start_date and self.end_date and
-                self.end_date < self.start_date):
-            raise ValidationError(_('Start date should be before end date.'))
+        # there is a start date and end date
+        if self.start_date and self.end_date:
+            if self.end_date < self.start_date:
+                raise ValidationError(_('Start date should be before end date.'))
 
-        if (self.end_date and self.start_date == self.end_date and
-                self.end_time < self.start_time):
-            raise ValidationError(_('Start date should be before end date.'))
+            # dates are equal, check time
+            if self.start_date == self.end_date:
+                # check that time is provided
+                if not (self.end_time and self.start_time):
+                    raise ValidationError(
+                        _('When specifying identical start and end dates, '
+                          'please also provide the start and end time.'))
+
+                # check time validity
+                if (self.end_time < self.start_time or
+                    self.start_time == self.end_time):
+                    raise ValidationError(
+                        _('For same start and end dates start time '
+                          'should be before end time.'))
 
         if self.enable_registration and self.register_link:
             raise ValidationError(

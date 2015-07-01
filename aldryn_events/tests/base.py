@@ -123,3 +123,29 @@ class EventBaseTestCase(TransactionTestCase):
             'slug': 'im-freien'
         }
         return self.create_event(de=de, **en)
+
+    def make_default_values_with_new_dates(self, date_values, num=None):
+        """
+        Prepare a dictionary with changed text values, and with provided dates.
+        Num is used to generate test values.
+        Acceptable date Formats:
+             2015-07-01, 07/01/2015, 07/01/15
+        Acceptable time Formats: (from admin form hint):
+            09:47:10, 09:47:10.551027, 09:47
+        Expects date_values to be dict in the following format or mix-ups:
+        {
+            'start_date': '2015-01-01',
+            'end_date': '2015-01-01',
+            'start_time': '09:47:10',
+            'end_time': '09:47:10'
+        }
+        """
+        if num is None:
+            num = random.randint(0, 9999999)
+        defaut_event_values = {
+            'title': 'Default event test {0}'.format(num),
+            'app_config': self.app_config,
+            'short_description': 'Lorem ipsum blah blah {0}'.format(num),
+        }
+        defaut_event_values.update(date_values)
+        return defaut_event_values
