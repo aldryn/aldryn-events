@@ -14,8 +14,12 @@
     'use strict';
 
     describe('cl.events.js', function () {
-        it('loads Cl', function () {
+        it('Cl namespace is available', function () {
             expect(Cl).toBeDefined();
+        });
+
+        it('has a public methode calendar', function () {
+            expect(Cl.events.calendar).toBeDefined();
         });
     });
 
