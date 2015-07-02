@@ -2,10 +2,12 @@
 {% load i18n thumbnail cms_tags apphooks_config_tags %}
 
 {% block events_content %}
+    {% render_placeholder view.config.placeholder_events_detail_top %}
     {% static_placeholder "events_detail_top" %}
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
+    {% render_placeholder view.config.placeholder_events_detail_bottom %}
     {% static_placeholder "events_detail_bottom" %}
 {% endblock events_content %}
 
@@ -51,6 +53,7 @@
             {% endif %}
         </ul>
     </div>
+    {% render_placeholder view.config.placeholder_events_detail_footer %}
     {% static_placeholder "events_detail_footer" %}
 
     <div class="row">
