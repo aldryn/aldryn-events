@@ -4,6 +4,7 @@
 {% block events_content %}
     {# INFO: if configuration is set, show ongoing events first #}
     {% if view.config.app_data.config.show_ongoing_first %}
+        {% render_placeholder view.config.placeholder_events_list_top_ongoing %}
         {% static_placeholder "events_list_top_ongoing" %}
         <div class="aldryn-events-list aldryn-events-list-ongoing">
             {% regroup ongoing_objects by start_date as ongoing_objects_grouped %}
@@ -17,6 +18,7 @@
     {% endif %}
 
     {# INFO: show upcoming events #}
+    {% render_placeholder view.config.placeholder_events_list_top %}
     {% static_placeholder "events_list_top" %}
     <div class="aldryn-events-list">
         {% regroup page_obj.object_list|default:object_list by start_date as event_list_grouped %}
@@ -29,6 +31,7 @@
             <p class="well">{% trans "No items available" %}</p>
         {% endfor %}
     </div>
+    {% render_placeholder view.config.placeholder_events_list_bottom %}
     {% static_placeholder "events_list_bottom" %}
 
     <div class="aldryn-events-pagination">

@@ -30,6 +30,12 @@ dist
 .settings
 /*.egg-info/
 /*.egg/
+.idea
+.tox
+env
+.coverage
+htmlcov/
+*~
 *.egg
 develop-eggs
 downloads
@@ -51,4 +57,4 @@ cms/static/cms/compass_app_log.txt
 coverage-*.txt
 docs/env
 node_modules/
-aldryn_events/tests/frontend/coverage/*
+aldryn_events/tests/frontend/coverage/

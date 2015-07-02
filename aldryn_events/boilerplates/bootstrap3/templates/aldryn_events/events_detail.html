@@ -2,10 +2,12 @@
 {% load i18n thumbnail cms_tags apphooks_config_tags %}
 
 {% block events_content %}
+    {% render_placeholder view.config.placeholder_events_detail_top %}
     {% static_placeholder "events_detail_top" %}
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
+    {% render_placeholder view.config.placeholder_events_detail_bottom %}
     {% static_placeholder "events_detail_bottom" %}
 {% endblock events_content %}
 
@@ -13,27 +15,58 @@
     <div class="aldryn-events-pager">
         <ul class="pager">
             {% if prev_event %}
-                <li class="previous"><a href="{{ prev_event.get_absolute_url }}"><span aria-hidden="true">&larr;</span> {% trans "Previous Event" %}</a></li>
+                <li class="previous">
+                    <a href="{{ prev_event.get_absolute_url }}">
+                        <span aria-hidden="true">&larr;</span>
+                        {% trans "Previous Event" %}
+                    </a>
+                </li>
             {% else %}
-                <li class="previous"><span class="text-muted"><span aria-hidden="true">&larr;</span> {% trans "Previous Event" %}</span></li>
+                <li class="previous">
+                    <span class="text-muted">
+                        <span aria-hidden="true">&larr;</span>
+                        {% trans "Previous Event" %}
+                    </span>
+                </li>
             {% endif %}
-            <li><span class="pager-back">– <a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back to Overview" %}</a> –</span></li>
+            <li>
+                <span class="pager-back">
+                    – <a href="{% namespace_url 'events_list' namespace=view.namespace %}">
+                        {% trans "Back to Overview" %}
+                    </a> –
+                </span>
+            </li>
             {% if next_event %}
-                <li class="next"><a href="{{ next_event.get_absolute_url }}">{% trans "Next Event" %} <span aria-hidden="true">&rarr;</span></a></li>
+                <li class="next">
+                    <a href="{{ next_event.get_absolute_url }}">
+                        {% trans "Next Event" %}
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </li>
             {% else %}
-                <li class="next"><span class="text-muted">{% trans "Next Event" %} <span aria-hidden="true">&rarr;</span></span></li>
+                <li class="next">
+                    <span class="text-muted">
+                        {% trans "Next Event" %}
+                        <span aria-hidden="true">&rarr;</span>
+                    </span>
+                </li>
             {% endif %}
         </ul>
     </div>
+    {% render_placeholder view.config.placeholder_events_detail_footer %}
     {% static_placeholder "events_detail_footer" %}
 
     <div class="row">
         <div class="col-md-16 col-md-push-4">
             {% if event.register_link %}
-                <p class="register-link"><a href="{{ event.register_link }}">{% trans "Register for this event" %}</a></p>
+                <p class="register-link">
+                    <a href="{{ event.register_link }}">{% trans "Register for this event" %}</a>
+                </p>
             {% endif %}
             {% if event.detail_link %}
-                <p class="detail-link"><a href="{{ event.detail_link }}">{% trans "More information" %}</a></p>
+                <p class="detail-link">
+                    <a href="{{ event.detail_link }}">{% trans "More information" %}</a>
+                </p>
             {% endif %}
 
             {% if event.enable_registration %}

@@ -1,47 +1,99 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
-from django.db import models, connection, transaction
+from south.v2 import SchemaMigration
+from django.db import models
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName".
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
+        # Adding field 'EventsConfig.placeholder_events_top'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_top',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_top', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
 
-        # in order to fix this migration for sqlite3 we need to enable
-        # transaction autocommit, otherwise it is broken
-        if connection.vendor == 'sqlite':
-            transaction.set_autocommit(True)
-        EventsConfig = orm.EventsConfig
-        Event = orm.Event
-        UpcomingPluginItem = orm.UpcomingPluginItem
-        EventListPlugin = orm.EventListPlugin
-        EventCalendarPlugin = orm.EventCalendarPlugin
+        # Adding field 'EventsConfig.placeholder_events_sidebar'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_sidebar',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_sidebar', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
 
-        ns, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        # Adding field 'EventsConfig.placeholder_events_list_top_ongoing'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_list_top_ongoing',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_list_top_ongoing', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
 
-        for model in [Event, EventListPlugin, UpcomingPluginItem, EventCalendarPlugin]:
-            for entry in model.objects.filter(app_config__isnull=True):
-                entry.app_config = ns
-                entry.save()
+        # Adding field 'EventsConfig.placeholder_events_list_top'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_list_top',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_list_top', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding field 'EventsConfig.placeholder_events_detail_top'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_top',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_detail_top', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding field 'EventsConfig.placeholder_events_detail_bottom'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_bottom',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_detail_bottom', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding field 'EventsConfig.placeholder_events_detail_footer'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_footer',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_detail_footer', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding field 'EventsConfig.placeholder_events_registration'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_registration',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_registration', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding field 'EventsConfig.placeholder_events_registration_footer'
+        db.add_column(u'aldryn_events_eventsconfig', 'placeholder_events_registration_footer',
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'aldryn_events_registration_footer', null=True, to=orm['cms.Placeholder']),
+                      keep_default=False)
+
+        # Adding unique constraint on 'EventsConfig', fields ['namespace']
+        db.create_unique(u'aldryn_events_eventsconfig', ['namespace'])
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        # in order to fix this migration for sqlite3 we need to enable
-        # transaction autocommit, otherwise it is broken
-        if connection.vendor == 'sqlite':
-            transaction.set_autocommit(True)
-        orm.EventsConfig.objects.filter(namespace='aldryn_events').delete()
+        # Removing unique constraint on 'EventsConfig', fields ['namespace']
+        db.delete_unique(u'aldryn_events_eventsconfig', ['namespace'])
+
+        # Deleting field 'EventsConfig.placeholder_events_top'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_top_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_sidebar'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_sidebar_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_list_top_ongoing'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_list_top_ongoing_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_list_top'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_list_top_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_detail_top'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_top_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_detail_bottom'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_bottom_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_detail_footer'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_detail_footer_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_registration'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_registration_id')
+
+        # Deleting field 'EventsConfig.placeholder_events_registration_footer'
+        db.delete_column(u'aldryn_events_eventsconfig', 'placeholder_events_registration_footer_id')
+
 
     models = {
         u'aldryn_events.event': {
             'Meta': {'ordering': "('start_date', 'start_time', 'end_date', 'end_time')", 'object_name': 'Event'},
-            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']", 'null': 'True'}),
+            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']"}),
+            'description': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
             'detail_link': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'enable_registration': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
@@ -57,7 +109,7 @@ class Migration(DataMigration):
         },
         u'aldryn_events.eventcalendarplugin': {
             'Meta': {'object_name': 'EventCalendarPlugin'},
-            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']", 'null': 'True'}),
+            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']"}),
             u'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'aldryn_events.eventcoordinator': {
@@ -69,7 +121,7 @@ class Migration(DataMigration):
         },
         u'aldryn_events.eventlistplugin': {
             'Meta': {'object_name': 'EventListPlugin'},
-            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']", 'null': 'True'}),
+            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']"}),
             u'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'events': ('sortedm2m.fields.SortedManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['aldryn_events.Event']", 'null': 'True', 'blank': 'True'}),
             'style': ('django.db.models.fields.CharField', [], {'default': "'standard'", 'max_length': '50'})
@@ -78,7 +130,16 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'EventsConfig'},
             'app_data': ('app_data.fields.AppDataField', [], {'default': "'{}'"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'namespace': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '100'}),
+            'namespace': ('django.db.models.fields.CharField', [], {'default': 'None', 'unique': 'True', 'max_length': '100'}),
+            'placeholder_events_detail_bottom': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_detail_bottom'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_detail_footer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_detail_footer'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_detail_top': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_detail_top'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_list_top': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_list_top'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_list_top_ongoing': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_list_top_ongoing'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_registration': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_registration'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_registration_footer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_registration_footer'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_sidebar': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_sidebar'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
+            'placeholder_events_top': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'aldryn_events_top'", 'null': 'True', 'to': "orm['cms.Placeholder']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         u'aldryn_events.eventsconfigtranslation': {
@@ -90,8 +151,6 @@ class Migration(DataMigration):
         },
         u'aldryn_events.eventtranslation': {
             'Meta': {'unique_together': "[('language_code', 'slug'), (u'language_code', u'master')]", 'object_name': 'EventTranslation', 'db_table': "u'aldryn_events_event_translation'"},
-            'description': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
-            'flyer': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'event_flyers'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['filer.File']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'event_images'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': "orm['filer.Image']"}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
@@ -124,7 +183,7 @@ class Migration(DataMigration):
         },
         u'aldryn_events.upcomingpluginitem': {
             'Meta': {'object_name': 'UpcomingPluginItem'},
-            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']", 'null': 'True'}),
+            'app_config': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['aldryn_events.EventsConfig']"}),
             u'cmsplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['cms.CMSPlugin']", 'unique': 'True', 'primary_key': 'True'}),
             'latest_entries': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '5'}),
             'past_events': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -163,16 +222,15 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'CMSPlugin'},
             'changed_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'depth': ('django.db.models.fields.PositiveIntegerField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
-            'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
+            'numchild': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.CMSPlugin']", 'null': 'True', 'blank': 'True'}),
+            'path': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
             'placeholder': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'}),
             'plugin_type': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
-            'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rght': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
-            'tree_id': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'})
+            'position': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         'cms.placeholder': {
             'Meta': {'object_name': 'Placeholder'},
@@ -200,7 +258,7 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '255', 'blank': 'True'}),
             'original_filename': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "u'owned_files'", 'null': 'True', 'to': u"orm['auth.User']"}),
-            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'polymorphic_filer.file_set'", 'null': 'True', 'to': u"orm['contenttypes.ContentType']"}),
+            'polymorphic_ctype': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'polymorphic_filer.file_set+'", 'null': 'True', 'to': u"orm['contenttypes.ContentType']"}),
             'sha1': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '40', 'blank': 'True'}),
             'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
@@ -234,4 +292,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['aldryn_events']
-    symmetrical = True
