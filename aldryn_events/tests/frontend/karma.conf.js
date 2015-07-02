@@ -37,11 +37,11 @@ module.exports = function (config) {
             'aldryn_events/boilerplates/bootstrap3/static/js/addons/*.js',
 
             // tests themselves
-            'tests/unit/*.js',
+            'aldryn_events/tests/frontend/unit/*.js',
 
             // fixture patterns
             {
-                pattern: 'tests/fixtures/**/*'
+                pattern: 'aldryn_events/tests/frontend/fixtures/**/*'
             }
         ],
 
@@ -60,8 +60,8 @@ module.exports = function (config) {
         // optionally, configure the reporter
         coverageReporter: {
             reporters: [
-                { type: 'html', dir: 'aldryn_events/tests/frontend/tests/coverage/' },
-                { type: 'lcov', dir: 'aldryn_events/tests/frontend/tests/coverage/' }
+                { type: 'html', dir: 'aldryn_events/tests/frontend/coverage/' },
+                { type: 'lcov', dir: 'aldryn_events/tests/frontend/coverage/' }
             ]
         },
 
