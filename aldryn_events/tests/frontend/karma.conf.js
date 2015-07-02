@@ -60,8 +60,8 @@ module.exports = function (config) {
         // optionally, configure the reporter
         coverageReporter: {
             reporters: [
-                { type: 'html', dir: 'tests/coverage/' },
-                { type: 'lcov', dir: 'tests/coverage/' }
+                { type: 'html', dir: 'aldryn_events/tests/frontend/tests/coverage/' },
+                { type: 'lcov', dir: 'aldryn_events/tests/frontend/tests/coverage/' }
             ]
         },
 
