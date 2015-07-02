@@ -7,7 +7,7 @@
                 {% if not detail_view %}
                     <a href="{{ event.get_absolute_url }}">
                 {% endif %}
-                <img src="{% thumbnail event.image 800x450 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
+                <img src="{% thumbnail event.image 800x250 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
                 {% if not detail_view %}
                     </a>
                 {% endif %}
