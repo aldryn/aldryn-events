@@ -33,15 +33,15 @@ module.exports = function (config) {
         files: [
             // these have to be specified in order since
             // dependency loading is not handled yet
-            'aldryn_events/boilerplates/bootstrap3/static/js/libs/*.js',
-            'aldryn_events/boilerplates/bootstrap3/static/js/addons/*.js',
+            '../../aldryn_events/boilerplates/bootstrap3/static/js/libs/*.js',
+            '../../aldryn_events/boilerplates/bootstrap3/static/js/addons/*.js',
 
             // tests themselves
-            'tests/unit/*.js',
+            'frontend/unit/*.js',
 
             // fixture patterns
             {
-                pattern: 'tests/fixtures/**/*'
+                pattern: 'frontend/fixtures/**/*'
             }
         ],
 
@@ -51,7 +51,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'aldryn_events/boilerplates/bootstrap3/static/js/addons/*.js': ['coverage'],
+            '../../aldryn_events/boilerplates/bootstrap3/static/js/addons/*.js': ['coverage'],
             // for fixtures
             '**/*.html': ['html2js'],
             '**/*.json': ['json_fixtures']
@@ -60,8 +60,8 @@ module.exports = function (config) {
         // optionally, configure the reporter
         coverageReporter: {
             reporters: [
-                { type: 'html', dir: 'tests/coverage/' },
-                { type: 'lcov', dir: 'tests/coverage/' }
+                { type: 'html', dir: 'frontend/coverage/' },
+                { type: 'lcov', dir: 'frontend/coverage/' }
             ]
         },
 

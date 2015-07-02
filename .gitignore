@@ -57,4 +57,4 @@ cms/static/cms/compass_app_log.txt
 coverage-*.txt
 docs/env
 node_modules/
-tests/coverage/
+aldryn_events/tests/frontend/coverage/

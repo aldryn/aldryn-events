@@ -21,23 +21,23 @@ var webdriverUpdate = require('gulp-protractor').webdriver_update;
 var PROJECT_ROOT = '.';
 var PROJECT_PATH = {
     'js': PROJECT_ROOT + '/aldryn_events/boilerplates/bootstrap3/static/js/',
-    'tests': PROJECT_ROOT + '/tests'
+    'tests': PROJECT_ROOT + '/aldryn_events/tests/frontend'
 };
 
 var PROJECT_PATTERNS = {
-    'jslint': [
+    'lint': [
         PROJECT_PATH.js + '/addons/*.js',
-        PROJECT_ROOT + '/tests/*.js',
-        PROJECT_ROOT + '/tests/unit/*.js',
-        PROJECT_ROOT + '/tests/integration/*.js',
+        PROJECT_PATH.tests + '/*.js',
+        PROJECT_PATH.tests + '/unit/*.js',
+        PROJECT_PATH.tests + '/integration/*.js',
         PROJECT_ROOT + '/gulpfile.js'
     ]
 };
 
 // #####################################################################################################################
 // #LINTING#
-gulp.task('jslint', function () {
-    gulp.src(PROJECT_PATTERNS.jslint)
+gulp.task('lint', function () {
+    gulp.src(PROJECT_PATTERNS.lint)
         .pipe(jshint())
         .pipe(jscs())
         .on('error', function (error) {
@@ -49,11 +49,11 @@ gulp.task('jslint', function () {
 // #########################################################
 // #TESTS#
 gulp.task('tests', ['tests:unit', 'tests:lint']);
-gulp.task('tests:lint', ['jslint']);
+gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
     karma.start({
-        'configFile': __dirname + '/tests/karma.conf.js',
+        'configFile': __dirname + '/aldryn_events/tests/frontend/karma.conf.js',
         'singleRun': true
     }, done);
 });
@@ -73,10 +73,10 @@ gulp.task('tests:integration', ['tests:webdriver'], function () {
 gulp.task('karma', function () {
     // run javascript tests
     karma.start({
-        'configFile': __dirname + '/tests/karma.conf.js'
+        'configFile': __dirname + '/aldryn_events/tests/frontend/karma.conf.js'
     });
 });
 
 // #####################################################################################################################
 // #COMMANDS#
-gulp.task('default', ['jslint']);
+gulp.task('default', ['lint']);
