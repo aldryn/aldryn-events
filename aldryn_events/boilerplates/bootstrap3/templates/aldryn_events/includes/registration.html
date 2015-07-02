@@ -1,6 +1,7 @@
 {% load i18n cms_tags sekizai_tags apphooks_config_tags bootstrap3 %}
 
 <div class="aldryn-events-registration">
+	{% render_placeholder view.config.placeholder_events_registration %}
 	{% static_placeholder "events_registration" %}
 
     {# INFO: shown when registration is closed #}
@@ -42,4 +43,5 @@
     {% endif %}
 </div>
 
+{% render_placeholder view.config.placeholder_events_registration_footer %}
 {% static_placeholder "events_registration_footer" %}

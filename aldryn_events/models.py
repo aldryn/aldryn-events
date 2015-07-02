@@ -18,7 +18,6 @@ from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from cms.utils.i18n import get_current_language, get_redirect_on_fallback
 
-from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_common.slugs import unique_slugify
 from aldryn_translation_tools.models import TranslationHelperMixin
 from aldryn_reversion.core import version_controlled_content
@@ -29,6 +28,7 @@ from parler.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
 from uuid import uuid4
 
+from .cms_appconfig import EventsConfig
 from .conf import settings
 from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
@@ -91,13 +91,6 @@ else:
         reversion.register(user_model_object)
     except RegistrationError:
         pass
-
-
-@version_controlled_content
-class EventsConfig(TranslatableModel, AppHookConfig):
-    translations = TranslatedFields(
-        app_title=models.CharField(_('application title'), max_length=234),
-    )
 
 
 @version_controlled_content(follow=['event_coordinators'])
