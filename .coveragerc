@@ -1,6 +1,8 @@
 [run]
 source = aldryn_events
-omit = *migrations*
+omit =
+    *migrations*
+    tests/*
 
 [report]
 exclude_lines =
