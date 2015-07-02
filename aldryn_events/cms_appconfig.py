@@ -24,7 +24,8 @@ class EventsConfig(TranslatableModel, AppHookConfig):
         'events_sidebar', related_name='aldryn_events_sidebar')
 
     placeholder_events_list_top_ongoing = PlaceholderField(
-        'events_list_top_ongoing', related_name='aldryn_events_list_top_ongoing')
+        'events_list_top_ongoing',
+        related_name='aldryn_events_list_top_ongoing')
 
     # Question list PHFs
     placeholder_events_list_top = PlaceholderField(
@@ -43,4 +44,5 @@ class EventsConfig(TranslatableModel, AppHookConfig):
         'events_registration', related_name='aldryn_events_registration')
 
     placeholder_events_registration_footer = PlaceholderField(
-        'events_registration_footer', related_name='aldryn_events_registration_footer')
+        'events_registration_footer',
+        related_name='aldryn_events_registration_footer')
