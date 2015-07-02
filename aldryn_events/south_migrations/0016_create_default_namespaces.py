@@ -2,7 +2,8 @@
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
-from django.db import models
+from django.db import models, connection, transaction
+
 
 class Migration(DataMigration):
 
@@ -11,6 +12,11 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName".
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
+
+        # in order to fix this migration for sqlite3 we need to enable
+        # transaction autocommit, otherwise it is broken
+        if connection.vendor == 'sqlite':
+            transaction.set_autocommit(True)
         EventsConfig = orm.EventsConfig
         Event = orm.Event
         UpcomingPluginItem = orm.UpcomingPluginItem
@@ -26,7 +32,11 @@ class Migration(DataMigration):
 
     def backwards(self, orm):
         "Write your backwards methods here."
-        orm.EventsConfig.filter(namespace='aldryn_events').delete()
+        # in order to fix this migration for sqlite3 we need to enable
+        # transaction autocommit, otherwise it is broken
+        if connection.vendor == 'sqlite':
+            transaction.set_autocommit(True)
+        orm.EventsConfig.objects.filter(namespace='aldryn_events').delete()
 
     models = {
         u'aldryn_events.event': {
