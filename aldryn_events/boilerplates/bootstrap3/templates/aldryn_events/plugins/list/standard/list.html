@@ -2,7 +2,12 @@
 {% load i18n %}
 
 {% block plugin %}
-    <div class="aldryn aldryn-events aldryn-events-listplugin">
+<div class="aldryn aldryn-events aldryn-events-listplugin">
+    {% if plugin_configuration_error %}
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <p class="config-errors">{{ plugin_configuration_error }}</p>
+        {% endif %}
+    {% else %}
         <ul class="list-unstyled">
             {% for event in events %}
                 <li>
@@ -13,5 +18,6 @@
                 <li class="well">{% trans "No items available" %}</li>
             {% endfor %}
         </ul>
-    </div>
+    {% endif %}
+</div>
 {% endblock plugin %}
