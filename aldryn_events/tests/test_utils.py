@@ -6,6 +6,8 @@ from aldryn_events.utils import build_calendar
 
 from .base import EventBaseTestCase, tz_datetime
 
+NUM_WEEKS_DISPLAYED = 6
+
 
 class UtilsTestCase(EventBaseTestCase):
 
@@ -63,3 +65,27 @@ class UtilsTestCase(EventBaseTestCase):
         self.assertEqual(dates[date(2015, 2, 25)], [ev5, ev6])
         self.assertEqual(dates[date(2015, 2, 26)], [ev5])
         self.assertEqual(dates[date(2015, 2, 27)], [ev5])
+
+
+class EventTestCase(EventBaseTestCase):
+
+    def test_build_calendar_always_returns_correct_amount_of_days(self):
+        # test that build_calendar utility method always returns appropriate
+        # amount of days which is NUM_WEEKS_DISPLAYED * 7 (days in week).
+        # Test against leap year and a regular year
+        failed = []
+        date_str = '{0}-{1}'
+        for year in (2012, 2015):
+            for month in range(1, 13):
+                prepared_dates = len(build_calendar(
+                    year=year, month=month, language='en',
+                    namespace=self.app_config.namespace))
+                if prepared_dates != 7 * NUM_WEEKS_DISPLAYED:
+                    failed.append(
+                        (date_str.format(month, year), prepared_dates))
+        if failed:
+            msg = 'Failed to get correct amount of dates for: {0}'
+            error_appears = '; '.join(
+                ['{0} returned {1} days'.format(date, days)
+                 for date, days in failed])
+            self.assertTrue(False, msg.format(error_appears))
