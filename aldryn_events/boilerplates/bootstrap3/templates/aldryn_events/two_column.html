@@ -2,20 +2,20 @@
 {% load i18n cms_tags %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-17">
-            {% static_placeholder "events_top" %}
-            <div class="aldryn aldryn-events">
-                {% block events_title %}{% endblock %}
-                {% block events_content %}{% endblock %}
-                {% block events_footer %}{% endblock %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-17">
+                {% static_placeholder "events_top" %}
+                <div class="aldryn aldryn-events">
+                    {% block events_title %}{% endblock %}
+                    {% block events_content %}{% endblock %}
+                    {% block events_footer %}{% endblock %}
+                </div>
+            </div>
+            <div class="col-md-7 aldryn-events aldryn-events-sidebar">
+                {% block events_sidebar %}{% endblock %}
+                {% static_placeholder "events_sidebar" %}
             </div>
         </div>
-        <div class="col-md-7 aldryn-events aldryn-events-sidebar">
-            {% block events_sidebar %}{% endblock %}
-            {% static_placeholder "events_sidebar" %}
-        </div>
     </div>
-</div>
 {% endblock content %}

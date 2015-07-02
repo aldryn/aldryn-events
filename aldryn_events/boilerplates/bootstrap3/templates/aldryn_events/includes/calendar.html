@@ -1,19 +1,19 @@
 {% load i18n static sekizai_tags apphooks_config_tags %}
 
 {% block events_calendar %}
-<div class="events-calendar js-events-calendar"
-    data-url="{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}"
-    data-pk="{{ plugin.instance.pk }}"
-    data-error="{% trans 'There was a problem accessing the calendar, please try again.'|escapejs %}">
+    <div class="events-calendar js-events-calendar"
+        data-url="{% namespace_url 'get-calendar-dates' namespace=calendar_tag.namespace %}"
+        data-pk="{{ plugin.instance.pk }}"
+        data-error="{% trans 'There was a problem accessing the calendar, please try again.'|escapejs %}">
 
-    <h3>{{ calendar_tag.label }}</h3>
-    <p class="controls clearfix">
-        <a href="#" class="pull-left js-trigger" data-direction="previous">{% trans "Previous month" %}</a>
-        <a href="{% namespace_url 'events_list' namespace=calendar_tag.namespace %}">{% trans "Today" %}</a>
-        <a href="#" class="pull-right js-trigger" data-direction="next">{% trans "Next month" %}</a>
-    </p>
-    {% include "aldryn_events/includes/calendar_table.html" %}
-</div>
+        <h3>{{ calendar_tag.label }}</h3>
+        <p class="controls clearfix">
+            <a href="#" class="pull-left js-trigger" data-direction="previous">{% trans "Previous month" %}</a>
+            <a href="{% namespace_url 'events_list' namespace=calendar_tag.namespace %}">{% trans "Today" %}</a>
+            <a href="#" class="pull-right js-trigger" data-direction="next">{% trans "Next month" %}</a>
+        </p>
+        {% include "aldryn_events/includes/calendar_table.html" %}
+    </div>
 {% endblock %}
 
 {% addtoblock "js" %}<script src="{% static 'js/addons/cl.events.js' %}"></script>{% endaddtoblock %}
