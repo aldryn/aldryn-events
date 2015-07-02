@@ -21,9 +21,9 @@ or to install from the latest source tree::
     pip install -e git+https://github.com/aldryn/aldryn-events.git#egg=aldryn-events
 
 
-***************
-``settings.py``
-***************
+***********
+settings.py
+***********
 
 In your project's ``settings.py`` make sure you have all of::
 
@@ -43,6 +43,9 @@ In your project's ``settings.py`` make sure you have all of::
     'standard_form',
 
 listed in ``INSTALLED_APPS``, *after* ``'cms'``.
+
+.. note::
+   If you are using Django 1.6, add ``south`` to  ``INSTALLED_APPS``.
 
 And make sure that your other settings conform to::
 
@@ -73,7 +76,7 @@ Now set the name of the boilerplate you want to use in your project::
    Note that Aldryn Events doesn't use the the traditional Django ``/templates`` and ``/static
    directories``. Instead, it employs `Aldryn Boilerplates
    <https://github.com/aldryn/aldryn-boilerplates>`_, which makes it possible to to support
-   multiple different frontend schemes ('Boilerplates')and switch between them without a need for
+   multiple different frontend schemes ('Boilerplates')and switch between them without the need for
    project-by-project file overwriting.
 
    Aldryn Events's templates and staticfiles will be found in named directories inside the
@@ -92,6 +95,8 @@ Now run ``python manage.py migrate`` to prepare the database for the new applica
 For Aldryn users
 ****************
 
-To install the addon on Aldryn, all you need to do is follow this
-`installation link <https://control.aldryn.com/control/?select_project_for_addon=aldryn-events>`_
-on the Aldryn Marketplace and follow the instructions.
+On the Aldryn platform, the Addon is available from the `Marketplace
+<http://www.aldryn.com/en/marketplace>`_.
+
+You can also `install Aldryn Events into any existing Aldryn project
+<https://control.aldryn.com/control/?select_project_for_addon=aldryn-events>`_.
