@@ -96,8 +96,8 @@ class EventTestCase(EventBaseTestCase):
             msg = ("Event clean method failed when it shouldn't "
                    "for following keys: {0}")
             errors = '; '.join(
-                ['key {0}, exception{1}'.format(str(key), str(e))
-                 for key, e in failures])
+                ['key {0}, exception{1}'.format(str(key), str(ex))
+                 for key, ex in failures])
 
             self.assertTrue(False, msg=msg.format(errors))
 

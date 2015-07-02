@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import inspect
-
-from django.core.urlresolvers import reverse, resolve
+from django.core.urlresolvers import reverse
 from django.utils.translation import override
 
 from cms import api

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import mock
 
-from django.template import Template, Context
+from django.template import Template
 
 from pyquery import PyQuery
 from sekizai.context import SekizaiContext
