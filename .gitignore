@@ -30,6 +30,12 @@ dist
 .settings
 /*.egg-info/
 /*.egg/
+.idea
+.tox
+env
+.coverage
+htmlcov/
+*~
 *.egg
 develop-eggs
 downloads
