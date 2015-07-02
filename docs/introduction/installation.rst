@@ -20,6 +20,7 @@ or to install from the latest source tree::
 
     pip install -e git+https://github.com/aldryn/aldryn-events.git#egg=aldryn-events
 
+
 ***************
 ``settings.py``
 ***************
@@ -43,7 +44,7 @@ In your project's ``settings.py`` make sure you have all of::
 
 listed in ``INSTALLED_APPS``, *after* ``'cms'``.
 
-And make sure that your other settings conform to:
+And make sure that your other settings conform to::
 
     TEMPLATE_CONTEXT_PROCESSORS = [
         ...
@@ -78,12 +79,18 @@ Now set the name of the boilerplate you want to use in your project::
    Aldryn Events's templates and staticfiles will be found in named directories inside the
    ``/boilerplates`` directory.
 
-********************
-Prepare the database
-********************
 
-Now run ``python manage.py migrate`` to prepare the database for the new
-application.
+****************************
+Prepare the database and run
+****************************
+
+Now run ``python manage.py migrate`` to prepare the database for the new application, then
+``python manage.py runserver``.
+
+
+****************
+For Aldryn users
+****************
 
 To install the addon on Aldryn, all you need to do is follow this
 `installation link <https://control.aldryn.com/control/?select_project_for_addon=aldryn-events>`_

@@ -10,7 +10,7 @@ Aldryn Events allows you to publish and manage a calendar of events - along with
 end times, location and so on - on your django CMS website. It's easy to use and flexible, and
 includes advanced features such as registration.
 
-Aldryn Events is open-source software <link to https://github.com/aldryn/aldryn-events>
+Aldryn Events is `open-source software <https://github.com/aldryn/aldryn-events>`_.
 
 .. toctree::
    :maxdepth: 2
