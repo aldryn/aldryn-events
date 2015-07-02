@@ -6,7 +6,6 @@
         <div class="row">
             <div class="col-md-17">
                 {% render_placeholder view.config.placeholder_events_top %}
-                {% static_placeholder "events_top" %}
                 <div class="aldryn aldryn-events">
                     {% block events_title %}{% endblock %}
                     {% block events_content %}{% endblock %}
@@ -16,7 +15,6 @@
             <div class="col-md-7 aldryn-events aldryn-events-sidebar">
                 {% block events_sidebar %}{% endblock %}
                 {% render_placeholder view.config.placeholder_events_sidebar %}
-                {% static_placeholder "events_sidebar" %}
             </div>
         </div>
     </div>
