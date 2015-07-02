@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.translation import override, ugettext_lazy as _
+from django.utils.translation import override, ugettext_lazy as _, ugettext
 
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
@@ -346,8 +346,8 @@ class EventCoordinator(models.Model):
 
 class Registration(models.Model):
     SALUTATIONS = Choices(
-        ('SALUTATION_FEMALE', 'mrs', _('Frau')),
-        ('SALUTATION_MALE', 'mr', _('Herr')),
+        ('SALUTATION_FEMALE', 'mrs', ugettext('Ms.')),
+        ('SALUTATION_MALE', 'mr', ugettext('Mr.')),
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
