@@ -194,7 +194,7 @@ def build_calendar(year, month, language, namespace=None):
 
         next_month = [(x, []) for x in get_monthdates(month + 1, year)]
         if next_month[0][0].month == month + 1:
-            monthdates += next_month[:6]
+            monthdates += next_month[:7]
         else:
             monthdates += next_month[7:14]
 
