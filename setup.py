@@ -42,6 +42,7 @@ CLASSIFIERS = [
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development',
@@ -61,6 +62,7 @@ setup(
     platforms=['OS Independent'],
     install_requires=REQUIREMENTS,
     classifiers=CLASSIFIERS,
+    long_description=open('README.rst').read(),
     include_package_data=True,
-    zip_safe=False
+    zip_safe=False,
 )
