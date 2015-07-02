@@ -25,7 +25,7 @@ var PROJECT_PATH = {
 };
 
 var PROJECT_PATTERNS = {
-    'jslint': [
+    'lint': [
         PROJECT_PATH.js + '/addons/*.js',
         PROJECT_PATH.tests + '/*.js',
         PROJECT_PATH.tests + '/unit/*.js',
@@ -36,8 +36,8 @@ var PROJECT_PATTERNS = {
 
 // #####################################################################################################################
 // #LINTING#
-gulp.task('jslint', function () {
-    gulp.src(PROJECT_PATTERNS.jslint)
+gulp.task('lint', function () {
+    gulp.src(PROJECT_PATTERNS.lint)
         .pipe(jshint())
         .pipe(jscs())
         .on('error', function (error) {
@@ -49,7 +49,7 @@ gulp.task('jslint', function () {
 // #########################################################
 // #TESTS#
 gulp.task('tests', ['tests:unit', 'tests:lint']);
-gulp.task('tests:lint', ['jslint']);
+gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
     karma.start({
@@ -79,4 +79,4 @@ gulp.task('karma', function () {
 
 // #####################################################################################################################
 // #COMMANDS#
-gulp.task('default', ['jslint']);
+gulp.task('default', ['lint']);
