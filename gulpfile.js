@@ -53,7 +53,7 @@ gulp.task('tests:lint', ['jslint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
     karma.start({
-        'configFile': PROJECT_PATH + '/karma.conf.js',
+        'configFile': __dirname + '/aldryn_events/tests/frontend/karma.conf.js',
         'singleRun': true
     }, done);
 });
@@ -73,7 +73,7 @@ gulp.task('tests:integration', ['tests:webdriver'], function () {
 gulp.task('karma', function () {
     // run javascript tests
     karma.start({
-        'configFile': PROJECT_PATH + '/karma.conf.js'
+        'configFile': __dirname + '/aldryn_events/tests/frontend/karma.conf.js'
     });
 });
 
