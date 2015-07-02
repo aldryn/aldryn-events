@@ -1,6 +1,5 @@
 import datetime
 
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import timezone
 from django.utils.dates import MONTHS
 from django.utils.translation import (
@@ -10,12 +9,19 @@ from django.utils.translation import (
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .utils import build_calendar
+from .utils import build_calendar, namespace_is_apphooked
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
 )
 
 from .forms import UpcomingPluginForm
+
+NO_APPHOOK_ERROR_MESSAGE = _(
+    'There is an error in plugin configuration: selected Events '
+    'config is not available. Please switch to edit mode and '
+    'change plugin app_config settings to use valid config. '
+    'Also note that aldryn-events should be used at least once '
+    'as an apphook for that config.')
 
 
 class UpcomingPlugin(CMSPluginBase):
@@ -36,15 +42,9 @@ class UpcomingPlugin(CMSPluginBase):
         context['instance'] = instance
         # check if we can reverse list view for configured namespace
         # if no prepare a message to admin users.
-        try:
-            reverse('{0}:events_list'.format(namespace))
-        except (NoReverseMatch, AttributeError):
-            context['plugin_configuration_error'] = _(
-                'There is an error in plugin configuration: selected Evevnts '
-                'config is not available. Please switch to edit mode and '
-                'change plugin app_config settings to use valid config. '
-                'Also note that aldryn-events should be used at least once '
-                'as an apphook for that config.')
+        if not namespace_is_apphooked(namespace):
+            # add message, should be properly handled in template
+            context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
             return context
 
         events = (Event.objects.namespace(namespace)
@@ -81,15 +81,9 @@ class EventListCMSPlugin(CMSPluginBase):
         namespace = instance.app_config_id and instance.app_config.namespace
         # check if we can reverse list view for configured namespace
         # if no prepare a message to admin users.
-        try:
-            reverse('{0}:events_list'.format(namespace))
-        except (NoReverseMatch, AttributeError):
-            context['plugin_configuration_error'] = _(
-                'There is an error in plugin configuration: selected Evevnts '
-                'config is not available. Please switch to edit mode and '
-                'change plugin app_config settings to use valid config. '
-                'Also note that aldryn-events should be used at least once '
-                'as an apphook for that config.')
+        if not namespace_is_apphooked(namespace):
+            # add message, should be properly handled in template
+            context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
             return context
         # With Django 1.5 and because a bug in SortedManyToManyField
         # we can not use instance.events or we get a error like:
@@ -114,6 +108,14 @@ class CalendarPlugin(CMSPluginBase):
     model = EventCalendarPlugin
 
     def render(self, context, instance, placeholder):
+        # # check if we can reverse list view for configured namespace
+        # # if no prepare a message to admin users.
+        namespace = instance.app_config_id and instance.app_config.namespace
+        if not namespace_is_apphooked(namespace):
+            # add message, should be properly handled in template
+            context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
+            return context
+
         year = context.get('event_year')
         month = context.get('event_month')
 
@@ -123,7 +125,6 @@ class CalendarPlugin(CMSPluginBase):
 
         current_date = datetime.date(int(year), int(month), 1)
         language = instance.language
-        namespace = instance.app_config_id and instance.app_config.namespace
 
         context['event_year'] = year
         context['event_month'] = month

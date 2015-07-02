@@ -1,2 +1,8 @@
 {% load aldryn_events %}
-{% calendar event_year event_month calendar_language calendar_namespace %}
+{% if plugin_configuration_error %}
+    {% if request.user.is_staff or request.user.is_superuser %}
+        <p class="config-errors">{{ plugin_configuration_error }}</p>
+    {% endif %}
+{% else %}
+    {% calendar event_year event_month calendar_language calendar_namespace %}
+{% endif %}

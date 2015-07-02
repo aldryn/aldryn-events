@@ -4,7 +4,7 @@ import calendar
 
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -241,3 +241,15 @@ def date_or_datetime(d, t):
         return d
     else:
         return None
+
+
+def namespace_is_apphooked(namespace):
+    """
+    Check if provided namespace has an app-hooked page.
+    Returns True or False.
+    """
+    try:
+        reverse('{0}:events_list'.format(namespace))
+    except (NoReverseMatch, AttributeError):
+        return False
+    return True

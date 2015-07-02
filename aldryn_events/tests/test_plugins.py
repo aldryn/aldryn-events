@@ -212,6 +212,37 @@ class EventPluginsTestCase(EventBaseTestCase):
             self.assertEqual(response.status_code, 200)
 
     @mock.patch('aldryn_events.managers.timezone')
+    def test_calendar_plugin_with_not_existing_ns(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
+        self.create_base_pages()
+        new_config = EventsConfig.objects.create(namespace='new_namespace')
+        page = api.create_page('Plugin test en', self.template, 'en',
+                               published=True, slug='plugin-test-en')
+        api.create_title('de', 'Plugin test de', page)
+        ph = page.placeholders.get(slot='content')
+        api.add_plugin(ph, 'CalendarPlugin', 'en', app_config=new_config)
+        api.add_plugin(ph, 'CalendarPlugin', 'de', app_config=new_config)
+        page.publish('en')
+        page.publish('de')
+
+        with force_language('en'):
+            event = Event.objects.create(
+                title='Test event namespace',
+                slug='test-event-namespace',
+                start_date=tz_datetime(2014, 1, 10),
+                publish_at=tz_datetime(2014, 1, 1),
+                app_config=new_config
+            )
+        event.create_translation(
+            'de',
+            title='Test event namespace de',
+            slug='test-event-namespace-de')
+        for language in ('en', 'de'):
+            page_url = page.get_absolute_url(language)
+            response = self.client.get(page_url)
+            self.assertEqual(response.status_code, 200)
+
+    @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_past(self, timezone_mock):
         """
         Test the upcoming events plugin for past entries
