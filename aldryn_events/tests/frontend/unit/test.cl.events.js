@@ -30,7 +30,7 @@
             expect(Cl.events.calendar).toBeDefined();
         });
 
-        it('Cl.events.init() returns undefined', function () {
+        it('has Cl.events.init() to return undefined', function () {
             expect(Cl.events.init()).toEqual(undefined);
         });
 
@@ -44,14 +44,14 @@
             expect(Cl.events.calendar.calls.count()).toEqual(5);
         });
 
-        it('Cl.events._handler returns false if direction is not specified', function () {
+        it('has Cl.events._handler to return false if direction is not specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0],
                 { preventDefault: emptyFunction })
             ).toEqual(false);
         });
 
-        it('Cl.events._handler returns undefined if direction is "next"', function () {
+        it('has Cl.events._handler to return undefined if direction is "next"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1],
                 { preventDefault: emptyFunction })
@@ -59,11 +59,71 @@
         });
 
 
-        it('Cl.events._handler returns undefined if direction is "previous"', function () {
+        it('has Cl.events._handler to return undefined if direction is "previous"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3],
                 { preventDefault: emptyFunction })
             ).toEqual(undefined);
+        });
+
+        it('has correct ajax request if direction is "next" and year is 2015, month is 7', function () {
+            spyOn($, 'ajax');
+            Cl.events._handler.call(
+                $('.js-trigger')[1],
+                { preventDefault: emptyFunction }
+            );
+
+            var callArgs = $.ajax.calls.allArgs()[0][0];
+
+            // validate ajax request url to have a proper year and month
+            expect(callArgs.url).toEqual(
+                '/en/events/get-dates/2015/8/?plugin_pk='
+            );
+        });
+
+        it('has correct ajax request if direction is "next" and year is 2015, month is 12', function () {
+            spyOn($, 'ajax');
+            Cl.events._handler.call(
+                $('.js-trigger')[2],
+                { preventDefault: function () {} }
+            );
+
+            var callArgs = $.ajax.calls.allArgs()[0][0];
+
+            // validate ajax request url to have a proper year and month
+            expect(callArgs.url).toEqual(
+                '/en/events/get-dates/2016/1/?plugin_pk='
+            );
+        });
+
+        it('has correct ajax request if direction is "previous" and year is 2015, month is 7', function () {
+            spyOn($, 'ajax');
+            Cl.events._handler.call(
+                $('.js-trigger')[3],
+                { preventDefault: function () {} }
+            );
+
+            var callArgs = $.ajax.calls.allArgs()[0][0];
+
+            // validate ajax request url to have a proper year and month
+            expect(callArgs.url).toEqual(
+                '/en/events/get-dates/2015/6/?plugin_pk='
+            );
+        });
+
+        it('has correct ajax request if direction is "previous" and year is 2015, month is 1', function () {
+            spyOn($, 'ajax');
+            Cl.events._handler.call(
+                $('.js-trigger')[4],
+                { preventDefault: function () {} }
+            );
+
+            var callArgs = $.ajax.calls.allArgs()[0][0];
+
+            // validate ajax request url to have a proper year and month
+            expect(callArgs.url).toEqual(
+                '/en/events/get-dates/2014/12/?plugin_pk='
+            );
         });
     });
 
