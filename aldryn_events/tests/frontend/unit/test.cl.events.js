@@ -18,7 +18,7 @@
             this.markup = fixture.load('calendar.html');
         });
 
-        afterEach(function(){
+        afterEach(function () {
             fixture.cleanup();
         });
 
@@ -117,8 +117,8 @@
             );
         });
 
-        it('has correct ajax request if direction is "previous" and year is' +
-            ' 2015, month is 1', function () {
+        it('has correct ajax request if direction is "previous" and year is ' +
+            '2015, month is 1', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[4],
