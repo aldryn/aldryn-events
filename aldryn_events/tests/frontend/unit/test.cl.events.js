@@ -11,6 +11,8 @@
 
     // ########################################################################
     describe('cl.events.js:', function () {
+        var emptyFunction = function () {};
+
         beforeEach(function () {
             fixture.setBase('frontend/fixtures');
             this.markup = fixture.load('calendar.html');
@@ -45,35 +47,22 @@
         it('Cl.events._handler returns false if direction is not specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0],
-                { preventDefault: function () {} })
+                { preventDefault: emptyFunction })
             ).toEqual(false);
         });
 
-        it('Cl.events._handler returns undefined if direction is "next" and month is 7', function () {
+        it('Cl.events._handler returns undefined if direction is "next"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1],
-                { preventDefault: function () {} })
+                { preventDefault: emptyFunction })
             ).toEqual(undefined);
         });
 
-        it('Cl.events._handler returns undefined if direction is "next" and month is 12', function () {
-            expect(Cl.events._handler.call(
-                $('.js-trigger')[2],
-                { preventDefault: function () {} })
-            ).toEqual(undefined);
-        });
 
-        it('Cl.events._handler returns undefined if direction is "previous" and month is 7', function () {
+        it('Cl.events._handler returns undefined if direction is "previous"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3],
-                { preventDefault: function () {} })
-            ).toEqual(undefined);
-        });
-
-        it('Cl.events._handler returns undefined if direction is "previous" and month is 1', function () {
-            expect(Cl.events._handler.call(
-                $('.js-trigger')[4],
-                { preventDefault: function () {} })
+                { preventDefault: emptyFunction })
             ).toEqual(undefined);
         });
     });
