@@ -2,6 +2,7 @@
 import mock
 
 from django.template import Template
+from django.utils.translation import override
 
 from pyquery import PyQuery
 from sekizai.context import SekizaiContext
@@ -58,8 +59,9 @@ class TagsTestCase(EventBaseTestCase):
         {%% calendar 2015 1 'en' '%s' %%}
         """ % self.app_config.namespace
         t = Template(template_str)
-        html = t.render(SekizaiContext({}))
-        table = PyQuery(html)('table.table-calendar')
+        with override('en'):
+            html = t.render(SekizaiContext({}))
+            table = PyQuery(html)('table.table-calendar')
         links = table.find('td.events, td.multiday-events').find('a')
 
         # test if tag rendered important elements
