@@ -47,16 +47,16 @@
             'specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0],
-                this.preventEvent)
-            ).toEqual(false);
+                this.preventEvent))
+            .toEqual(false);
         });
 
         it('has Cl.events._handler to return undefined if direction is ' +
             '"next"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1],
-                this.preventEvent)
-            ).toEqual(undefined);
+                this.preventEvent))
+            .toEqual(undefined);
         });
 
 
@@ -64,8 +64,8 @@
             '"previous"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3],
-                this.preventEvent)
-            ).toEqual(undefined);
+                this.preventEvent))
+            .toEqual(undefined);
         });
 
         it('has correct ajax request if direction is "next" and year is ' +
