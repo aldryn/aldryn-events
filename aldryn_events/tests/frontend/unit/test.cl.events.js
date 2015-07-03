@@ -11,11 +11,10 @@
 
     // ########################################################################
     describe('cl.events.js:', function () {
-        var emptyFunction = function () {};
-
         beforeEach(function () {
             fixture.setBase('frontend/fixtures');
             this.markup = fixture.load('calendar.html');
+            this.preventEvent = { preventDefault: function () {} };
         });
 
         afterEach(function () {
@@ -48,7 +47,7 @@
             'specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0],
-                { preventDefault: emptyFunction })
+                this.preventEvent)
             ).toEqual(false);
         });
 
@@ -56,7 +55,7 @@
             '"next"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1],
-                { preventDefault: emptyFunction })
+                this.preventEvent)
             ).toEqual(undefined);
         });
 
@@ -65,7 +64,7 @@
             '"previous"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3],
-                { preventDefault: emptyFunction })
+                this.preventEvent)
             ).toEqual(undefined);
         });
 
@@ -74,7 +73,7 @@
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[1],
-                { preventDefault: emptyFunction }
+                this.preventEvent
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
@@ -90,7 +89,7 @@
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[2],
-                { preventDefault: emptyFunction }
+                this.preventEvent
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
@@ -106,7 +105,7 @@
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[3],
-                { preventDefault: emptyFunction }
+                this.preventEvent
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
@@ -122,7 +121,7 @@
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[4],
-                { preventDefault: emptyFunction }
+                this.preventEvent
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
