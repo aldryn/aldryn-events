@@ -65,6 +65,7 @@ HELPER_SETTINGS = {
             'hide_untranslated': False,
         }
     },
+    'PARLER_ENABLE_CACHING': False,
     'CMS_LANGUAGES': {
         'default': {
             'public': True,
