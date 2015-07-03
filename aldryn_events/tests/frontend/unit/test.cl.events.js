@@ -46,26 +46,23 @@
         it('has Cl.events._handler to return false if direction is not ' +
             'specified', function () {
             expect(Cl.events._handler.call(
-                $('.js-trigger')[0],
-                this.preventEvent))
-            .toEqual(false);
+                $('.js-trigger')[0], this.preventEvent))
+                .toEqual(false);
         });
 
         it('has Cl.events._handler to return undefined if direction is ' +
             '"next"', function () {
             expect(Cl.events._handler.call(
-                $('.js-trigger')[1],
-                this.preventEvent))
-            .toEqual(undefined);
+                $('.js-trigger')[1], this.preventEvent))
+                .toEqual(undefined);
         });
 
 
         it('has Cl.events._handler to return undefined if direction is ' +
             '"previous"', function () {
             expect(Cl.events._handler.call(
-                $('.js-trigger')[3],
-                this.preventEvent))
-            .toEqual(undefined);
+                $('.js-trigger')[3], this.preventEvent))
+                .toEqual(undefined);
         });
 
         it('has correct ajax request if direction is "next" and year is ' +
