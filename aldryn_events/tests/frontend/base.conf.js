@@ -6,7 +6,7 @@
 'use strict';
 
 // #############################################################################
-// #CONFIGURATION#
+// CONFIGURATION
 module.exports = {
     formatTaskName: function formatTaskName(browserName) {
         return [

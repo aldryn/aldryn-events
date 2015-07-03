@@ -7,7 +7,7 @@
 /* global describe, it, expect, browser */
 
 // #############################################################################
-// #INTEGRATION TEST#
+// INTEGRATION TEST
 describe('Django CMS website', function () {
     it('should have a title', function () {
         browser.get('http://www.django-cms.org');

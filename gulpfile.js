@@ -6,7 +6,7 @@
 'use strict';
 
 // #############################################################################
-// #IMPORTS#
+// IMPORTS
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var karma = require('karma').server;
@@ -16,7 +16,7 @@ var jscs = require('gulp-jscs');
 var webdriverUpdate = require('gulp-protractor').webdriver_update;
 
 // #############################################################################
-// #SETTINGS#
+// SETTINGS
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
     'js': PROJECT_ROOT + '/aldryn_events/boilerplates/bootstrap3/static/js/',
@@ -34,7 +34,7 @@ var PROJECT_PATTERNS = {
 };
 
 // #############################################################################
-// #LINTING#
+// LINTING
 gulp.task('lint', function () {
     return gulp.src(PROJECT_PATTERNS.lint)
         .pipe(jshint())
@@ -46,7 +46,7 @@ gulp.task('lint', function () {
 });
 
 // #########################################################
-// #TESTS#
+// TESTS
 gulp.task('tests', ['tests:unit', 'tests:lint']);
 gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
@@ -79,5 +79,5 @@ gulp.task('tests:watch', function () {
 });
 
 // #############################################################################
-// #COMMANDS#
+// COMMANDS
 gulp.task('default', ['lint']);

@@ -6,7 +6,7 @@
 'use strict';
 
 // #############################################################################
-// #CONFIGURATION#
+// CONFIGURATION
 var baseConf = require('./base.conf');
 
 module.exports = function (config) {
