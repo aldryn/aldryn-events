@@ -44,14 +44,16 @@
             expect(Cl.events.calendar.calls.count()).toEqual(5);
         });
 
-        it('has Cl.events._handler to return false if direction is not specified', function () {
+        it('has Cl.events._handler to return false if direction is not ' +
+            'specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0],
                 { preventDefault: emptyFunction })
             ).toEqual(false);
         });
 
-        it('has Cl.events._handler to return undefined if direction is "next"', function () {
+        it('has Cl.events._handler to return undefined if direction is ' +
+            '"next"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1],
                 { preventDefault: emptyFunction })
@@ -59,14 +61,16 @@
         });
 
 
-        it('has Cl.events._handler to return undefined if direction is "previous"', function () {
+        it('has Cl.events._handler to return undefined if direction is ' +
+            '"previous"', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3],
                 { preventDefault: emptyFunction })
             ).toEqual(undefined);
         });
 
-        it('has correct ajax request if direction is "next" and year is 2015, month is 7', function () {
+        it('has correct ajax request if direction is "next" and year is ' +
+            '2015, month is 7', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[1],
@@ -81,11 +85,12 @@
             );
         });
 
-        it('has correct ajax request if direction is "next" and year is 2015, month is 12', function () {
+        it('has correct ajax request if direction is "next" and year is ' +
+            '2015, month is 12', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[2],
-                { preventDefault: function () {} }
+                { preventDefault: emptyFunction }
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
@@ -96,11 +101,12 @@
             );
         });
 
-        it('has correct ajax request if direction is "previous" and year is 2015, month is 7', function () {
+        it('has correct ajax request if direction is "previous" and year is ' +
+            '2015, month is 7', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[3],
-                { preventDefault: function () {} }
+                { preventDefault: emptyFunction }
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
@@ -111,11 +117,12 @@
             );
         });
 
-        it('has correct ajax request if direction is "previous" and year is 2015, month is 1', function () {
+        it('has correct ajax request if direction is "previous" and year is' +
+            ' 2015, month is 1', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
                 $('.js-trigger')[4],
-                { preventDefault: function () {} }
+                { preventDefault: emptyFunction }
             );
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
