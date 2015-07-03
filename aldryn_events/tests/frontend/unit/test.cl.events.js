@@ -69,9 +69,7 @@
             '2015, month is 7', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
-                $('.js-trigger')[1],
-                this.preventEvent
-            );
+                $('.js-trigger')[1], this.preventEvent);
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
 
@@ -85,9 +83,7 @@
             '2015, month is 12', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
-                $('.js-trigger')[2],
-                this.preventEvent
-            );
+                $('.js-trigger')[2], this.preventEvent);
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
 
@@ -101,9 +97,7 @@
             '2015, month is 7', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
-                $('.js-trigger')[3],
-                this.preventEvent
-            );
+                $('.js-trigger')[3], this.preventEvent);
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
 
@@ -117,9 +111,7 @@
             '2015, month is 1', function () {
             spyOn($, 'ajax');
             Cl.events._handler.call(
-                $('.js-trigger')[4],
-                this.preventEvent
-            );
+                $('.js-trigger')[4], this.preventEvent);
 
             var callArgs = $.ajax.calls.allArgs()[0][0];
 
