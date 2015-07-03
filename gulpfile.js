@@ -52,8 +52,8 @@ gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
     karma.start({
-        'configFile': PROJECT_PATH.tests + '/karma.conf.js',
-        'singleRun': true
+        configFile: PROJECT_PATH.tests + '/karma.conf.js',
+        singleRun: true
     }, done);
 });
 
@@ -74,7 +74,7 @@ gulp.task('tests:integration', ['tests:webdriver'], function () {
 gulp.task('tests:watch', function () {
     // run javascript tests
     karma.start({
-        'configFile': PROJECT_PATH.tests + '/karma.conf.js'
+        configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
 });
 
