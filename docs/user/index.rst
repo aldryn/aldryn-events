@@ -1,6 +1,6 @@
-#####################
+###################
 Using Aldryn Events
-#####################
+###################
 
 .. note::
    This part of the guide assumes that django CMS has been :doc:`appropriately installed and
@@ -12,7 +12,8 @@ Using Aldryn Events
 Add an event
 ************
 
-Visit the Events page. You should see that the django CMS toolbar now contains a new item, *Events*. Select *Add Event...* from this menu.
+Visit the Events page. You should see that the django CMS toolbar now contains a new item,
+*Events*. Select *Add Event...* from this menu.
 
 Provide some basic details, such as:
 
