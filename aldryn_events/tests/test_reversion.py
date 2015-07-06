@@ -445,8 +445,10 @@ class ReversionTestCase(EventBaseTestCase):
             self.assertNotContains(response, content1_de)
 
             # test against the default urls
-            self.assertNotEqual(revision_2_reversed_url_de, default_event_url_en)
-            self.assertNotEqual(revision_2_reversed_url_de, default_event_url_de)
+            self.assertNotEqual(
+                revision_2_reversed_url_de, default_event_url_en)
+            self.assertNotEqual(
+                revision_2_reversed_url_de, default_event_url_de)
             # test against previous revision
             self.assertNotEqual(revision_2_reversed_url_de, revision_1_url_de)
             # test against the other translation
