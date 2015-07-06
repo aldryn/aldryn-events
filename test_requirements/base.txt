@@ -1,6 +1,5 @@
 aldryn-apphook-reload>=0.2.1
 coverage
-django-cms
 djangocms-admin-style
 djangocms-helper
 easy-thumbnails
