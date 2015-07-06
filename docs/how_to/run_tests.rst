@@ -6,7 +6,7 @@ Run the tests
 Backend Tests
 =============
 
-You can run the tests by running the following commands:
+You can run the tests by following:
 
 * ``virtualenv env`` to create the virtual environment
 * ``source env/bin/activate`` to activate it
