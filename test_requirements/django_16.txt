@@ -1,4 +1,4 @@
 Django>=1.6,<1.7
-django-reversion<1.8.3
+django-reversion<1.8.3  # rq.filter: <1.8.3
 South
 -r base.txt
