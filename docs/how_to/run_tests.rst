@@ -12,6 +12,7 @@ You can run the tests by running the following commands:
 * ``source env/bin/activate`` to activate it
 * ``pip install -e test_requirements/django_17.txt`` to install the
   requirements
+* ``python runtests.py`` to run the tests
 
 Note that you can install any of the ``django_xx.txt`` to use different Django
 versions.
