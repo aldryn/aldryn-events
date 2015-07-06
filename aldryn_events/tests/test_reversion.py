@@ -1,389 +1,485 @@
 # -*- coding: utf-8 -*-
+import reversion
+import six
+from datetime import datetime, timedelta
+
+from django.db import transaction
+
 from cms import api
-from cms.utils.i18n import force_language
-from django.core.urlresolvers import reverse
-import mock
-from aldryn_events.models import Event, EventsConfig
-from aldryn_events.tests.base import (
-    EventBaseTestCase, tz_datetime
-)
+from aldryn_events.models import Event
+from aldryn_reversion.core import create_revision_with_placeholders
+
+from parler.utils.context import switch_language
+
+from .base import EventBaseTestCase, tz_datetime
 
 
-def calendar_url(year, month, language):
-    with force_language(language):
-        url = reverse(
-            'aldryn_events:get-calendar-dates',
-            kwargs={'year': year, 'month': month}
-        )
-    return url
+class ReversionTestCase(EventBaseTestCase):
+    def setUp(self):
+        super(ReversionTestCase, self).setUp()
+        self.create_base_pages()
+        self.default_en = {
+            'title': 'Event2014',
+            'slug': 'open-air',
+            'start_date': tz_datetime(2014, 9, 10),
+            'publish_at': tz_datetime(2014, 9, 10, 9),
+            'app_config': self.app_config
+        }
+        self.default_de = {
+            'title': 'Ereignis',
+            'slug': 'im-freien'
+        }
+        self.default_content = {
+            'en': 'Default english content',
+            'de': 'default german content'
+        }
 
+    def create_revision(self, obj, content=None, **kwargs):
+        with transaction.atomic():
+            with reversion.create_revision():
+                # populate event with new values
+                for property, value in six.iteritems(kwargs):
+                    setattr(obj, property, value)
+                if content:
+                    # get correct plugin for language. do not update the same
+                    # one.
+                    language = obj.get_current_language()
+                    plugins = obj.description.get_plugins().filter(
+                        language=language)
+                    plugin = plugins[0].get_plugin_instance()[0]
+                    plugin.body = content
+                    plugin.save()
+                obj.save()
 
-class EventPluginsTestCase(EventBaseTestCase):
+    def revert_to(self, object_with_revision, revision_number):
+        """
+        Revert <object with revision> to revision number.
+        """
+        # get by position, since reversion_id is not reliable,
+        version = list(reversed(
+            reversion.get_for_object(
+                object_with_revision)))[revision_number - 1]
+        version.revision.revert()
 
-    def new_event_from_num(self, num, start_date, end_date, publish_at):
-        """ create event based on a num in both languages """
-        text, text_de = 'event', 'ereignis'
-        event = self.create_event(
-            title='{0} {1} en'.format(text, num),
-            slug='{0}-{1}-en'.format(text, num),
-            start_date=start_date, end_date=end_date,
-            publish_at=publish_at,
-            de={
-                'title': '{0} {1} de'.format(text_de, num),
-                'slug': '{0}-{1}-de'.format(text_de, num)
-            }
-        )
+    def create_default_event(self, translated=False):
+
+        event = Event.objects.create(**self.default_en)
+        with switch_language(event, 'en'):
+            api.add_plugin(event.description, 'TextPlugin', 'en',
+                           body=self.default_content['en'])
+
+        # check if we need a translated event
+        if translated:
+            event.create_translation('de', **self.default_de)
+            with switch_language(event, 'de'):
+                api.add_plugin(event.description, 'TextPlugin', 'de',
+                               body=self.default_content['de'])
+
         return Event.objects.language('en').get(pk=event.pk)
 
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_event_list_plugin(self, timezone_mock):
+    def make_new_values(self, values_dict, replace_with):
         """
-        We add an event to the Event Plugin and look it up
+        Replace formating symbol {0} with replace_with param. modifies dates by
+        + timedelta(days=int(replace_with)) Returns new dictionnary with same
+        keys and replaced symbols.
         """
-        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
-        # default event start_date='2014-09-10' publish_at='2014-01-01 12:00'
-        event1 = self.create_event(
-            title='Event2014',
-            slug='open-air',
-            start_date=tz_datetime(2014, 9, 10),
-            publish_at=tz_datetime(2014, 1, 1, 9),
-            de={'title': 'Ereignis', 'slug': 'im-freien'}
-        )
-        event2 = self.create_event(
-            title='Event2014 only english',
-            start_date=tz_datetime(2014, 1, 29),
-            publish_at=tz_datetime(2014, 1, 1, 12)
-        )
+        new_dict = {}
+        for key, value in values_dict.items():
+            if key in ('start_date', 'end_date'):
+                new_val = value + timedelta(days=replace_with)
+                if type(new_val) != datetime.date:
+                    new_val = new_val.date()
+            elif key in ('start_time', 'end_time'):
+                new_val = value + timedelta(hours=replace_with)
+            elif key in ('publish_at',):
+                new_val = value + timedelta(days=replace_with)
+            else:
+                new_val = value.format(replace_with)
+            new_dict[key] = new_val
+        return new_dict
 
-        root_page = self.create_root_page()
-        page = api.create_page(
-            'Events en', self.template, 'en', published=True, parent=root_page,
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace,
-            publication_date=tz_datetime(2014, 1, 8)
-        )
-        api.create_title('de', 'Events de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
-        )
-        plugin_de = api.add_plugin(
-            ph, 'EventListCMSPlugin', 'de', app_config=self.app_config,
-        )
-        plugin_en.events = [event1, event2]
-        plugin_en.save()
-        plugin_de.events = [event1]
-        plugin_de.save()
-        page.publish('en')
-        page.publish('de')
-
-        # EN: test plugin rendering
-        with force_language('en'):
-            response = self.client.get('/en/events-en/')
-            event1.set_current_language('en')
-            self.assertContains(response, event1.title)
-            self.assertContains(response, event1.get_absolute_url())
-            event2.set_current_language('en')
-            self.assertContains(response, event2.title)
-            self.assertContains(response, event2.get_absolute_url())
-
-        # DE: test plugin rendering
-        with force_language('de'):
-            response = self.client.get('/de/events-de/')
-            event1.set_current_language('de')
-            self.assertContains(response, event1.title)
-            self.assertContains(response, event1.get_absolute_url())
-            self.assertContains(response, event2.title)
-            self.assertContains(response, event2.get_absolute_url())
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_upcoming_plugin_for_future(self, timezone_mock):
-        """
-        Test the upcoming events plugin
-        """
-        timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-        evpage = api.create_page(
-            title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
-            parent=self.create_root_page(),
-            apphook='EventListAppHook',
-            apphook_namespace=self.app_config.namespace,
-            publication_date=tz_datetime(2014, 1, 1)
-        )
-        api.create_title('de', 'Events de', evpage, slug='eventsapp')
-        evpage.publish('en')
-        evpage.publish('de')
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-            publication_date=tz_datetime(2014, 1, 1)
-
-        )
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        api.add_plugin(ph, 'UpcomingPlugin', 'en', app_config=self.app_config)
-        api.add_plugin(ph, 'UpcomingPlugin', 'de', app_config=self.app_config)
-        page.publish('en')
-        page.publish('de')
-
-        for i in range(1, 7):
-            self.new_event_from_num(
-                i,
-                start_date=tz_datetime(2014, 1, 29),
-                end_date=tz_datetime(2014, 2, 5),
-                publish_at=tz_datetime(2014, 1, 1, 12)
-            )
-
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
-        rendered = {}
-        with force_language('en'):
-            response = self.client.get(page.get_absolute_url('en'))
-            rendered['en'] = response.content
-        with force_language('de'):
-            response = self.client.get(page.get_absolute_url('de'))
-            rendered['de'] = response.content
-
-        for i in range(1, 6):
-            for lang in ['en', 'de']:
-                text = 'event' if lang == 'en' else 'ereignis'
-                name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(
-                    name, rendered[lang],
-                    'Title "{0}" not found in rendered plugin for '
-                    'language "{1}".'.format(name, lang)
-                )
-                self.assertIn(
-                    url, rendered[lang],
-                    'URL "{0}" not found in rendered plugin for '
-                    'language "{1}".'.format(url, lang)
-                )
-
-        self.assertNotIn(
-            'event 6 en', rendered,
-            'Title "event 6 en" found in rendered plugin, but limit is '
-            '5 entries.'
-        )
-        self.assertNotIn(
-            'event-6-en', rendered,
-            'URL "event-6-en" found in rendered plugin, but limit is '
-            '5 entries.'
-        )
-        self.assertNotIn(
-            'event 6 de', rendered,
-            'Title "event 6 de" found in rendered plugin, but limit '
-            'is 5 entries.'
-        )
-        self.assertNotIn(
-            'event-6-de', rendered,
-            'URL "event-6-de" found in rendered plugin, but limit '
-            'is 5 entries.'
-        )
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_upcoming_plugin_with_not_existing_ns(self, timezone_mock):
-        timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-        self.create_base_pages()
-        new_config = EventsConfig.objects.create(namespace='new_namespace')
-        page = api.create_page('Plugin test en', self.template, 'en',
-                               published=True, slug='plugin-test-en')
-        api.create_title('de', 'Plugin test de', page)
-        ph = page.placeholders.get(slot='content')
-        api.add_plugin(ph, 'UpcomingPlugin', 'en', app_config=new_config)
-        api.add_plugin(ph, 'UpcomingPlugin', 'de', app_config=new_config)
-        page.publish('en')
-        page.publish('de')
-
-        with force_language('en'):
-            event = Event.objects.create(
-                title='Test event namespace',
-                slug='test-event-namespace',
-                start_date=tz_datetime(2014, 1, 10),
-                publish_at=tz_datetime(2014, 1, 1),
-                app_config=new_config
-            )
-        event.create_translation(
-            'de',
-            title='Test event namespace de',
-            slug='test-event-namespace-de')
-        for language in ('en', 'de'):
-            page_url = page.get_absolute_url(language)
-            response = self.client.get(page_url)
-            self.assertEqual(response.status_code, 200)
-
-    @mock.patch('aldryn_events.managers.timezone')
-    def test_upcoming_plugin_for_past(self, timezone_mock):
-        """
-        Test the upcoming events plugin for past entries
-        """
-        timezone_mock.now.return_value = tz_datetime(2014, 7, 6, 12)
-        evpage = api.create_page(
-            title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
-            apphook='EventListAppHook',
-            parent=self.create_root_page(),
-            apphook_namespace=self.app_config.namespace,
-            publication_date=tz_datetime(2014, 1, 1)
-        )
-        api.create_title('de', 'Events de', evpage, slug='eventsapp')
-        evpage.publish('en')
-        evpage.publish('de')
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-        )
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        plugin_en = api.add_plugin(ph, 'UpcomingPlugin', 'en',
-                                   app_config=self.app_config)
-        plugin_de = api.add_plugin(ph, 'UpcomingPlugin', 'de',
-                                   app_config=self.app_config)
-        plugin_en.past_events, plugin_de.past_events = True, True
-        plugin_en.save()
-        plugin_de.save()
-        page.publish('en')
-        page.publish('de')
-
-        for i in range(1, 7):
-            self.new_event_from_num(
-                i,
-                start_date=tz_datetime(2014, 6, 29),
-                end_date=tz_datetime(2014, 7, 5),
-                publish_at=tz_datetime(2014, 6, 20, 12)
-            )
-
-        # Test plugin rendering for both languages in a forloop. I don't
-        # like it but save lot of text space since we test for 5 entries
-        rendered = {}
-        with force_language('en'):
-            response = self.client.get(page.get_absolute_url('en'))
-            rendered['en'] = response.content
-        with force_language('de'):
-            response = self.client.get(page.get_absolute_url('de'))
-            rendered['de'] = response.content
-
-        for i in range(1, 6):
-            for lang in ['en', 'de']:
-                text = 'event' if lang == 'en' else 'ereignis'
-                name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
-                self.assertIn(
-                    name, rendered[lang],
-                    'Title "{0}" not found in rendered plugin for '
-                    'language "{1}".'.format(name, lang)
-                )
-                self.assertIn(
-                    url, rendered[lang],
-                    'URL "{0}" not found in rendered plugin for '
-                    'language "{1}".'.format(url, lang)
-                )
-
-        self.assertNotIn(
-            'event 6 en', rendered,
-            'Title "event 6 en" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event-6-en', rendered,
-            'URL "event-6-en" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event 6 de', rendered,
-            'Title "event 6 de" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-        self.assertNotIn(
-            'event-6-de', rendered,
-            'URL "event-6-de" found in rendered plugin, but limit is 5 '
-            'entries.'
-        )
-
-    @mock.patch('aldryn_events.managers.timezone')
-    @mock.patch('aldryn_events.cms_plugins.timezone')
-    def test_calendar_plugin(self, timezone_mock, plugin_timezone_mock):
-        """
-        This plugin should show a link to event list page on days that has
-        events
-        """
-        timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-        plugin_timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
-        self.create_base_pages()
-        page = api.create_page(
-            'Home en', self.template, 'en', published=True, slug='home',
-            publication_date=tz_datetime(2014, 1, 2)
-        )
-
-        api.create_title('de', 'Home de', page)
-        ph = page.placeholders.get(slot='content')
-        plugins = {
-            'en': api.add_plugin(
-                ph, 'CalendarPlugin', 'en', app_config=self.app_config
-            ),
-            'de': api.add_plugin(
-                ph, 'CalendarPlugin', 'de', app_config=self.app_config
-            )
+    def test_revert_revision(self):
+        values_raw = {
+            'title': 'Title revision {0}',
+            'slug': 'revision-{0}-slug',
+            'start_date': tz_datetime(2014, 9, 10),
+            'publish_at': tz_datetime(2014, 9, 10),
         }
-        page.publish('en')
-        page.publish('de')
 
-        for i in range(1, 7):
-            self.new_event_from_num(
-                i,
-                start_date=tz_datetime(2014, 1, 29, 12),
-                end_date=tz_datetime(2014, 2, 5, 12),
-                publish_at=tz_datetime(2014, 1, 1, 12)
-            )
+        content1 = 'Revision 1 content'
+        content2 = 'Revision 2 content, brand new one!'
 
-        # add a event for next month to check if date is rendered
-        self.new_event_from_num(
-            7,
-            start_date=tz_datetime(2014, 2, 10, 12),
-            end_date=tz_datetime(2014, 2, 15, 1),
-            publish_at=tz_datetime(2014, 1, 1, 12)
-        )
-        rendered = {}
+        event = self.create_default_event()
+        # revision 1
+        revision_1_values = self.make_new_values(values_raw, 1)
+        event.set_current_language('en')
+        self.create_revision(event, content=content1, **revision_1_values)
+        # revision 2
+        revision_2_values = self.make_new_values(values_raw, 2)
 
-        with force_language('en'):
-            rendered['en'] = {
-                'p1': self.client.get(page.get_absolute_url()).content,
-                'p2': self.client.get(
-                    "{0}?plugin_pk={1}".format(
-                        calendar_url(2014, 2, 'en'), plugins['en'].pk
-                    )
-                ).content
-            }
-        with force_language('de'):
-            rendered['de'] = {
-                'p1': self.client.get(page.get_absolute_url()).content,
-                'p2': self.client.get(
-                    "{0}?plugin_pk={1}".format(
-                        calendar_url(2014, 2, 'de'), plugins['de'].pk
-                    )
-                ).content
-            }
+        event = Event.objects.get(pk=event.pk)
+        event.set_current_language('en')
+        self.create_revision(event, content=content2, **revision_2_values)
 
-        html_p1 = ('<td class="events"><a href="/{0}/eventsapp/2014/1/29/">'
-                   '29</a></td>')
-        html_p2 = ('<td class="events"><a href="/{0}/eventsapp/2014/2/10/">'
-                   '10</a></td>')
-        self.assertIn(
-            html_p1.format('de'), rendered['de']['p1'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p1.format('de'), 'DE')
-        )
-        self.assertIn(
-            html_p1.format('en'), rendered['en']['p1'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p1.format('en'), 'EN')
-        )
+        # check that latest revision values are used
+        with switch_language(event, 'en'):
+            url_revision_2 = event.get_absolute_url()
+        response = self.client.get(url_revision_2)
+        self.assertContains(response, revision_2_values['title'])
+        self.assertContains(response, content2)
+        # test that there is no default values
+        self.assertNotContains(response, self.default_content['en'])
+        self.assertNotContains(response, self.default_en['title'])
+        # test that there is no previous version content (placeholder)
+        self.assertNotContains(response, content1)
 
-        self.assertIn(
-            html_p2.format('de'), rendered['de']['p2'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p2.format('de'), 'DE')
-        )
-        self.assertIn(
-            html_p2.format('en'), rendered['en']['p2'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p2.format('en'), 'EN')
-        )
+        # test revert for event
+        self.revert_to(event, 1)
+        # test urls, since slug was changed they shouldn't be the same.
+        event = Event.objects.get(pk=event.pk)
+        with switch_language(event, 'en'):
+            url_revision_1 = event.get_absolute_url()
+        self.assertNotEqual(url_revision_2, url_revision_1)
+
+        response = self.client.get(url_revision_1)
+
+        self.assertContains(response, revision_1_values['title'])
+        self.assertContains(response, content1)
+
+        # test that there is no default content
+        self.assertNotContains(response, self.default_content['en'])
+        self.assertNotContains(response, self.default_en['title'])
+
+        # test that there is no revision 2 content
+        self.assertNotContains(response, revision_2_values['title'])
+        # test that there is no revision 2 content (placeholder)
+        self.assertNotContains(response, content2)
+
+    def test_revert_revision_with_translation(self):
+        # does not covers image translated FK field
+        values_raw_en = {
+            'title': 'Title revision {0} en',
+            'slug': 'revision-{0}-slug-en',
+            'short_description': 'revision {0} short description en'
+        }
+
+        values_raw_de = {
+            'title': 'Title revision {0} de',
+            'slug': 'revision-{0}-slug-de',
+            'short_description': 'revision {0} short description de'
+        }
+
+        content1_en = 'Revision 1 content'
+        content2_en = 'Revision 2 content, brand new one!'
+
+        content1_de = 'Revision German 1 content'
+        content2_de = 'Revision German 2 content, brand new one!'
+
+        event = self.create_default_event(translated=True)
+
+        # prepare default urls to compare.
+        with switch_language(event, 'en'):
+            default_event_url_en = event.get_absolute_url()
+        with switch_language(event, 'en'):
+            default_event_url_de = event.get_absolute_url()
+
+        # revision 1 en
+        revision_1_values_en = self.make_new_values(values_raw_en, 1)
+        revision_1_values_de = self.make_new_values(values_raw_de, 1)
+        event.set_current_language('en')
+        self.create_revision(event, content=content1_en,
+                             **revision_1_values_en)
+        # revision 2 de
+        event = Event.objects.get(pk=event.pk)
+        event.set_current_language('de')
+        self.create_revision(event, content=content1_de,
+                             **revision_1_values_de)
+
+        # test latest revision with respect to languages
+        with switch_language(event, 'en'):
+            revision_1_url_en = event.get_absolute_url()
+            response = self.client.get(revision_1_url_en)
+
+            self.assertContains(response, revision_1_values_en['title'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
+            self.assertNotEqual(revision_1_url_en, default_event_url_en)
+            self.assertNotEqual(revision_1_url_en, default_event_url_de)
+
+        with switch_language(event, 'de'):
+            revision_1_url_de = event.get_absolute_url()
+            response = self.client.get(revision_1_url_de)
+
+            self.assertContains(response, revision_1_values_de['title'])
+            self.assertContains(response,
+                                revision_1_values_de['short_description'])
+            # test against the default urls
+            self.assertNotEqual(revision_1_url_de, default_event_url_en)
+            self.assertNotEqual(revision_1_url_de, default_event_url_de)
+            # test against the other translation
+            self.assertNotEqual(revision_1_url_de, revision_1_url_en)
+
+        # revision 2a (3) change only german translation
+        revision_2_values_de = self.make_new_values(values_raw_de, 2)
+        event = Event.objects.get(pk=event.pk)
+        event.set_current_language('de')
+        self.create_revision(event, content=content2_de,
+                             **revision_2_values_de)
+
+        event = Event.objects.get(pk=event.pk)
+        # test latest (rev 2a atm) revision with respect to languages
+        with switch_language(event, 'en'):
+            revision_2_url_en = event.get_absolute_url()
+            response = self.client.get(revision_2_url_en)
+
+            self.assertContains(response, revision_1_values_en['title'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
+            self.assertContains(response, content1_en)
+
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
+            self.assertNotContains(response, content1_de)
+            self.assertNotContains(response, content2_de)
+
+            # compare with default (initial) urls.
+            self.assertNotEqual(revision_2_url_en, default_event_url_en)
+            self.assertNotEqual(revision_2_url_en, default_event_url_de)
+
+            # check that url was not changed.
+            self.assertEqual(revision_2_url_en, revision_1_url_en)
+
+        with switch_language(event, 'de'):
+            revision_2_url_de = event.get_absolute_url()
+            response = self.client.get(revision_2_url_de)
+
+            self.assertContains(response, revision_2_values_de['title'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
+            self.assertContains(response, content2_de)
+            # test that other translation content is not being served using
+            # revision_1_values_en since it is the only existing English values
+            # so far
+            self.assertNotContains(response, revision_1_values_en['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
+            self.assertNotContains(response, content1_en)
+
+            # test that it doesnt contains previous revision data
+            self.assertNotContains(response, revision_1_values_de['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
+            self.assertNotContains(response, content1_de)
+
+            # test against the default urls
+            self.assertNotEqual(revision_2_url_de, default_event_url_en)
+            self.assertNotEqual(revision_2_url_de, default_event_url_de)
+            # test against previous revision
+            self.assertNotEqual(revision_2_url_de, revision_1_url_de)
+            # test against the other translation
+            self.assertNotEqual(revision_2_url_de, revision_2_url_en)
+
+        # revision 2b (4) english translation update
+        revision_2_values_en = self.make_new_values(values_raw_en, 2)
+        event = Event.objects.get(pk=event.pk)
+        event.set_current_language('en')
+        self.create_revision(event, content=content2_en,
+                             **revision_2_values_en)
+
+        event = Event.objects.get(pk=event.pk)
+        # test latest (rev 2b atm) revision with respect to languages
+        with switch_language(event, 'en'):
+            revision_2b_url_en = event.get_absolute_url()
+            response = self.client.get(revision_2b_url_en)
+            # test latest rev content
+            self.assertContains(response, revision_2_values_en['title'])
+            self.assertContains(response,
+                                revision_2_values_en['short_description'])
+            self.assertContains(response, content2_en)
+
+            # test that there is no prev version content
+            self.assertNotContains(response, content1_en)
+
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
+            self.assertNotContains(response, content1_de)
+            self.assertNotContains(response, content2_de)
+
+            # compare with default (initial) urls.
+            self.assertNotEqual(revision_2b_url_en, default_event_url_en)
+            self.assertNotEqual(revision_2b_url_en, default_event_url_de)
+
+            # check that url was changed.
+            self.assertNotEqual(revision_2b_url_en, revision_1_url_en)
+            # FIXME: not sure if we need to check against other revision url,
+            # even though that translation wasn't changed
+            # test against german translation url (previously built)
+            # self.assertNotEqual(revision_2b_url_en, revision_2_url_de)
+
+        with switch_language(event, 'de'):
+            revision_2b_url_de = event.get_absolute_url()
+            response = self.client.get(revision_2b_url_de)
+
+            self.assertContains(response, revision_2_values_de['title'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
+            self.assertContains(response, content2_de)
+            # test that other translation content is not being served
+            # previous en revision
+            self.assertNotContains(response, revision_1_values_en['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
+            self.assertNotContains(response, content1_en)
+            # latest en revision
+            self.assertNotContains(response, revision_2_values_en['title'])
+            self.assertNotContains(response,
+                                   revision_2_values_en['short_description'])
+            self.assertNotContains(response, content2_en)
+
+            # test that it doesnt contains previous revision data
+            self.assertNotContains(response, revision_1_values_de['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
+            self.assertNotContains(response, content1_de)
+
+            # test against the default urls
+            self.assertNotEqual(revision_2b_url_de, default_event_url_en)
+            self.assertNotEqual(revision_2b_url_de, default_event_url_de)
+            # test against previous revision
+            self.assertNotEqual(revision_2b_url_de, revision_1_url_de)
+            # test against the other translation
+            # previous revision en url
+            self.assertNotEqual(revision_2b_url_de, revision_2_url_en)
+            # latest revision en url
+            self.assertNotEqual(revision_2b_url_de, revision_2b_url_en)
+
+            # test that de url is not changed in new revision
+            self.assertEqual(revision_2b_url_de, revision_2_url_de)
+
+        # finaly the revert part.
+        # rever to 1, EN=1 DE=1
+        self.revert_to(event, 2)
+        # get latest state instead of in memory
+        event = Event.objects.get(pk=event.pk)
+        with switch_language(event, 'en'):
+            revision_1_reverted_url_en = event.get_absolute_url()
+            response = self.client.get(revision_1_reverted_url_en)
+
+            self.assertContains(response, revision_1_values_en['title'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
+            self.assertNotEqual(revision_1_reverted_url_en,
+                                default_event_url_en)
+            self.assertNotEqual(revision_1_reverted_url_en,
+                                default_event_url_de)
+
+            # test that it is the same.
+            self.assertEqual(revision_1_reverted_url_en, revision_1_url_en)
+
+        with switch_language(event, 'de'):
+            revision_1_reverted_url_de = event.get_absolute_url()
+            response = self.client.get(revision_1_reverted_url_de)
+
+            self.assertContains(response, revision_1_values_de['title'])
+            self.assertContains(response,
+                                revision_1_values_de['short_description'])
+            # test against the default urls
+            self.assertNotEqual(revision_1_reverted_url_de,
+                                default_event_url_en)
+            self.assertNotEqual(revision_1_reverted_url_de,
+                                default_event_url_de)
+            # test against the other translation
+            self.assertNotEqual(revision_1_reverted_url_de, revision_1_url_en)
+            self.assertEqual(revision_1_reverted_url_de, revision_1_url_de)
+
+        # revert to 3, EN=1 DE=2
+        self.revert_to(event, 3)
+        # test latest (rev 2a atm) revision with respect to languages
+        event = Event.objects.get(pk=event.pk)
+        with switch_language(event, 'en'):
+            revision_2_reversed_url_en = event.get_absolute_url()
+            response = self.client.get(revision_2_reversed_url_en)
+
+            self.assertContains(response, revision_1_values_en['title'])
+            self.assertContains(response,
+                                revision_1_values_en['short_description'])
+            self.assertContains(response, content1_en)
+
+            # test that en version in last revision doesn't contains german
+            # content (placeholder)
+            self.assertNotContains(response, content1_de)
+            self.assertNotContains(response, content2_de)
+
+            # compare with default (initial) urls.
+            self.assertNotEqual(revision_2_reversed_url_en,
+                                default_event_url_en)
+            self.assertNotEqual(revision_2_reversed_url_en,
+                                default_event_url_de)
+
+            # check that url was not changed.
+            self.assertEqual(revision_2_reversed_url_en, revision_2_url_en)
+
+            # plugin and revision related
+            self.assertNotContains(response, content2_en)
+
+        with switch_language(event, 'de'):
+            revision_2_reversed_url_de = event.get_absolute_url()
+            response = self.client.get(revision_2_reversed_url_de)
+
+            self.assertContains(response, revision_2_values_de['title'])
+            self.assertContains(response,
+                                revision_2_values_de['short_description'])
+            self.assertContains(response, content2_de)
+            # test that other translation content is not being served using
+            # revision_1_values_en since it is the only existing English values
+            # so far
+            self.assertNotContains(response, revision_1_values_en['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_en['short_description'])
+            self.assertNotContains(response, content1_en)
+
+            # test that it doesnt contains previous revision data
+            self.assertNotContains(response, revision_1_values_de['title'])
+            self.assertNotContains(response,
+                                   revision_1_values_de['short_description'])
+            self.assertNotContains(response, content1_de)
+
+            # test against the default urls
+            self.assertNotEqual(revision_2_reversed_url_de, default_event_url_en)
+            self.assertNotEqual(revision_2_reversed_url_de, default_event_url_de)
+            # test against previous revision
+            self.assertNotEqual(revision_2_reversed_url_de, revision_1_url_de)
+            # test against the other translation
+            self.assertNotEqual(revision_2_reversed_url_de, revision_2_url_en)
+
+    def test_edit_plugin_directly(self):
+        content1 = 'Content 1 text'
+        content2 = 'Content 2 text'
+
+        event = self.create_default_event()
+        # revision 1
+        self.create_revision(event, content1)
+
+        self.assertEqual(len(reversion.get_for_object(event)), 1)
+
+        # revision 2
+        with transaction.atomic():
+            with reversion.create_revision():
+                plugins = event.description.get_plugins().filter(
+                    language=event.get_current_language())
+                plugin = plugins[0].get_plugin_instance()[0]
+                plugin.body = content2
+                plugin.save()
+                create_revision_with_placeholders(event)
+
+        self.assertEqual(len(reversion.get_for_object(event)), 2)
+
+        response = self.client.get(event.get_absolute_url())
+        self.assertContains(response, content2)
+        self.assertNotContains(response, content1)
+
+        self.revert_to(event, 1)
+        event = Event.objects.get(pk=event.pk)
+        response = self.client.get(event.get_absolute_url())
+        self.assertContains(response, content1)
+        self.assertNotContains(response, content2)
