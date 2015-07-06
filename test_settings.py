@@ -104,7 +104,7 @@ HELPER_SETTINGS = {
     # disable migration for DJ 1.7 in tests
     'MIGRATION_MODULES': DisableMigrations(),
     'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
-    'DEBUG': False,
+    'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
@@ -128,7 +128,7 @@ HELPER_SETTINGS = {
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware'
     ],
-    'ALDRYN_BOILERPLATE_NAME': 'legacy',
+    'ALDRYN_BOILERPLATE_NAME': 'bootstrap3',
     'STATICFILES_FINDERS': [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         # important! place right before
