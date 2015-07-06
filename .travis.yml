@@ -36,7 +36,7 @@ before_script:
   - npm install -g gulp
   - npm install -g codeclimate-test-reporter
   - npm install
-  - pythom setup.py install
+  - python setup.py install
   - python test_settings.py server
 
 after_script:
