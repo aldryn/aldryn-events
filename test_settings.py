@@ -104,7 +104,7 @@ HELPER_SETTINGS = {
     # disable migration for DJ 1.7 in tests
     'MIGRATION_MODULES': DisableMigrations(),
     'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
-    'DEBUG': True,
+    'DEBUG': False,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
@@ -157,7 +157,8 @@ HELPER_SETTINGS = {
         'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
         'django.template.loaders.app_directories.Loader',
         'django.template.loaders.eggs.Loader'
-    )
+    ),
+    'ALLOWED_HOSTS': ['*'],
 }
 
 
