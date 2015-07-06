@@ -132,7 +132,7 @@ describe('cl.events.js:', function () {
 
         it('has ajax request with "success" function replacing the table ' +
             'class correctly', function () {
-            spyOn($, 'ajax').and.callFake(function(params) {
+            spyOn($, 'ajax').and.callFake(function (params) {
                 params.success('<table class="test-table"></table>');
             });
 
