@@ -27,6 +27,7 @@ REQUIREMENTS = [
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
     'django-tablib>=3.0',
+    'django>=1.6,<1.8',
     'djangocms-text-ckeditor',
     'python-dateutil',
 ]
