@@ -36,14 +36,17 @@ var PROJECT_PATTERNS = {
 // #############################################################################
 // LINTING
 gulp.task('lint', function () {
-    gulp.src(PROJECT_PATTERNS.lint)
+    return gulp.src(PROJECT_PATTERNS.lint)
         .pipe(jshint())
         .pipe(jscs())
         .on('error', function (error) {
             gutil.log('\n' + error.message);
+            if (process.env.CI) {
+                // Force the process to exit with error code
+                process.exit(1);
+            }
         })
-        .pipe(jshint.reporter('jshint-stylish'))
-        .pipe(jshint.reporter('fail'));
+        .pipe(jshint.reporter('jshint-stylish'));
 });
 
 // #########################################################
