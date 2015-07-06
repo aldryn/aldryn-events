@@ -1,6 +1,8 @@
 aldryn-apphook-reload>=0.2.1
 coverage
+djangocms-admin-style
 djangocms-helper
+easy-thumbnails
 importlib
 mock
 pyquery

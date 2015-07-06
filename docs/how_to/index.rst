@@ -2,5 +2,4 @@
 How-to guides
 #############
 
-TODO
-
+To be completed

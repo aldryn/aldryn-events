@@ -55,26 +55,24 @@ Running tests
 Aldryn Events uses `django CMS Helper <https://github.com/nephila/djangocms-helper>`_ to run its
 test suite.
 
-There's more than one way to do this, but here's one to help you get started::
+Backend Tests
+=============
 
-    # create a virtual environment
-    virtualenv test-aldryn-events
+To run the tests, in the aldryn-events directory::
 
-    # activate it
-    cd test-aldryn-events/
-    source bin/activate
+    virtualenv env  # create a virtual environment
+    source env/bin/activate  # activate it
+    python setup.py install  # install the package requirements
+    pip install -r test_requirements/django_17.txt  # install the test requirements
+    python runtests.py  # run the tests
 
-    # get Aldryn Events from GitHub
-    git clone git@github.com:aldryn/aldryn-events.git
+You can run the tests against a different version of Django by using the appropriate value in
+``django_xx.txt`` when installing the test requirements.
 
-    # downgrade pip to a version < 6
-    pip install -U 'pip<6'
 
-    # install the dependencies for testing
-    pip install -Ur aldryn-events/test_requirements/django_17.txt
+Frontend Tests
+==============
 
-    # run the test suite
-    # note that you must be in the aldryn-events directory when you do this,
-    # otherwise you'll get "Template not found" errors
-    cd aldryn-events
-    python runtests.py
+Follow the instructions in the `aldryn-boilerplate-bootstrap3
+<https://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/testing/index.html>`_
+documentation.
