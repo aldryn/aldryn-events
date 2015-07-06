@@ -133,7 +133,8 @@ describe('cl.events.js:', function () {
         it('has ajax request with "success" function replacing the table ' +
             'class correctly', function () {
             spyOn($, 'ajax').and.callFake(function (params) {
-                params.success('<table class="test-table"></table>');
+                params.success('<table class="test-table" data-month' +
+                    '="Testmonth" data-year="2020"></table>');
             });
 
             Cl.events._handler.call(
@@ -143,6 +144,24 @@ describe('cl.events.js:', function () {
             expect($('.table-calendar').length).toEqual(4);
             // validate that the table with class "test-table" appeared
             expect($('.test-table').length).toEqual(1);
+
+            // validate that h3 title gets updated with new month and year
+            expect($('h3')[4].innerHTML).toEqual('Testmonth 2020');
+        });
+
+        it('has ajax request with "error" function alert working ' +
+            'correctly', function () {
+            spyOn($, 'ajax').and.callFake(function (params) {
+                params.error();
+            });
+
+            spyOn(window, 'alert');
+
+            Cl.events._handler.call(
+                $('.js-trigger')[5], this.preventEvent);
+
+            expect(window.alert).toHaveBeenCalledWith('Test: There was a ' +
+                'problem accessing the calendar, please try again.');
         });
     });
 
