@@ -13,6 +13,7 @@ if not py27:
     )
 
 REQUIREMENTS = [
+    'Django>=1.6,<1.8',
     'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
@@ -26,7 +27,6 @@ REQUIREMENTS = [
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
     'django-tablib>=3.0',
-    'django>=1.6,<1.8',
     'djangocms-text-ckeditor',
     'python-dateutil',
 ]
