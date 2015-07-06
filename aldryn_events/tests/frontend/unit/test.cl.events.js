@@ -38,8 +38,8 @@ describe('cl.events.js:', function () {
 
             // validate that calendar was called inside Cl.events.init()
             expect(Cl.events.calendar).toHaveBeenCalled();
-            // validate 5 calls as 5 calendars are specified in calendar.html
-            expect(Cl.events.calendar.calls.count()).toEqual(5);
+            // validate 6 calls as 6 calendars are specified in calendar.html
+            expect(Cl.events.calendar.calls.count()).toEqual(6);
         });
     });
 
@@ -47,18 +47,18 @@ describe('cl.events.js:', function () {
         it('returns false if direction is not specified', function () {
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0], this.preventEvent))
-                .toEqual(false);
+                    .toEqual(false);
         });
 
         it('returns undefined if direction is specified', function () {
             // validate the return of undefined if direction is "next"
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1], this.preventEvent))
-                .toEqual(undefined);
+                    .toEqual(undefined);
             // validate the return of undefined if direction is "previous"
             expect(Cl.events._handler.call(
                 $('.js-trigger')[3], this.preventEvent))
-                .toEqual(undefined);
+                    .toEqual(undefined);
         });
 
         it('has correct ajax request if direction is "next" and year is ' +
@@ -114,6 +114,19 @@ describe('cl.events.js:', function () {
             // validate ajax request url to have a proper year and month
             expect(callArgs.url).toEqual(
                 '/en/events/get-dates/2014/12/?plugin_pk='
+            );
+        });
+
+        it('has correct ajax request if data-pk is specified', function () {
+            spyOn($, 'ajax');
+            Cl.events._handler.call(
+                $('.js-trigger')[5], this.preventEvent);
+
+            var callArgs = $.ajax.calls.allArgs()[0][0];
+
+            // validate ajax request url to have a proper year and month
+            expect(callArgs.url).toEqual(
+                '/en/events/get-dates/2014/12/?plugin_pk=test1'
             );
         });
     });
