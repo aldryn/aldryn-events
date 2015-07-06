@@ -36,6 +36,7 @@ before_script:
   - npm install -g gulp
   - npm install -g codeclimate-test-reporter
   - npm install
+  - python test_settings.py server
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info
