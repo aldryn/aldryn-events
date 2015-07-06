@@ -129,6 +129,21 @@ describe('cl.events.js:', function () {
                 '/en/events/get-dates/2014/12/?plugin_pk=test1'
             );
         });
+
+        it('has ajax request with "success" function replacing the table ' +
+            'class correctly', function () {
+            spyOn($, 'ajax').and.callFake(function (params) {
+                params.success('<table class="test-table"></table>');
+            });
+
+            Cl.events._handler.call(
+                $('.js-trigger')[5], this.preventEvent);
+
+            // validate that "table-calendar" tables got reduced by 1
+            expect($('.table-calendar').length).toEqual(4);
+            // validate that the table with class "test-table" appeared
+            expect($('.test-table').length).toEqual(1);
+        });
     });
 
 });
