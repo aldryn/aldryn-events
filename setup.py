@@ -13,7 +13,7 @@ if not py27:
     )
 
 REQUIREMENTS = [
-    'Django<1.8,>=1.6',
+    'Django>=1.6,<1.8',
     'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
