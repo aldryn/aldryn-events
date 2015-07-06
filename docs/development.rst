@@ -62,6 +62,7 @@ To run the tests, in the aldryn-events directory::
 
     virtualenv env  # create a virtual environment
     source env/bin/activate  # activate it
+    python setup.py install  # install the package requirements
     pip install -r test_requirements/django_17.txt  # install the test requirements
     python runtests.py  # run the tests
 
