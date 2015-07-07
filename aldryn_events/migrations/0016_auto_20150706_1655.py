@@ -4,13 +4,12 @@ from __future__ import unicode_literals
 from django.db import models, migrations, transaction
 from django.db.models import get_model
 from django.db.utils import ProgrammingError
-from cms.models.fields import PlaceholderField
 
 
 def create_missing_placeholders(apps, schema_editor):
-    print 'data migration'
+    import cms.models.fields
+    from cms.models import Placeholder
     EventsConfig = apps.get_model('aldryn_events', 'EventsConfig')
-    Placeholder = apps.get_model('cms', 'Placeholder')
     configs_qs = EventsConfig.objects.all()
 
     try:
@@ -21,18 +20,16 @@ def create_missing_placeholders(apps, schema_editor):
         with transaction.atomic():
             configs = list(configs_qs)
     except ProgrammingError:
-        print 'exception'
         # most likely we also need the latest Placeholder model
-        from cms.models import Placeholder
-        NewEventsConfig = get_model('aldryn_events.{0}'.format(EventsConfig.__name__))
+        NewEventsConfig = get_model('aldryn_events.{0}'.format(
+            EventsConfig.__name__))
         with transaction.atomic():
             configs = NewEventsConfig.objects.filter()
 
     # get placeholders and their names
-    print configs
     for cfg in configs:
         for field in cfg._meta.fields:
-            if not field.__class__ == PlaceholderField:
+            if not field.__class__ == cms.models.fields.PlaceholderField:
                 # skip other fields.
                 continue
             placeholder_name = field.name
@@ -43,16 +40,12 @@ def create_missing_placeholders(apps, schema_editor):
                 continue
             # since there is no placeholder - create it, we cannot use
             # get_or_create because it can get placeholder from other config
-            PlaceholderField.pre_save(PlaceholderField(slotname=placeholder_name), cfg, False)
-            # new_placeholder = Placeholder.objects.create(slot=placeholder_name)
-            # setattr(cfg, placeholder_name, PlaceholderField(slotname=placeholder_name))
-            # print new_placeholder.id
-            # after we process all placeholder fields - save config,
-            # so that django can pick up them.
-            # IMPORTANT: Please don't move it outside of a loop, this would
-            # break this migration.
-            # cfg.save()
-    print 'data migration end'
+            new_placeholder = Placeholder.objects.create(
+                slot=placeholder_name)
+            setattr(cfg, placeholder_id_name, new_placeholder.pk)
+        # after we process all placeholder fields - save config,
+        # so that django can pick up them.
+        cfg.save()
 
 
 def noop_backwards(apps, schema_editor):
