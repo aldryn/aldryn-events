@@ -51,7 +51,8 @@ listed in ``INSTALLED_APPS``, *after* ``'cms'``.
 Aldryn Boilerplates
 ===================
 
-Make sure you follow the installation directions for `Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_.
+Make sure you follow the installation directions for
+`Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_.
 To get up and running quickly make sure that your other settings conform to::
 
     TEMPLATE_CONTEXT_PROCESSORS = [
@@ -94,8 +95,7 @@ Filer
 Aldryn Events also depends on Filer, be sure to follow 
 `Filer's installation instructions <http://django-filer.readthedocs.org/en/latest/installation.html>`_.
 To get up and running quickly, make sure you adapt your settings to include the
-`filer.thumbnail_processors.scale_and_crop_with_subject_location`
-thumbnail processor: ::
+``filer.thumbnail_processors.scale_and_crop_with_subject_location`` thumbnail processor: ::
 
     THUMBNAIL_PROCESSORS = (
         'easy_thumbnails.processors.colorspace',
