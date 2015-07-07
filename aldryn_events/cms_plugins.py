@@ -14,7 +14,10 @@ from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
 )
 
-from .forms import UpcomingPluginForm
+from .forms import (
+    UpcomingPluginForm, EventListPluginForm, EventCalendarPluginForm,
+)
+
 
 NO_APPHOOK_ERROR_MESSAGE = _(
     'There is an error in plugin configuration: selected Events '
@@ -67,6 +70,7 @@ class EventListCMSPlugin(CMSPluginBase):
     module = _('Events')
     name = _('List')
     model = EventListPlugin
+    form = EventListPluginForm
 
     def render(self, context, instance, placeholder):
         self.render_template = (
@@ -106,6 +110,7 @@ class CalendarPlugin(CMSPluginBase):
     module = _('Events')
     cache = False
     model = EventCalendarPlugin
+    form = EventCalendarPluginForm
 
     def render(self, context, instance, placeholder):
         # # check if we can reverse list view for configured namespace
