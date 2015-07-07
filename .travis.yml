@@ -39,7 +39,7 @@ before_script:
   - pip install django-cms
   - python setup.py install
   - pip install -r test_requirements/django_17.txt
-  - python test_settings.py server
+  - python test_settings.py server &
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info
