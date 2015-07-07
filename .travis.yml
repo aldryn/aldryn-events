@@ -45,7 +45,6 @@ after_script:
   - codeclimate < tests/coverage/**/lcov.info
 
 script:
-  - tox -e $TOX_ENV
   - gulp tests
 
 after_success:

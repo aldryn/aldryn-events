@@ -33,6 +33,8 @@ var PROJECT_PATTERNS = {
     ]
 };
 
+var PORT = parseInt(process.env.PORT, 10) || 8000;
+
 // #############################################################################
 // LINTING
 gulp.task('lint', function () {
@@ -66,7 +68,7 @@ gulp.task('tests:integration', ['tests:webdriver'], function () {
     return gulp.src([PROJECT_PATH.tests + '/integration/*.js'])
         .pipe(protractor({
             configFile: PROJECT_PATH.tests + '/protractor.conf.js',
-            args: ['--baseUrl', 'http://127.0.0.1:8000']
+            args: ['--baseUrl', 'http://127.0.0.1:' + PORT]
         }))
         .on('error', function (error) {
             gutil.log(gutil.colors.red(
