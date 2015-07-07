@@ -64,7 +64,7 @@ To run the tests, in the aldryn-events directory::
     source env/bin/activate  # activate it
     python setup.py install  # install the package requirements
     pip install -r test_requirements/django_17.txt  # install the test requirements
-    python runtests.py  # run the tests
+    python test_settings.py  # run the tests
 
 You can run the tests against a different version of Django by using the appropriate value in
 ``django_xx.txt`` when installing the test requirements.
