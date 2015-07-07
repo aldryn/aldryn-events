@@ -141,14 +141,15 @@ class AppConfigPluginFormMixin(object):
         not_published = available_configs.exclude(
             pk__in=published_configs_pks).values_list(
             'namespace', flat=True)
-        msg = ugettext('Following app_configs is app hooked but pages are not '
-                'published, to use them - publish pages to which they are '
-                'attached.')
+        msg = ugettext(
+            'Following app_configs is app hooked but pages are not '
+            'published, to use them - publish pages to which they are '
+            'attached.')
         not_published_namespaces = '; '.join(not_published)
         full_message = '{0} \n<br/>{1}'.format(msg, not_published_namespaces)
         # update help text
         if (not self.fields['app_config'].help_text or
-                    len(self.fields['app_config'].help_text.strip()) < 1):
+                len(self.fields['app_config'].help_text.strip()) < 1):
             self.fields['app_config'].help_text = full_message
         else:
             self.fields['app_config'].help_text += full_message
