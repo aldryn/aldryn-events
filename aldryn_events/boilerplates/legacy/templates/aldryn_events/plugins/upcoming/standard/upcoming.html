@@ -13,7 +13,7 @@
             {% for event in events %}
                 <li>
                     <p>
-                        <a href="{{ event.get_absolute_url }}">{{ event }}</a> <span class="date">{{ event.start }}</span>
+                        <a href="{{ event.get_absolute_url }}">{{ event.get_title }}</a> <span class="date">{{ event.start }}</span>
                     </p>
                 </li>
             {% empty %}
