@@ -75,6 +75,7 @@ class EventBaseTestCase(TransactionTestCase):
         root_page = self.create_root_page(
             publication_date=tz_datetime(2014, 6, 8)
         )
+
         page = api.create_page(
             title='Events en', template=self.template, language='en',
             slug='eventsapp', published=True,
