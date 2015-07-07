@@ -11,8 +11,8 @@
             <ul class="list-unstyled">
                 {% for event in events %}
                     <li>
-                        <a href="{{ event.get_absolute_url }}">{{ event }}</a>
-                        <span class="date">{{ event.start|date }}</span>
+                        <a href="{{ event.get_absolute_url }}">{{ event.get_title }}</a>
+                        <span class="date"> {{ event.start|date }}</span>
                     </li>
                 {% empty %}
                     <li class="well">{% trans "No items available" %}</li>
