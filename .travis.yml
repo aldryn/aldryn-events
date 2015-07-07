@@ -38,7 +38,7 @@ before_script:
   - npm install
   - pip install django-cms
   - python setup.py install
-  - pip install -r test_requirements/django_17.txt
+  - pip install -r test_requirements/integration.txt
   - python test_settings.py server &
 
 after_script:
