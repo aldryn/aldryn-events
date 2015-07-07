@@ -36,15 +36,19 @@ before_script:
   - npm install -g gulp
   - npm install -g codeclimate-test-reporter
   - npm install
-  - python setup.py install
-  - python test_settings.py server
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info
 
 script:
   - tox -e $TOX_ENV
-  - gulp tests
+  - gulp tests:unit
+  - virtualenv env
+  - source env/bin/activate
+  - python setup.py install
+  - pip install -r test_requirements/django_17.txt
+  - python test_settings.py server
+  - deactivate
 
 after_success:
   - coveralls
