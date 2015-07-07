@@ -53,3 +53,6 @@ after_success:
 
 notifications:
   webhooks: http://addons.us-iad-rs.aldryn.io/en/travis-endpoint/
+
+addons:
+  sauce_connect: true
