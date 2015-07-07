@@ -1,6 +1,6 @@
-###############
+#############
 Aldryn Events
-###############
+#############
 
 
 Aldryn Events is an `Aldryn <http://aldryn.com>`_-compatible events application for for `django CMS
@@ -16,9 +16,6 @@ Aldryn Events is `open-source software <https://github.com/aldryn/aldryn-events>
    :maxdepth: 2
 
    introduction/index
-   how_to/index
-   topics/index
-   reference/index
    release/index
    user/index
    development.rst

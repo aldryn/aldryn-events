@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.db import transaction
 
 from cms import api
+from cms.utils.i18n import force_language
 from aldryn_events.models import Event
 from aldryn_reversion.core import create_revision_with_placeholders
 
@@ -458,7 +459,8 @@ class ReversionTestCase(EventBaseTestCase):
         content1 = 'Content 1 text'
         content2 = 'Content 2 text'
 
-        event = self.create_default_event()
+        with force_language('en'):
+            event = self.create_default_event()
         # revision 1
         self.create_revision(event, content1)
 
