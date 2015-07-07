@@ -36,8 +36,7 @@ before_script:
   - npm install -g gulp
   - npm install -g codeclimate-test-reporter
   - npm install
-  - virtualenv env
-  - source env/bin/activate
+  - pip uninstall django-mptt
   - python setup.py install
   - pip install -r test_requirements/django_17.txt
   - python test_settings.py server
