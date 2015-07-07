@@ -55,7 +55,6 @@ class EventBaseTestCase(TransactionTestCase):
         )
         self.template = get_cms_setting('TEMPLATES')[0][0]
         self.language = settings.LANGUAGES[0][0]
-        self.root_page = self.create_root_page()
 
     def tearDown(self):
         super(EventBaseTestCase, self).tearDown()
@@ -73,10 +72,14 @@ class EventBaseTestCase(TransactionTestCase):
         return root_page.reload()
 
     def create_base_pages(self):
+        root_page = self.create_root_page(
+            publication_date=tz_datetime(2014, 6, 8)
+        )
+
         page = api.create_page(
             title='Events en', template=self.template, language='en',
             slug='eventsapp', published=True,
-            parent=self.root_page,
+            parent=root_page,
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 6, 8)
