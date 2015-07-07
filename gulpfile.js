@@ -51,7 +51,7 @@ gulp.task('lint', function () {
 
 // #########################################################
 // TESTS
-gulp.task('tests', ['tests:unit', 'tests:lint']);
+gulp.task('tests', ['tests:unit', 'tests:lint', 'tests:integration']);
 gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
