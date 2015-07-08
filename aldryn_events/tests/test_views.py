@@ -21,7 +21,7 @@ class TestEventViews(EventBaseTestCase):
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 1, 8)
         )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
+        api.create_title('de', 'Events de', page)
         page.publish('en')
         page.publish('de')
         page.reload()
