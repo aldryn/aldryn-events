@@ -89,21 +89,15 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
             if year and month and day:
                 year, month, day = map(int, [year, month, day])
                 _date = date(year, month, day)
-                last_datetime = datetime(
-                    year, month, day, 23, 59, 59, tzinfo=tz
-                )
 
                 qs = qs.filter(
                     Q(start_date=_date, end_date__isnull=True) |
                     Q(start_date__lte=_date, end_date__gte=_date)
-                ).published(last_datetime)
+                ).published()
             elif year and month:
                 year, month = map(int, [year, month])
                 date_start = date(year, month, 1)
                 date_end = date_start + relativedelta(months=1, days=-1)
-                last_datetime = datetime(
-                    tzinfo=tz, *(date_end.timetuple()[:3])
-                ) + relativedelta(days=1, minutes=-1)
 
                 qs = qs.filter(
                     Q(start_date__range=(date_start, date_end),
@@ -114,14 +108,11 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
                       end_date__range=(date_start, date_end)) |
                     Q(start_date__lt=date_start,
                       end_date__gte=date_end)
-                ).published(last_datetime)
+                ).published()
             else:
                 year = int(year)
                 date_start = date(year, 1, 1)
                 date_end = date_start + relativedelta(years=1, days=-1)
-                last_datetime = datetime(
-                    tzinfo=tz, *(date_end.timetuple()[:3])
-                ) + relativedelta(days=1, minutes=-1)
 
                 qs = qs.filter(
                     Q(start_date__range=(date_start, date_end),
@@ -130,8 +121,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
                       end_date__lte=date_end) |
                     Q(start_date__lt=date_start,
                       end_date__range=(date_start, date_end))
-                ).published(last_datetime)
-
+                ).published()
         else:
             if self.archive:
                 qs = qs.archive()

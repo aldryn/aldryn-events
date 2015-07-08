@@ -23,13 +23,13 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         page = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             parent=root_page,
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 6, 8)
         )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
+        api.create_title('de', 'Events de', page)
         page.publish('en')
         page.publish('de')
         return page.reload()
@@ -44,15 +44,18 @@ class EventPagesTestCase(EventBaseTestCase):
         event = self.create_default_event()
 
         with switch_language(event, 'en'):
+            apphook_url = self.get_apphook_url(language='en')
             self.assertEqual(
-                event.get_absolute_url(), '/en/eventsapp/open-air/'
+                event.get_absolute_url(),
+                '{0}open-air/'.format(apphook_url)
             )
             response = self.client.get(event.get_absolute_url())
             self.assertContains(response, event.title)
 
         with switch_language(event, 'de'):
+            apphook_url = self.get_apphook_url(language='de')
             self.assertEqual(
-                event.get_absolute_url(), '/de/eventsapp/im-freien/'
+                event.get_absolute_url(), '{0}im-freien/'.format(apphook_url)
             )
             response = self.client.get(event.get_absolute_url())
             self.assertContains(response, event.title)
@@ -72,13 +75,13 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         page = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             parent=root_page,
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 6, 8)
         )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
+        api.create_title('de', 'Events de', page)
         page.publish('en')
         page.publish('de')
 
@@ -154,7 +157,7 @@ class EventPagesTestCase(EventBaseTestCase):
         root_page.publish('en')
         page = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             parent=root_page,
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
@@ -405,7 +408,8 @@ class RegistrationTestCase(EventBaseTestCase):
         )
         with force_language('en'):
             reset_url = reverse(
-                'aldryn_events:events_registration_reset',
+                '{0}:events_registration_reset'.format(
+                    self.app_config.namespace),
                 kwargs={'slug': event.slug},
                 current_app=self.app_config.namespace
             )
