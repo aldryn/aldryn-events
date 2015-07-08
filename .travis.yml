@@ -36,18 +36,12 @@ before_script:
   - npm install -g gulp
   - npm install -g codeclimate-test-reporter
   - npm install
-  - pip install django-cms
-  - python setup.py install
-  - pip install -r test_requirements/integration.txt
-  - python test_settings.py server &
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info
 
 script:
   - tox -e $TOX_ENV
-  - gulp tests:unit
-  - gulp tests:integration
 
 after_success:
   - coveralls
