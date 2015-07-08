@@ -18,17 +18,21 @@ var eventsPage = {
     usernameInput: element(by.id('id_cms-username')),
     passwordInput: element(by.id('id_cms-password')),
     loginButton: element(by.css('.cms_form-login input[type="submit"]')),
-    userMenuOption: element.all(by.css('.cms_toolbar-item-navigation li')).first(),
+    userMenuOption: element.all(by.css(
+        '.cms_toolbar-item-navigation li')).first(),
 
-    loginToSite: function () {
+    cmsLogin: function (object) {
+        // object can contain username and password, if not set it will
+        // fallback to 'admin'
         eventsPage.usernameInput.clear();
 
         // fill in email field
-        eventsPage.usernameInput.sendKeys('admin').then(function () {
+        eventsPage.usernameInput.sendKeys(object.username || 'admin')
+            .then(function () {
             eventsPage.passwordInput.clear();
 
             // fill in password field
-            eventsPage.passwordInput.sendKeys('admin');
+            eventsPage.passwordInput.sendKeys(object.password || 'admin');
         }).then(function () {
             eventsPage.loginButton.click();
 

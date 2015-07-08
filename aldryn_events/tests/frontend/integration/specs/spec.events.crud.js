@@ -24,6 +24,6 @@ describe('Aldryn Events tests: ', function () {
         }, eventsPage.mainElementsWaitTime);
 
         // login to the site
-        eventsPage.loginToSite();
+        eventsPage.cmsLogin({});
     });
 });
