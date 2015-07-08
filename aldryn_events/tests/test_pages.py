@@ -217,8 +217,8 @@ class EventPagesTestCase(EventBaseTestCase):
         expected_object_list = [event.pk for event in [ev4, ev1]]
         self.assertEqual(actual_object_list, expected_object_list)
 
-        ongoing_list = PyQuery(response.content)('ul.ongoing-events')
-        links = ongoing_list.find('h3 a')
+        ongoing_list = PyQuery(response.content)('.list-unstyled')
+        links = ongoing_list.find('li a')
         self.assertEqual(2, links.length)
         self.assertEqual(ev2.get_absolute_url(), links[0].attrib['href'])
         self.assertEqual(ev3.get_absolute_url(), links[1].attrib['href'])
@@ -370,7 +370,7 @@ class RegistrationTestCase(EventBaseTestCase):
         self.assertEqual(['myemail@gmail.com'], mail.outbox[0].recipients())
         self.assertEqual(
             mail.outbox[1].subject,
-            'new registration for "{0}"'.format(event.title)
+            'New registration for "{0}"'.format(event.title)
         )
         self.assertEqual(['theboss@gmail.com'], mail.outbox[1].recipients())
 
