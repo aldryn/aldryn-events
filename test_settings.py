@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-import sys
-from django import get_version
 
 
 def noop_gettext(s):
