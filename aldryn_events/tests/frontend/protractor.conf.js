@@ -20,7 +20,7 @@ var config = {
     },
 
     onPrepare: function () {
-        // Set Angular site flag
+        // Set Angular site flag to disable Angular-specific features
         browser.ignoreSynchronization = true;
     },
 

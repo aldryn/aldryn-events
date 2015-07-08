@@ -9,42 +9,39 @@
 // #############################################################################
 // INTEGRATION TEST PAGE OBJECT
 
-var aldrynEventsPage = {
+var eventsPage = {
     site: 'http://127.0.0.1:8000/en/',
     mainElementsWaitTime: 12000,
 
     // log in, log out
     editModeLink: element(by.css('.inner a[href="/?edit"]')),
-    loginUsername: 'admin',
-    loginPassword: 'admin',
     usernameInput: element(by.id('id_cms-username')),
     passwordInput: element(by.id('id_cms-password')),
     loginButton: element(by.css('.cms_form-login input[type="submit"]')),
-    userMenuOptions: element.all(by.css('.cms_toolbar-item-navigation li')),
+    userMenuOption: element.all(by.css('.cms_toolbar-item-navigation li')).first(),
 
-    loginToSite: function (emailInput, email, passwordInput, password,
-        loginButton, userMenu) {
-        emailInput.clear();
+    loginToSite: function () {
+        eventsPage.usernameInput.clear();
 
         // fill in email field
-        emailInput.sendKeys(email).then(function () {
-            passwordInput.clear();
+        eventsPage.usernameInput.sendKeys('admin').then(function () {
+            eventsPage.passwordInput.clear();
 
             // fill in password field
-            passwordInput.sendKeys(password);
+            eventsPage.passwordInput.sendKeys('admin');
         }).then(function () {
-            loginButton.click();
+            eventsPage.loginButton.click();
 
             // wait for user menu to appear
             browser.wait(function () {
-                return browser.isElementPresent(userMenu);
-            }, aldrynEventsPage.mainElementsWaitTime);
+                return browser.isElementPresent(eventsPage.userMenuOption);
+            }, eventsPage.mainElementsWaitTime);
 
             // validate user menu
-            expect(userMenu.isDisplayed()).toBeTruthy();
+            expect(eventsPage.userMenuOption.isDisplayed()).toBeTruthy();
         });
     },
 
 };
 
-module.exports = aldrynEventsPage;
+module.exports = eventsPage;
