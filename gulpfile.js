@@ -70,7 +70,11 @@ gulp.task('tests:sauce:start', function (done) {
         done();
         return;
     }
-    tunnel = new SauceTunnel(process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY, process.env.TRAVIS_JOB_NUMBER);
+    tunnel = new SauceTunnel(
+        process.env.SAUCE_USERNAME,
+        process.env.SAUCE_ACCESS_KEY,
+        process.env.TRAVIS_JOB_NUMBER
+    );
 
     tunnel.start(function (isCreated) {
         if (!isCreated) {
