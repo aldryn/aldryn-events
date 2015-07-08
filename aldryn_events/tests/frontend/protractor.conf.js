@@ -36,6 +36,7 @@ if (process.env.CI || process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY
     config.sauceKey = process.env.SAUCE_ACCESS_KEY;
     config.multiCapabilities = Object.keys(browsers).map(function (key) {
         var browserCapability =  browsers[key];
+        browserCapability['tunnel-identifier'] = process.ENV.TRAVIS_JOB_NUMBER;
         browserCapability.name = formatTaskName(browserCapability.browserName);
         return browserCapability;
     });
