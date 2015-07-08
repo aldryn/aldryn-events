@@ -45,7 +45,8 @@ after_script:
   - codeclimate < tests/coverage/**/lcov.info
 
 script:
-  - gulp tests
+  - gulp tests:unit
+  - gulp tests:integration
 
 after_success:
   - coveralls
