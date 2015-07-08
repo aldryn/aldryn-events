@@ -24,6 +24,8 @@ var eventsPage = {
     cmsLogin: function (object) {
         // object can contain username and password, if not set it will
         // fallback to 'admin'
+        object = object || {};
+
         eventsPage.usernameInput.clear();
 
         // fill in email field
