@@ -9,11 +9,9 @@
 // #############################################################################
 // INTEGRATION TEST
 describe('Aldryn Events tests: ', function () {
-    var aldrynTestsLibrary = require('../pages/alteli.js');
     var aldrynEventsPage = require('../pages/page.add.delete.event.js');
 
-    it('should log in to the site with valid username and ' +
-        'password', function () {
+    it('login to the site with valid username and password', function () {
         // go to the main page
         browser.get(aldrynEventsPage.site);
 
@@ -26,7 +24,7 @@ describe('Aldryn Events tests: ', function () {
         }, aldrynEventsPage.mainElementsWaitTime);
 
         // login to the site
-        aldrynTestsLibrary.loginToSite(
+        aldrynEventsPage.loginToSite(
             aldrynEventsPage.usernameInput,
             aldrynEventsPage.loginUsername,
             aldrynEventsPage.passwordInput,

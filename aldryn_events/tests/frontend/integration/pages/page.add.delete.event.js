@@ -3,16 +3,11 @@
  * @copyright: http://www.divio.ch
  */
 
-// ACCEPTANCE TEST
-// #############################################################################
 'use strict';
-/* global by, element */
-/* jshint browser: true */
-/* jshint shadow: true */
+/* global by, element, browser, expect */
 
-/**
- * This file uses the Page Object pattern to define a test.
- **/
+// #############################################################################
+// INTEGRATION TEST PAGE OBJECT
 
 var aldrynEventsPage = {
     site: 'http://127.0.0.1:8000/en/',
@@ -26,6 +21,30 @@ var aldrynEventsPage = {
     passwordInput: element(by.id('id_cms-password')),
     loginButton: element(by.css('.cms_form-login input[type="submit"]')),
     userMenuOptions: element.all(by.css('.cms_toolbar-item-navigation li')),
+
+    loginToSite: function (emailInput, email, passwordInput, password,
+        loginButton, userMenu) {
+        emailInput.clear();
+
+        // fill in email field
+        emailInput.sendKeys(email).then(function () {
+            passwordInput.clear();
+
+            // fill in password field
+            passwordInput.sendKeys(password);
+        }).then(function () {
+            loginButton.click();
+
+            // wait for user menu to appear
+            browser.wait(function () {
+                return browser.isElementPresent(userMenu);
+            }, aldrynEventsPage.mainElementsWaitTime);
+
+            // validate user menu
+            expect(userMenu.isDisplayed()).toBeTruthy();
+        });
+    },
+
 };
 
 module.exports = aldrynEventsPage;
