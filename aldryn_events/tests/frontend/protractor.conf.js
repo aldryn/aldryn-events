@@ -20,14 +20,20 @@ var config = {
     },
 
     onPrepare: function () {
+        // Set Angular site flag to disable Angular-specific features
         browser.ignoreSynchronization = true;
     },
 
-    // Options to be passed to Jasmine-node.
+    // Name of the process executing this capability.  Not used directly by
+    // protractor or the browser, but instead pass directly to third parties
+    // like SauceLabs as the name of the job running this test
+    name: 'aldryn-events integration tests',
+
     jasmineNodeOpts: {
         showColors: true,
         defaultTimeoutInterval: 240000
     }
+
 };
 
 if (process.env.CI || process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
