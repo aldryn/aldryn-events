@@ -16,19 +16,5 @@
     "quotmark": "single",
     "strict": true,
     "unused": true,
-    "trailing": true,
-    "predef": [
-        "browser",
-        "by",
-        "By",
-        "element",
-        "it",
-        "xit",
-        "jasmine",
-        "describe",
-        "beforeEach",
-        "afterEach",
-        "expect",
-        "isAngularSite"
-    ]
+    "trailing": true
 }
