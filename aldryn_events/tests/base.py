@@ -6,6 +6,7 @@ from cms.utils.i18n import force_language
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TransactionTestCase
 from django.utils.timezone import get_current_timezone
 
@@ -75,16 +76,20 @@ class EventBaseTestCase(TransactionTestCase):
         root_page = self.create_root_page(
             publication_date=tz_datetime(2014, 6, 8)
         )
+        # we cannot extract this to setUp because of mocking
+        # but having self.root_page would be useful.
+        if getattr(self, 'root_page', None) is None:
+            self.root_page = root_page
 
         page = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             parent=root_page,
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 6, 8)
         )
-        api.create_title('de', 'Events de', page, slug='eventsapp')
+        api.create_title('de', 'Events de', page)
         page.publish('en')
         page.publish('de')
         return page.reload()
@@ -150,3 +155,22 @@ class EventBaseTestCase(TransactionTestCase):
         }
         defaut_event_values.update(date_values)
         return defaut_event_values
+
+    def get_apphook_url(self, namespace=None, language=None):
+        """
+        Returns url for default view with pattern '^$' which is a
+        base url for our application. Right now 'events_list' is
+        considered as default view.
+        """
+        DEFAULT_VIEW = 'events_list'
+
+        if namespace is None:
+            namespace = self.app_config.namespace
+        # if language is not provided then leave control over language to
+        # caller
+        if language is None:
+            return reverse('{0}:{1}'.format(namespace, DEFAULT_VIEW))
+        # otherwise force it for cases with parler switch_language which
+        # seems to affect only parler internals
+        with force_language(language):
+            return reverse('{0}:{1}'.format(namespace, DEFAULT_VIEW))

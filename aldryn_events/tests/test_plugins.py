@@ -11,10 +11,10 @@ from aldryn_events.tests.base import (
 from aldryn_events.utils import namespace_is_apphooked
 
 
-def calendar_url(year, month, language):
+def calendar_url(year, month, language, namespace):
     with force_language(language):
         url = reverse(
-            'aldryn_events:get-calendar-dates',
+            '{0}:get-calendar-dates'.format(namespace),
             kwargs={'year': year, 'month': month}
         )
     return url
@@ -189,13 +189,13 @@ class EventPluginsTestCase(EventBaseTestCase):
         timezone_mock.now.return_value = tz_datetime(2014, 1, 2)
         evpage = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             parent=self.create_root_page(),
             apphook='EventListAppHook',
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 1, 1)
         )
-        api.create_title('de', 'Events de', evpage, slug='eventsapp')
+        api.create_title('de', 'Events de', evpage)
         evpage.publish('en')
         evpage.publish('de')
         page = api.create_page(
@@ -232,7 +232,9 @@ class EventPluginsTestCase(EventBaseTestCase):
             for lang in ['en', 'de']:
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
+                expected_slug = '{0}-{1}-{2}/'.format(text, i, lang)
+                apphook_url = self.get_apphook_url(language=lang)
+                url = '{0}{1}'.format(apphook_url, expected_slug)
                 self.assertIn(
                     name, rendered[lang],
                     'Title "{0}" not found in rendered plugin for '
@@ -335,13 +337,13 @@ class EventPluginsTestCase(EventBaseTestCase):
         timezone_mock.now.return_value = tz_datetime(2014, 7, 6, 12)
         evpage = api.create_page(
             title='Events en', template=self.template, language='en',
-            slug='eventsapp', published=True,
+            published=True,
             apphook='EventListAppHook',
             parent=self.create_root_page(),
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 1, 1)
         )
-        api.create_title('de', 'Events de', evpage, slug='eventsapp')
+        api.create_title('de', 'Events de', evpage)
         evpage.publish('en')
         evpage.publish('de')
         page = api.create_page(
@@ -381,7 +383,9 @@ class EventPluginsTestCase(EventBaseTestCase):
             for lang in ['en', 'de']:
                 text = 'event' if lang == 'en' else 'ereignis'
                 name = '{0} {1} {2}'.format(text, i, lang)
-                url = '/{2}/eventsapp/{0}-{1}-{2}/'.format(text, i, lang)
+                expected_slug = '{0}-{1}-{2}/'.format(text, i, lang)
+                apphooh_url = self.get_apphook_url(language=lang)
+                url = '{0}{1}'.format(apphooh_url, expected_slug)
                 self.assertIn(
                     name, rendered[lang],
                     'Title "{0}" not found in rendered plugin for '
@@ -458,48 +462,39 @@ class EventPluginsTestCase(EventBaseTestCase):
             publish_at=tz_datetime(2014, 1, 1, 12)
         )
         rendered = {}
+        apphook_urls = {}
+        for language in ('de', 'en'):
+            with force_language(language):
+                page_url = page.get_absolute_url()
+                plugin = plugins[language]
+                # prepare apphook urls with respect to language
+                namespace = plugin.app_config.namespace
+                apphook_urls[language] = self.get_apphook_url(
+                    namespace=namespace)
+                plugin_url = "{0}?plugin_pk={1}".format(
+                    calendar_url(2014, 2, language, namespace), plugin.pk)
+                rendered[language] = {
+                    'p1': self.client.get(page_url).content,
+                    'p2': self.client.get(plugin_url).content
+                }
 
-        with force_language('en'):
-            rendered['en'] = {
-                'p1': self.client.get(page.get_absolute_url()).content,
-                'p2': self.client.get(
-                    "{0}?plugin_pk={1}".format(
-                        calendar_url(2014, 2, 'en'), plugins['en'].pk
-                    )
-                ).content
-            }
-        with force_language('de'):
-            rendered['de'] = {
-                'p1': self.client.get(page.get_absolute_url()).content,
-                'p2': self.client.get(
-                    "{0}?plugin_pk={1}".format(
-                        calendar_url(2014, 2, 'de'), plugins['de'].pk
-                    )
-                ).content
-            }
-
-        html_p1 = ('<td class="events"><a href="/{0}/eventsapp/2014/1/29/">'
+        # expected html patterns
+        html_p1 = ('<td class="events"><a href="{0}2014/1/29/">'
                    '29</a></td>')
-        html_p2 = ('<td class="events"><a href="/{0}/eventsapp/2014/2/10/">'
+        html_p2 = ('<td class="events"><a href="{0}2014/2/10/">'
                    '10</a></td>')
-        self.assertIn(
-            html_p1.format('de'), rendered['de']['p1'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p1.format('de'), 'DE')
-        )
-        self.assertIn(
-            html_p1.format('en'), rendered['en']['p1'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p1.format('en'), 'EN')
-        )
 
-        self.assertIn(
-            html_p2.format('de'), rendered['de']['p2'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p2.format('de'), 'DE')
-        )
-        self.assertIn(
-            html_p2.format('en'), rendered['en']['p2'],
-            'Expected html `{0}` not found on rendered plugin for '
-            'language "{1}"'.format(html_p2.format('en'), 'EN')
-        )
+        message = ('Expected html `{0}` not found on rendered plugin for '
+                   'language "{1}"')
+
+        for language in ('de', 'en'):
+            rendered_html_p1 = html_p1.format(apphook_urls[language])
+            self.assertIn(
+                rendered_html_p1, rendered[language]['p1'],
+                message.format(rendered_html_p1, language)
+            )
+            rendered_html_p2 = html_p2.format(apphook_urls[language])
+            self.assertIn(
+                rendered_html_p2, rendered[language]['p2'],
+                message.format(rendered_html_p2, language)
+            )
