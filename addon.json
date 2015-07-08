@@ -15,13 +15,5 @@
         "parler",
         "sortedm2m",
         "standard_form"
-    ],
-    "author": {
-        "name": "Divio AG",
-        "url": "divio.ch"
-    },
-    "license": {
-        "name": "BSD",
-        "text": "!literal-include LICENSE.txt"
-    }
+    ]
 }
