@@ -1,26 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-import sys
-from django import get_version
-
-
-class DisableMigrations(dict):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
-
-
-class DisableMigrations(dict):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
 
 
 def noop_gettext(s):
@@ -97,14 +76,6 @@ HELPER_SETTINGS = {
         'easy_thumbnails.processors.filters',
     ),
     'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
-    # 'MIGRATION_MODULES ': {
-    #     'filer': 'filer.migrations_django',
-    # },
-    # Disable migrations so tests runs really faster
-    # Source: https://gist.github.com/c-rhodes/cebe9d4619125949dff8
-    # disable migration for DJ 1.7 in tests
-    'MIGRATION_MODULES': DisableMigrations(),
-    'SOUTH_TESTS_MIGRATE': False,  # disable migration for DJ < 1.6 in tests
     'DEBUG': False,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
