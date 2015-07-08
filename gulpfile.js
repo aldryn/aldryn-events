@@ -14,6 +14,8 @@ var protractor = require('gulp-protractor').protractor;
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 var webdriverUpdate = require('gulp-protractor').webdriver_update;
+var SauceTunnel = require('sauce-tunnel');
+var tunnel;
 
 // #############################################################################
 // SETTINGS
@@ -63,8 +65,35 @@ gulp.task('tests:unit', function (done) {
     }, done);
 });
 
+gulp.task('tests:sauce:start', function (done) {
+    if (!process.env.CI) {
+        done();
+        return;
+    }
+    tunnel = new SauceTunnel(process.env.SAUCE_USERNAME, process.env.SAUCE_ACCESS_KEY, process.env.TRAVIS_JOB_NUMBER);
+
+    tunnel.start(function (isCreated) {
+        if (!isCreated) {
+            done('Failed to create Sauce tunnel.');
+        }
+        console.log('Connected to Sauce Labs.');
+        done();
+    });
+});
+
+gulp.task('tests:sauce:end', function (done) {
+    if (!process.env.CI) {
+        done();
+        return;
+    }
+    tunnel.stop(function () {
+        console.log('Stopping the server.');
+        done();
+    });
+});
+
 gulp.task('tests:webdriver', webdriverUpdate);
-gulp.task('tests:integration', ['tests:webdriver'], function () {
+gulp.task('tests:integration', ['tests:webdriver', 'tests:sauce:start'], function () {
     return gulp.src([PROJECT_PATH.tests + '/integration/specs/*.js'])
         .pipe(protractor({
             configFile: PROJECT_PATH.tests + '/protractor.conf.js',
@@ -74,6 +103,9 @@ gulp.task('tests:integration', ['tests:webdriver'], function () {
             gutil.log(gutil.colors.red(
                 'Error (' + error.plugin + '): ' + error.message
             ));
+        })
+        .on('end', function () {
+            gulp.run('tests:sauce:end');
         });
 });
 
