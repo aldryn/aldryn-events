@@ -163,7 +163,7 @@ class EventPagesTestCase(EventBaseTestCase):
         page.publish('en')
 
         # happens in Apr 5
-        self.create_event(
+        ev1 = self.create_event(
             title='ev1',
             start_date=tz_datetime(2014, 4, 5),
             publish_at=tz_datetime(2014, 4, 1)
@@ -183,7 +183,7 @@ class EventPagesTestCase(EventBaseTestCase):
             publish_at=tz_datetime(2014, 4, 3)
         )
         # happens in Apr 8
-        self.create_event(
+        ev4 = self.create_event(
             title='ev4',
             start_date=tz_datetime(2014, 4, 8),
             publish_at=tz_datetime(2014, 4, 4)
@@ -206,12 +206,14 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         self.app_config.save()
 
-        self.assertQuerysetEqual(
-            context['ongoing_objects'], ['ev2', 'ev3'], transform=str
-        )
-        self.assertQuerysetEqual(
-            context['object_list'], ['ev4', 'ev1'], transform=str
-        )
+        actual_ongoing = [event.pk for event in context['ongoing_objects']]
+        expected_ongoing = [event.pk for event in [ev2, ev3]]
+        self.assertEqual(actual_ongoing, expected_ongoing)
+
+        actual_object_list = [event.pk for event in context['object_list']]
+        expected_object_list = [event.pk for event in [ev4, ev1]]
+        self.assertEqual(actual_object_list, expected_object_list)
+
         ongoing_list = PyQuery(response.content)('ul.ongoing-events')
         links = ongoing_list.find('h3 a')
         self.assertEqual(2, links.length)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms import api
+from cms.models import Placeholder
 from cms.utils.i18n import force_language
 from django.core.urlresolvers import reverse
 import mock
@@ -7,6 +8,7 @@ from aldryn_events.models import Event, EventsConfig
 from aldryn_events.tests.base import (
     EventBaseTestCase, tz_datetime
 )
+from aldryn_events.utils import namespace_is_apphooked
 
 
 def calendar_url(year, month, language):
@@ -16,6 +18,89 @@ def calendar_url(year, month, language):
             kwargs={'year': year, 'month': month}
         )
     return url
+
+
+class EventConfigPlaceholdersTestCase(EventBaseTestCase):
+
+    def setUp(self):
+        super(EventConfigPlaceholdersTestCase, self).setUp()
+        self.page_with_apphook = self.create_base_pages()
+
+    def test_event_config_placeholders_are_usable(self):
+        # make sure default config is apphooked to a page.
+        # FIXME: until migrations are not enabled and ensured to work with
+        # tests - this wont test the default adryn_events namespace =(
+        # though this test is (or at least it should be) pretty useful.
+        default_events_config = EventsConfig.objects.get_or_create(
+            namespace='aldryn_events')[0]
+        if not namespace_is_apphooked(default_events_config.namespace):
+            page = api.create_page(
+                title='default events config en', template=self.template,
+                language='en',
+                published=True,
+                parent=self.root_page,
+                apphook='EventListAppHook',
+                apphook_namespace=default_events_config.namespace,
+                publication_date=tz_datetime(2014, 6, 8)
+            )
+            api.create_title('de', 'default events config en', page)
+            page.publish('en')
+            page.publish('de')
+            page_with_default_config = page.reload()
+            # get some time for aldryn-apphook-reload to perform actions
+            with force_language('en'):
+                default_config_url = page_with_default_config.get_abolute_url()
+            self.client.get(default_config_url)
+
+        configs = EventsConfig.objects.all()
+        # this would be used to build unique value for text plugin
+        # namespace-lang-placeholder_name, which would be searched on the page.
+        plugin_content_raw = '{0}-{1}-{2}'
+        plugins_content = {}
+        for cfg in configs:
+            cfg_placehodlers = [field for field in cfg._meta.fields
+                                if field.__class__ == Placeholder]
+            placeholders_names = [placeholder.name for placeholder in
+                                  cfg_placehodlers]
+            # make sure that we have an empty list to store plugins content
+            plugins_content[cfg] = []
+            for placeholder_name in placeholders_names:
+                placeholder_instance = getattr(cfg, placeholder_name)
+                self.assertNotEqual(type(placeholder_instance), type(None))
+                plugin_text = plugin_content_raw.format(
+                    cfg.namespace, 'en', placeholder_name)
+                plugin = api.add_plugin(
+                    placeholder_instance, 'TextPlugin', 'en',
+                    body=plugin_text)
+                # track other namespaces plugin content to check
+                # their uniqueness
+                plugins_content[cfg].append(plugin_text)
+
+        # test EventsConfig placeholder content if it is attached to a page
+        skipped = []
+        for cfg in configs:
+            if not namespace_is_apphooked(cfg.namespace):
+                skipped.append(cfg)
+                continue
+
+            with force_language('en'):
+                apphook_url = reverse('{0}:events_list'.format(cfg.namespace))
+            response = self.client.get(apphook_url)
+
+            # test own content
+            for text in plugins_content[cfg]:
+                self.assertIn(response, text)
+
+            # make sure other namespace plugins are not leaked
+            other_configs = [config for config in plugins_content.keys()
+                             if config is not cfg]
+            all_other_namespace_plugins_text = [
+                text for other_config in other_configs
+                for text in plugins_content[other_config]]
+            for other_plugins_text in all_other_namespace_plugins_text:
+                self.assertNotIn(response, other_plugins_text)
+        # make sure that we tested at least one config
+        self.assertNotEqual(configs.count(), len(skipped))
 
 
 class EventPluginsTestCase(EventBaseTestCase):

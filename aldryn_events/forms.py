@@ -2,9 +2,8 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.forms import DateTimeField, TimeField, DateField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils import timezone
 from django.template import TemplateDoesNotExist
 from django.template.loader import select_template
@@ -14,9 +13,13 @@ from app_data import AppDataForm
 from parler.forms import TranslatableModelForm
 from cms.models import Page
 
-from .models import Registration, UpcomingPluginItem, Event, EventsConfig
+from .models import (
+    Registration, UpcomingPluginItem, Event, EventsConfig,
+    EventListPlugin, EventCalendarPlugin,
+)
 from .utils import (
-    send_user_confirmation_email, send_manager_confirmation_email
+    send_user_confirmation_email, send_manager_confirmation_email,
+    namespace_is_apphooked,
 )
 
 
@@ -115,11 +118,9 @@ class EventRegistrationForm(forms.ModelForm):
         )
 
 
-class UpcomingPluginForm(forms.ModelForm):
-    model = UpcomingPluginItem
-
+class AppConfigPluginFormMixin(object):
     def __init__(self, *args, **kwargs):
-        super(UpcomingPluginForm, self).__init__(*args, **kwargs)
+        super(AppConfigPluginFormMixin, self).__init__(*args, **kwargs)
         # get available event configs, that have the same namespace
         # as pages with namespaces. that will ensure that user wont
         # select config that is not app hooked because that
@@ -128,7 +129,34 @@ class UpcomingPluginForm(forms.ModelForm):
             namespace__in=Page.objects.exclude(
                 application_namespace__isnull=True).values_list(
                 'application_namespace', flat=True))
-        self.fields['app_config'].queryset = available_configs
+
+        published_configs_pks = [
+            config.pk for config in available_configs
+            if namespace_is_apphooked(config.namespace)]
+
+        self.fields['app_config'].queryset = available_configs.filter(
+            pk__in=published_configs_pks)
+        # inform user that there are not published namespaces
+        # which he shouldn't use
+        not_published = available_configs.exclude(
+            pk__in=published_configs_pks).values_list(
+            'namespace', flat=True)
+        msg = ugettext(
+            'Following app_configs is app hooked but pages are not '
+            'published, to use them - publish pages to which they are '
+            'attached.')
+        not_published_namespaces = '; '.join(not_published)
+        full_message = '{0} \n<br/>{1}'.format(msg, not_published_namespaces)
+        # update help text
+        if (not self.fields['app_config'].help_text or
+                len(self.fields['app_config'].help_text.strip()) < 1):
+            self.fields['app_config'].help_text = full_message
+        else:
+            self.fields['app_config'].help_text += full_message
+
+        # pre select app config if there is only one option
+        if self.fields['app_config'].queryset.count() == 1:
+                self.fields['app_config'].empty_label = None
 
     def clean(self):
         # since namespace is not a unique thing we need to validate it
@@ -137,17 +165,18 @@ class UpcomingPluginForm(forms.ModelForm):
         # which also would lead to same 500 error. The easiest way is to try
         # to reverse, in case of success that would mean that the app_config
         # is correct and can be used.
-        data = super(UpcomingPluginForm, self).clean()
-        try:
-            reverse('{0}:events_list'.format(
-                data['app_config'].namespace))
-        except NoReverseMatch:
+        data = super(AppConfigPluginFormMixin, self).clean()
+        if not namespace_is_apphooked(data['app_config'].namespace):
             raise ValidationError(
                 _('Seems that selected Job config is not plugged to any page, '
                   'or maybe that page is not published.'
                   'Please select Job config that is being used.'),
                 code='invalid')
         return data
+
+
+class UpcomingPluginForm(AppConfigPluginFormMixin, forms.ModelForm):
+    model = UpcomingPluginItem
 
     def clean_style(self):
         style = self.cleaned_data.get('style')
@@ -161,6 +190,24 @@ class UpcomingPluginForm(forms.ModelForm):
                 "Not a valid style (Template does not exist)"
             )
         return style
+
+
+class EventListPluginForm(AppConfigPluginFormMixin, forms.ModelForm):
+    model = EventListPlugin
+
+    def clean(self):
+        data = super(EventListPluginForm, self).clean()
+        # save only events for selected app_config
+        selected_events = data.get('events', [])
+        app_config = data['app_config']
+        new_events = [event for event in selected_events
+                      if event.app_config.pk == app_config.pk]
+        data['events'] = new_events
+        return data
+
+
+class EventCalendarPluginForm(AppConfigPluginFormMixin, forms.ModelForm):
+    model = EventCalendarPlugin
 
 
 class EventOptionForm(AppDataForm):

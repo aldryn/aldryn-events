@@ -47,7 +47,13 @@ listed in ``INSTALLED_APPS``, *after* ``'cms'``.
 .. note::
    If you are using Django 1.6, add ``south`` to  ``INSTALLED_APPS``.
 
-And make sure that your other settings conform to::
+
+Aldryn Boilerplates
+===================
+
+Make sure you follow the installation directions for
+`Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_.
+To get up and running quickly make sure that your other settings conform to::
 
     TEMPLATE_CONTEXT_PROCESSORS = [
         ...
@@ -83,12 +89,29 @@ Now set the name of the boilerplate you want to use in your project::
    ``/boilerplates`` directory.
 
 
+Filer
+=====
+
+Aldryn Events also depends on Filer, be sure to follow 
+`Filer's installation instructions <http://django-filer.readthedocs.org/en/latest/installation.html>`_.
+To get up and running quickly, make sure you adapt your settings to include the
+``filer.thumbnail_processors.scale_and_crop_with_subject_location`` thumbnail processor: ::
+
+    THUMBNAIL_PROCESSORS = (
+        'easy_thumbnails.processors.colorspace',
+        'easy_thumbnails.processors.autocrop',
+        # 'easy_thumbnails.processors.scale_and_crop',
+        'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+        'easy_thumbnails.processors.filters',
+    )
+
+
 ****************************
 Prepare the database and run
 ****************************
 
-Now run ``python manage.py migrate`` to prepare the database for the new application, then
-``python manage.py runserver``.
+Now run ``python manage.py migrate`` to prepare the database for the new
+application, then ``python manage.py runserver``.
 
 
 ****************
