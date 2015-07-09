@@ -36,7 +36,7 @@ var config = {
 
 };
 
-if (process.env.CI || process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
     config.capabilities = null;
     config.sauceUser = process.env.SAUCE_USERNAME;
     config.sauceKey = process.env.SAUCE_ACCESS_KEY;

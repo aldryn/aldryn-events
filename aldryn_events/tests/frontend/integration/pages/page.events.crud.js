@@ -10,7 +10,7 @@
 // INTEGRATION TEST PAGE OBJECT
 
 var eventsPage = {
-    site: 'http://127.0.0.1:8000/en/',
+    site: '/',
     mainElementsWaitTime: 12000,
     iframeWaitTime: 15000,
 
