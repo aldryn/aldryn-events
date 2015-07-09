@@ -41,12 +41,12 @@ var eventsPage = {
 
         // fill in email field
         eventsPage.usernameInput.sendKeys(
-            credentials.username || 'admin').then(function () {
+            credentials.username).then(function () {
             eventsPage.passwordInput.clear();
 
             // fill in password field
             eventsPage.passwordInput.sendKeys(
-                credentials.password || 'admin');
+                credentials.password);
         }).then(function () {
             eventsPage.loginButton.click();
 

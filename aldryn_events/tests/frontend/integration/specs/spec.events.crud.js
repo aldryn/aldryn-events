@@ -74,8 +74,7 @@ describe('Aldryn Events tests: ', function () {
             }, eventsPage.mainElementsWaitTime);
 
             // validate test link text
-            eventsPage.testLink.getText()
-            .then(function (title) {
+            eventsPage.testLink.getText().then(function (title) {
                 expect(title).toEqual('Test');
             });
         });
