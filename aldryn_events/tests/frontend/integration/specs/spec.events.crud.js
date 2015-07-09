@@ -191,6 +191,62 @@ describe('Aldryn Events tests: ', function () {
             expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
             // validate Back to Overview link
             expect(eventsPage.backToOverviewLink.isDisplayed()).toBeTruthy();
+
+            eventsPage.backToOverviewLink.click();
+        });
+    });
+
+    it('deletes event', function () {
+        // wait for modal iframe to appear
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.sideMenuIframe);
+        }, eventsPage.iframeWaitTime);
+
+        // switch to side menu iframe
+        browser.switchTo()
+            .frame(browser.findElement(By.css('.cms_sideframe-frame iframe')));
+
+        // wait for edit event link to appear
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.editEventLink);
+        }, eventsPage.mainElementsWaitTime);
+
+        eventsPage.editEventLink.click();
+
+        // wait for delete button to appear
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.deleteButton);
+        }, eventsPage.mainElementsWaitTime);
+
+        eventsPage.deleteButton.click();
+
+        // wait for confirmation button to appear
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.confirmationButton);
+        }, eventsPage.mainElementsWaitTime);
+
+        eventsPage.confirmationButton.click();
+
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.successNotification);
+        }, eventsPage.mainElementsWaitTime);
+
+        // validate success notification
+        expect(eventsPage.successNotification.isDisplayed()).toBeTruthy();
+
+        // switch to default page content
+        browser.switchTo().defaultContent();
+
+        // refresh the page to see changes
+        browser.refresh();
+
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.eventsList);
+        }, eventsPage.mainElementsWaitTime);
+
+        // validate empty events list
+        eventsPage.eventsList.getText().then(function (text) {
+            expect(text).toEqual('No items available');
         });
     });
 
