@@ -40,8 +40,8 @@ if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
     config.capabilities = null;
     config.sauceUser = process.env.SAUCE_USERNAME;
     config.sauceKey = process.env.SAUCE_ACCESS_KEY;
-    config.multiCapabilities = Object.keys(browsers).map(function (key) {
-        var browserCapability =  browsers[key];
+    config.multiCapabilities = browsers.map(function (browser) {
+        var browserCapability =  browser;
         browserCapability['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
         browserCapability.name = formatTaskName(browserCapability.browserName);
         return browserCapability;
