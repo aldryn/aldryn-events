@@ -10,7 +10,7 @@
 // INTEGRATION TEST PAGE OBJECT
 
 var eventsPage = {
-    site: '/',
+    site: 'http://127.0.0.1:8000/en/',
     mainElementsWaitTime: 12000,
     iframeWaitTime: 15000,
 
@@ -19,17 +19,53 @@ var eventsPage = {
     usernameInput: element(by.id('id_cms-username')),
     passwordInput: element(by.id('id_cms-password')),
     loginButton: element(by.css('.cms_form-login input[type="submit"]')),
-    userMenus: element.all(by.css('.cms_toolbar-item-navigation li')),
+    userMenus: element.all(by.css('.cms_toolbar-item-navigation > li > a')),
+
+    // adding new page
     userMenuDropdown: element(by.css(
         '.cms_toolbar-item-navigation-hover')),
     administrationOptions: element.all(by.css(
         '.cms_toolbar-item-navigation a[href="/en/admin/"]')),
     sideMenuIframe: element(by.css('.cms_sideframe-frame iframe')),
     addPageLink: element(by.css('.model-page .addlink')),
-    pageTitleInput: element(by.id('id_title')),
+    titleInput: element(by.id('id_title')),
     saveButton: element(by.css('.submit-row [name="_save"]')),
-    editPageLink: element(by.css('.col1 a')),
+    editPageLink: element(by.css('.col1 [href*="preview/"]')),
     testLink: element(by.css('.selected a')),
+
+    // adding new event
+    breadcrumbsLinks: element.all(by.css('.breadcrumbs a')),
+    addEventLink: element(by.css('.model-event .addlink')),
+    startDateLinks: element.all(by.css('.field-start_date a')),
+    startTimeLinks: element.all(by.css(
+        '.field-start_time > .datetimeshortcuts > a')),
+    endDateInput: element(by.id('id_end_date')),
+    endTimeInput: element(by.id('id_end_time')),
+    successNotification: element(by.css('.messagelist .success')),
+    editEventLink: element(by.css(
+        '.field-title [href*="/aldryn_events/event/"]')),
+
+    // adding event to the page
+    advancedSettingsOption: element(by.css(
+        '.cms_toolbar-item-navigation [href*="advanced-settings"]')),
+    modalIframe: element(by.css('.cms_modal-frame iframe')),
+    applicationSelect: element(by.id('application_urls')),
+    saveModalButton: element(by.css('.cms_modal-buttons .cms_btn-action')),
+    eventMetaBlock: element(by.css('.aldryn-events-meta')),
+    eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),
+    eventLink: element(by.css('.aldryn-events-list h2 > a')),
+    backToOverviewLink: element(by.css('.pager-back a')),
+
+    // deleting event
+    deleteButton: element(by.css('.deletelink-box a')),
+    sidebarConfirmationButton: element(by.css('#content [type="submit"]')),
+    eventsList: element(by.css('.aldryn-events-list .well')),
+
+    // deleting page
+    deletePageOption: element(by.css(
+        '.cms_toolbar-item-navigation [href*="/delete/"]')),
+    modalConfirmationButton: element(by.css('.cms_modal-buttons .deletelink')),
+    emptyPageTitle: element(by.css('h1.logo')),
 
     cmsLogin: function (credentials) {
         // object can contain username and password, if not set it will
