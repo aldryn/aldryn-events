@@ -9,7 +9,7 @@
             {% regroup ongoing_objects by start_date as ongoing_objects_grouped %}
             {% for event in ongoing_objects_grouped %}
                 <h2>{{ event.start_date|date:"l, j F o" }}</h2>
-                {% include "aldryn_events/includes/event.html" %}
+                {% include "aldryn_events/includes/event.html" with is_ongoing_events="true" %}
             {% empty %}
                 <p class="well">{% trans "No items available" %}</p>
             {% endfor %}
