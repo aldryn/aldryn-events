@@ -63,7 +63,7 @@ To run the tests, in the aldryn-events directory::
     virtualenv env  # create a virtual environment
     source env/bin/activate  # activate it
     python setup.py install  # install the package requirements
-    pip install -r test_requirements/integration.txt  # install the test requirements
+    pip install -r test_requirements/django_17.txt  # install the test requirements
     python test_settings.py  # run the tests
 
 You can run the tests against a different version of Django by using the appropriate value in
