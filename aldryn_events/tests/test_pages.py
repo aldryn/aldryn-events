@@ -217,8 +217,8 @@ class EventPagesTestCase(EventBaseTestCase):
         expected_object_list = [event.pk for event in [ev4, ev1]]
         self.assertEqual(actual_object_list, expected_object_list)
 
-        ongoing_list = PyQuery(response.content)('.list-unstyled')
-        links = ongoing_list.find('li a')
+        ongoing_list = PyQuery(response.content)('.aldryn-events-ongoing')
+        links = ongoing_list.find('h2 a')
         self.assertEqual(2, links.length)
         self.assertEqual(ev2.get_absolute_url(), links[0].attrib['href'])
         self.assertEqual(ev3.get_absolute_url(), links[1].attrib['href'])
