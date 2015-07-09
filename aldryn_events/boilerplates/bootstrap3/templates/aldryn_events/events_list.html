@@ -23,7 +23,7 @@
         {% for ev_group in event_list_grouped %}
             <h2>{{ ev_group.grouper|date:"l, j F o" }}</h2>
             {% for event in ev_group.list %}
-                {% include "aldryn_events/includes/event.html" %}
+                {% include "aldryn_events/includes/event.html" with is_upcoming_events="true" %}
             {% endfor %}
         {% empty %}
             <p class="well">{% trans "No items available" %}</p>

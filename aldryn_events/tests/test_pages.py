@@ -217,10 +217,11 @@ class EventPagesTestCase(EventBaseTestCase):
         expected_object_list = [event.pk for event in [ev4, ev1]]
         self.assertEqual(actual_object_list, expected_object_list)
 
-        ongoing_list = PyQuery(response.content)('.events-outdated')
+        ongoing_list = PyQuery(response.content)('.events-upcoming')
         links = ongoing_list.find('h2 a')
-        self.assertEqual(1, links.length)
-        self.assertEqual(ev1.get_absolute_url(), links[0].attrib['href'])
+        self.assertEqual(2, links.length)
+        self.assertEqual(ev4.get_absolute_url(), links[0].attrib['href'])
+        self.assertEqual(ev1.get_absolute_url(), links[1].attrib['href'])
 
     def setUpForEventListPages(self):
         return [
