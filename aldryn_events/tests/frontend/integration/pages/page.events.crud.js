@@ -58,8 +58,14 @@ var eventsPage = {
 
     // deleting event
     deleteButton: element(by.css('.deletelink-box a')),
-    confirmationButton: element(by.css('#content [type="submit"]')),
+    sidebarConfirmationButton: element(by.css('#content [type="submit"]')),
     eventsList: element(by.css('.aldryn-events-list .well')),
+
+    // deleting page
+    deletePageOption: element(by.css(
+        '.cms_toolbar-item-navigation [href*="/delete/"]')),
+    modalConfirmationButton: element(by.css('.cms_modal-buttons .deletelink')),
+    emptyPageTitle: element(by.css('h1.logo')),
 
     cmsLogin: function (credentials) {
         // object can contain username and password, if not set it will
