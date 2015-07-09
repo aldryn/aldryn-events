@@ -42,7 +42,7 @@ describe('Aldryn Events tests: ', function () {
                 return browser.isElementPresent(eventsPage.sideMenuIframe);
             }, eventsPage.iframeWaitTime);
 
-            // switch to side menu iframe
+            // switch to sidebar menu iframe
             browser.switchTo().frame(browser.findElement(
                 By.css('.cms_sideframe-frame iframe')));
 
@@ -87,7 +87,7 @@ describe('Aldryn Events tests: ', function () {
             return browser.isElementPresent(eventsPage.sideMenuIframe);
         }, eventsPage.iframeWaitTime);
 
-        // switch to side menu iframe
+        // switch to sidebar menu iframe
         browser.switchTo()
             .frame(browser.findElement(By.css('.cms_sideframe-frame iframe')));
 
@@ -202,7 +202,7 @@ describe('Aldryn Events tests: ', function () {
             return browser.isElementPresent(eventsPage.sideMenuIframe);
         }, eventsPage.iframeWaitTime);
 
-        // switch to side menu iframe
+        // switch to sidebar menu iframe
         browser.switchTo()
             .frame(browser.findElement(By.css('.cms_sideframe-frame iframe')));
 
@@ -222,10 +222,10 @@ describe('Aldryn Events tests: ', function () {
 
         // wait for confirmation button to appear
         browser.wait(function () {
-            return browser.isElementPresent(eventsPage.confirmationButton);
+            return browser.isElementPresent(eventsPage.sidebarConfirmationButton);
         }, eventsPage.mainElementsWaitTime);
 
-        eventsPage.confirmationButton.click();
+        eventsPage.sidebarConfirmationButton.click();
 
         browser.wait(function () {
             return browser.isElementPresent(eventsPage.successNotification);
@@ -247,6 +247,35 @@ describe('Aldryn Events tests: ', function () {
         // validate empty events list
         eventsPage.eventsList.getText().then(function (text) {
             expect(text).toEqual('No items available');
+        });
+    });
+
+    it('deletes page', function () {
+        // click the Page link in the top menu
+        eventsPage.userMenus.get(1).click().then(function () {
+            // wait for top menu dropdown options to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.userMenuDropdown);
+            }, eventsPage.mainElementsWaitTime);
+
+            eventsPage.deletePageOption.click();
+
+            // wait for confirmation button to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.modalConfirmationButton);
+            }, eventsPage.mainElementsWaitTime);
+
+            eventsPage.modalConfirmationButton.click();
+        }).then(function () {
+            // wait for edit mode link to confirm page deletion
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.editModeLink);
+            }, eventsPage.mainElementsWaitTime);
+
+            // validate page title of empty page
+            eventsPage.emptyPageTitle.getText().then(function (text) {
+                expect(text).toEqual('Installation successful!');
+            });
         });
     });
 
