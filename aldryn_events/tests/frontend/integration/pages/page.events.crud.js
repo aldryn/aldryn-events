@@ -45,7 +45,6 @@ var eventsPage = {
     editEventLink: element(by.css(
         '.field-title [href*="/aldryn_events/event/"]')),
 
-
     // adding event to the page
     advancedSettingsOption: element(by.css(
         '.cms_toolbar-item-navigation [href*="advanced-settings"]')),
@@ -56,6 +55,11 @@ var eventsPage = {
     eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),
     eventLink: element(by.css('.aldryn-events-list h2 > a')),
     backToOverviewLink: element(by.css('.pager-back a')),
+
+    // deleting event
+    deleteButton: element(by.css('.deletelink-box a')),
+    confirmationButton: element(by.css('#content [type="submit"]')),
+    eventsList: element(by.css('.aldryn-events-list .well')),
 
     cmsLogin: function (credentials) {
         // object can contain username and password, if not set it will
