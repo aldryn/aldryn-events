@@ -11,7 +11,7 @@
 var eventsPage = require('../pages/page.events.crud.js');
 
 describe('Aldryn Events tests: ', function () {
-    it('login to the site with valid username and password', function () {
+    it('logs in to the site with valid username and password', function () {
         // go to the main page
         browser.get(eventsPage.site);
 
@@ -27,7 +27,7 @@ describe('Aldryn Events tests: ', function () {
         eventsPage.cmsLogin();
     });
 
-    it('create a new test page', function () {
+    it('creates a new test page', function () {
         // click the example.com link in the top menu
         eventsPage.userMenus.first().click().then(function () {
             // wait for top menu dropdown options to appear
@@ -81,7 +81,7 @@ describe('Aldryn Events tests: ', function () {
         });
     });
 
-    it('create a new event', function () {
+    it('creates a new event', function () {
         // wait for modal iframe to appear
         browser.wait(function () {
             return browser.isElementPresent(eventsPage.sideMenuIframe);
@@ -128,6 +128,69 @@ describe('Aldryn Events tests: ', function () {
             expect(eventsPage.successNotification.isDisplayed()).toBeTruthy();
             // validate edit event link
             expect(eventsPage.editEventLink.isDisplayed()).toBeTruthy();
+        });
+    });
+
+    it('adds a new event on the page', function () {
+        // switch to default page content
+        browser.switchTo().defaultContent();
+
+        // click the Page link in the top menu
+        eventsPage.userMenus.get(1).click().then(function () {
+            // wait for top menu dropdown options to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.userMenuDropdown);
+            }, eventsPage.mainElementsWaitTime);
+
+            eventsPage.advancedSettingsOption.click();
+
+            // wait for modal iframe to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.modalIframe);
+            }, eventsPage.iframeWaitTime);
+
+            // switch to modal iframe
+            browser.switchTo()
+                .frame(browser.findElement(By.css('.cms_modal-frame iframe')));
+
+            // wait for Application select to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.applicationSelect);
+            }, eventsPage.mainElementsWaitTime);
+
+            // set Application
+            eventsPage.applicationSelect.click();
+            eventsPage.applicationSelect.sendKeys('Events').then(function () {
+                eventsPage.applicationSelect.click();
+            });
+
+            // switch to default page content
+            browser.switchTo().defaultContent();
+
+            eventsPage.saveModalButton.click();
+        }).then(function () {
+            // wait for events calendar block to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.eventsCalendarBlock);
+            }, eventsPage.mainElementsWaitTime);
+
+            // validate event date and time block
+            expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+            // validate events calendar block
+            expect(eventsPage.eventsCalendarBlock.isDisplayed()).toBeTruthy();
+
+            // click the link to go to the event page
+            eventsPage.eventLink.click();
+        }).then(function () {
+            // wait for event date and time block to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.eventMetaBlock);
+            }, eventsPage.mainElementsWaitTime);
+
+            // validate event date and time block on event page
+            expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+            // validate Back to Overview link
+            expect(eventsPage.backToOverviewLink.isDisplayed()).toBeTruthy();
         });
     });
 

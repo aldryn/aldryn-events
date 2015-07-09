@@ -19,7 +19,7 @@ var eventsPage = {
     usernameInput: element(by.id('id_cms-username')),
     passwordInput: element(by.id('id_cms-password')),
     loginButton: element(by.css('.cms_form-login input[type="submit"]')),
-    userMenus: element.all(by.css('.cms_toolbar-item-navigation > li')),
+    userMenus: element.all(by.css('.cms_toolbar-item-navigation > li > a')),
 
     // adding new page
     userMenuDropdown: element(by.css(
@@ -44,6 +44,18 @@ var eventsPage = {
     successNotification: element(by.css('.messagelist .success')),
     editEventLink: element(by.css(
         '.field-title [href*="/aldryn_events/event/"]')),
+
+
+    // adding event to the page
+    advancedSettingsOption: element(by.css(
+        '.cms_toolbar-item-navigation [href*="advanced-settings"]')),
+    modalIframe: element(by.css('.cms_modal-frame iframe')),
+    applicationSelect: element(by.id('application_urls')),
+    saveModalButton: element(by.css('.cms_modal-buttons .cms_btn-action')),
+    eventMetaBlock: element(by.css('.aldryn-events-meta')),
+    eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),
+    eventLink: element(by.css('.aldryn-events-list h2 > a')),
+    backToOverviewLink: element(by.css('.pager-back a')),
 
     cmsLogin: function (credentials) {
         // object can contain username and password, if not set it will
