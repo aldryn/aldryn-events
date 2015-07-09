@@ -42,7 +42,6 @@ after_script:
 
 script:
   - tox -e $TOX_ENV
-  - gulp tests
 
 after_success:
   - coveralls

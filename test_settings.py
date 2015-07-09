@@ -76,7 +76,7 @@ HELPER_SETTINGS = {
         'easy_thumbnails.processors.filters',
     ),
     'EMAIL_BACKEND': 'django.core.mail.backends.locmem.EmailBackend',
-    'DEBUG': False,
+    'DEBUG': True,
     # 'TEMPLATE_DEBUG': True,
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
@@ -100,7 +100,7 @@ HELPER_SETTINGS = {
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware'
     ],
-    'ALDRYN_BOILERPLATE_NAME': 'legacy',
+    'ALDRYN_BOILERPLATE_NAME': 'bootstrap3',
     'STATICFILES_FINDERS': [
         'django.contrib.staticfiles.finders.FileSystemFinder',
         # important! place right before
@@ -129,7 +129,7 @@ HELPER_SETTINGS = {
         'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
         'django.template.loaders.app_directories.Loader',
         'django.template.loaders.eggs.Loader'
-    )
+    ),
 }
 
 

@@ -20,14 +20,20 @@ var config = {
     },
 
     onPrepare: function () {
+        // Set Angular site flag to disable Angular-specific features
         browser.ignoreSynchronization = true;
     },
 
-    // Options to be passed to Jasmine-node.
+    // Name of the process executing this capability.  Not used directly by
+    // protractor or the browser, but instead pass directly to third parties
+    // like SauceLabs as the name of the job running this test
+    name: 'aldryn-events integration tests',
+
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 30000
+        defaultTimeoutInterval: 240000
     }
+
 };
 
 if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
@@ -36,6 +42,7 @@ if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
     config.sauceKey = process.env.SAUCE_ACCESS_KEY;
     config.multiCapabilities = Object.keys(browsers).map(function (key) {
         var browserCapability =  browsers[key];
+        browserCapability['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
         browserCapability.name = formatTaskName(browserCapability.browserName);
         return browserCapability;
     });

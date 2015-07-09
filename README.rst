@@ -4,6 +4,8 @@ Aldryn-Events
 
 |PyPI Version| |Build Status| |Coverage Status| |codeclimate| |requires_io|
 
+|Browser Matrix|
+
 Aldryn Events is an Aldryn-compatible application for publishing information
 about events in django CMS.
 
@@ -43,3 +45,5 @@ Requirements
 .. |requires_io| image:: https://requires.io/github/aldryn/aldryn-events/requirements.svg?branch=master
    :target: https://requires.io/github/aldryn/aldryn-events/requirements/?branch=master
    :alt: Requirements Status
+.. |Browser Matrix| image:: https://saucelabs.com/browser-matrix/aldryn-events.svg
+   :target: https://saucelabs.com/u/aldryn-events

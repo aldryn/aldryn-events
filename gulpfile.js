@@ -14,6 +14,8 @@ var protractor = require('gulp-protractor').protractor;
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 var webdriverUpdate = require('gulp-protractor').webdriver_update;
+var SauceTunnel = require('sauce-tunnel');
+var tunnel;
 
 // #############################################################################
 // SETTINGS
@@ -33,6 +35,8 @@ var PROJECT_PATTERNS = {
     ]
 };
 
+var PORT = parseInt(process.env.PORT, 10) || 8000;
+
 // #############################################################################
 // LINTING
 gulp.task('lint', function () {
@@ -51,7 +55,7 @@ gulp.task('lint', function () {
 
 // #########################################################
 // TESTS
-gulp.task('tests', ['tests:unit', 'tests:lint']);
+gulp.task('tests', ['tests:unit', 'tests:lint', 'tests:integration']);
 gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
     // run javascript tests
@@ -61,17 +65,51 @@ gulp.task('tests:unit', function (done) {
     }, done);
 });
 
+gulp.task('tests:sauce:start', function (done) {
+    if (!process.env.CI) {
+        done();
+        return;
+    }
+    tunnel = new SauceTunnel(
+        process.env.SAUCE_USERNAME,
+        process.env.SAUCE_ACCESS_KEY,
+        process.env.TRAVIS_JOB_NUMBER
+    );
+
+    tunnel.start(function (isCreated) {
+        if (!isCreated) {
+            done('Failed to create Sauce tunnel.');
+        }
+        console.log('Connected to Sauce Labs.');
+        done();
+    });
+});
+
+gulp.task('tests:sauce:end', function (done) {
+    if (!process.env.CI) {
+        done();
+        return;
+    }
+    tunnel.stop(function () {
+        console.log('Stopping the server.');
+        done();
+    });
+});
+
 gulp.task('tests:webdriver', webdriverUpdate);
-gulp.task('tests:integration', ['tests:webdriver'], function () {
-    return gulp.src([PROJECT_PATH.tests + '/integration/*.js'])
+gulp.task('tests:integration', ['tests:webdriver', 'tests:sauce:start'], function () {
+    return gulp.src([PROJECT_PATH.tests + '/integration/specs/*.js'])
         .pipe(protractor({
             configFile: PROJECT_PATH.tests + '/protractor.conf.js',
-            args: []
+            args: ['--baseUrl', 'http://127.0.0.1:' + PORT]
         }))
         .on('error', function (error) {
             gutil.log(gutil.colors.red(
                 'Error (' + error.plugin + '): ' + error.message
             ));
+        })
+        .on('end', function () {
+            gulp.run('tests:sauce:end');
         });
 });
 

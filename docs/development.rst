@@ -75,4 +75,6 @@ Frontend Tests
 
 Follow the instructions in the `aldryn-boilerplate-bootstrap3
 <https://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/testing/index.html>`_
-documentation.
+documentation and setup the environment through the `Backend Tests` section.
+
+Instead of using ``python test_settings.py`` described above, you need to excecute ``python test_settings.py server`` to get a running local server. You can open the development server locally through ``http://127.0.0.1:8000/``. The database is added within the root of this project ``local.sqlite``. You might want to delete the database from time to time to start with a fresh installation. Don't forget to restart the server if you do so.
