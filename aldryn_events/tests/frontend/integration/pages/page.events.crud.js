@@ -30,6 +30,7 @@ var eventsPage = {
     pagesLink: element(by.css('.model-page > th > a')),
     addPageLink: element(by.css('.sitemap-noentry .addlink')),
     titleInput: element(by.id('id_title')),
+    slugErrorNotification: element(by.css('.errors.slug')),
     saveButton: element(by.css('.submit-row [name="_save"]')),
     editPageLink: element(by.css('.col1 [href*="preview/"]')),
     testLink: element(by.css('.selected a')),

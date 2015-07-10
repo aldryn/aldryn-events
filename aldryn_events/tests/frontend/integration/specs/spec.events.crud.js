@@ -81,23 +81,29 @@ describe('Aldryn Events tests: ', function () {
                 eventsPage.titleInput.sendKeys('Test').then(function () {
                     eventsPage.saveButton.click();
 
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.editPageLink);
-                    }, eventsPage.mainElementsWaitTime);
+                    eventsPage.slugErrorNotification.isPresent()
+                        .then(function (present) {
+                        if (present === false) {
+                            browser.wait(function () {
+                                return browser.isElementPresent(eventsPage.editPageLink);
+                            }, eventsPage.mainElementsWaitTime);
 
-                    // validate/click edit page link
-                    eventsPage.editPageLink.click();
+                            // validate/click edit page link
+                            eventsPage.editPageLink.click();
 
-                    // switch to default page content
-                    browser.switchTo().defaultContent();
+                            // switch to default page content
+                            browser.switchTo().defaultContent();
 
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.testLink);
-                    }, eventsPage.mainElementsWaitTime);
+                            browser.wait(function () {
+                                return browser.isElementPresent(eventsPage.testLink);
+                            }, eventsPage.mainElementsWaitTime);
 
-                    // validate test link text
-                    eventsPage.testLink.getText().then(function (title) {
-                        expect(title).toEqual('Test');
+                            // validate test link text
+                            eventsPage.testLink.getText()
+                                .then(function (title) {
+                                expect(title).toEqual('Test');
+                            });
+                        }
                     });
                 });
             }
@@ -137,6 +143,9 @@ describe('Aldryn Events tests: ', function () {
 
             eventsPage.titleInput.sendKeys(eventName);
         }).then(function () {
+            browser.actions().mouseMove(eventsPage.startTimeLinks.first())
+                .perform();
+        }).then(function () {
             // click Today link
             eventsPage.startDateLinks.first().click();
             // click Now link
@@ -156,7 +165,8 @@ describe('Aldryn Events tests: ', function () {
             expect(eventsPage.successNotification.isDisplayed())
                 .toBeTruthy();
             // validate edit event link
-            expect(eventsPage.editEventLinks.first().isDisplayed()).toBeTruthy();
+            expect(eventsPage.editEventLinks.first().isDisplayed())
+                .toBeTruthy();
         });
     });
 
@@ -203,7 +213,8 @@ describe('Aldryn Events tests: ', function () {
                         return browser.isElementPresent(eventsPage.saveModalButton);
                     }, eventsPage.mainElementsWaitTime);
 
-                    browser.actions().mouseMove(eventsPage.saveModalButton).perform();
+                    browser.actions().mouseMove(eventsPage.saveModalButton)
+                        .perform();
                     eventsPage.saveModalButton.click();
                 }).then(function () {
                     // wait for event date and time block to appear
@@ -212,9 +223,11 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.mainElementsWaitTime);
 
                     // validate event date and time block
-                    expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventMetaBlock.isDisplayed())
+                        .toBeTruthy();
                     // validate events calendar block
-                    expect(eventsPage.eventsCalendarBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventsCalendarBlock.isDisplayed())
+                        .toBeTruthy();
 
                     // click the link to go to the event page
                     eventsPage.eventLink.click();
@@ -225,9 +238,11 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.mainElementsWaitTime);
 
                     // validate event date and time block on event page
-                    expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventMetaBlock.isDisplayed())
+                        .toBeTruthy();
                     // validate Back to Overview link
-                    expect(eventsPage.backToOverviewLink.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.backToOverviewLink.isDisplayed())
+                        .toBeTruthy();
 
                     eventsPage.backToOverviewLink.click();
                 });
