@@ -27,7 +27,8 @@ var eventsPage = {
     administrationOptions: element.all(by.css(
         '.cms_toolbar-item-navigation a[href="/en/admin/"]')),
     sideMenuIframe: element(by.css('.cms_sideframe-frame iframe')),
-    addPageLink: element(by.css('.model-page .addlink')),
+    pagesLink: element(by.css('.model-page > th > a')),
+    addPageLink: element(by.css('.sitemap-noentry .addlink')),
     titleInput: element(by.id('id_title')),
     saveButton: element(by.css('.submit-row [name="_save"]')),
     editPageLink: element(by.css('.col1 [href*="preview/"]')),
@@ -42,7 +43,7 @@ var eventsPage = {
     endDateInput: element(by.id('id_end_date')),
     endTimeInput: element(by.id('id_end_time')),
     successNotification: element(by.css('.messagelist .success')),
-    editEventLink: element(by.css(
+    editEventLinks: element.all(by.css(
         '.field-title [href*="/aldryn_events/event/"]')),
 
     // adding event to the page
@@ -59,13 +60,6 @@ var eventsPage = {
     // deleting event
     deleteButton: element(by.css('.deletelink-box a')),
     sidebarConfirmationButton: element(by.css('#content [type="submit"]')),
-    eventsList: element(by.css('.aldryn-events-list .well')),
-
-    // deleting page
-    deletePageOption: element(by.css(
-        '.cms_toolbar-item-navigation [href*="/delete/"]')),
-    modalConfirmationButton: element(by.css('.cms_modal-buttons .deletelink')),
-    emptyPageTitle: element(by.css('h1.logo')),
 
     cmsLogin: function (credentials) {
         // object can contain username and password, if not set it will
