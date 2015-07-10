@@ -11,6 +11,9 @@
 var eventsPage = require('../pages/page.events.crud.js');
 
 describe('Aldryn Events tests: ', function () {
+    // create random event name
+    var eventName = 'Test event ' + (Math.floor(Math.random() * 10001));
+
     it('logs in to the site with valid username and password', function () {
         // go to the main page
         browser.get(eventsPage.site);
@@ -102,9 +105,6 @@ describe('Aldryn Events tests: ', function () {
     });
 
     it('creates a new event', function () {
-        // create random event name
-        var eventName = 'Test event ' + (Math.floor(Math.random() * 10001));
-
         // check if the focus is on sidebar ifarme
         eventsPage.editPageLink.isPresent().then(function (present) {
             if (present === false) {
@@ -250,34 +250,53 @@ describe('Aldryn Events tests: ', function () {
             return browser.isElementPresent(eventsPage.editEventLinks.first());
         }, eventsPage.mainElementsWaitTime);
 
-        eventsPage.editEventLinks.first().click();
+        // validate edit event links texts to find proper event for deletion
+        eventsPage.editEventLinks.first().getText().then(function (text) {
+            if (text === eventName) {
+                eventsPage.editEventLinks.first().click();
+            } else {
+                eventsPage.editEventLinks.get(1).getText()
+                    .then(function (text) {
+                    if (text === eventName) {
+                        eventsPage.editEventLinks.get(1).click();
+                    } else {
+                        eventsPage.editEventLinks.get(2).getText()
+                            .then(function (text) {
+                            if (text === eventName) {
+                                eventsPage.editEventLinks.get(2).click();
+                            }
+                        });
+                    }
+                });
+            }
+        }).then(function () {
+            // wait for delete button to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.deleteButton);
+            }, eventsPage.mainElementsWaitTime);
 
-        // wait for delete button to appear
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.deleteButton);
-        }, eventsPage.mainElementsWaitTime);
+            eventsPage.deleteButton.click();
 
-        eventsPage.deleteButton.click();
+            // wait for confirmation button to appear
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.sidebarConfirmationButton);
+            }, eventsPage.mainElementsWaitTime);
 
-        // wait for confirmation button to appear
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.sidebarConfirmationButton);
-        }, eventsPage.mainElementsWaitTime);
+            eventsPage.sidebarConfirmationButton.click();
 
-        eventsPage.sidebarConfirmationButton.click();
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.successNotification);
+            }, eventsPage.mainElementsWaitTime);
 
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.successNotification);
-        }, eventsPage.mainElementsWaitTime);
+            // validate success notification
+            expect(eventsPage.successNotification.isDisplayed()).toBeTruthy();
 
-        // validate success notification
-        expect(eventsPage.successNotification.isDisplayed()).toBeTruthy();
+            // switch to default page content
+            browser.switchTo().defaultContent();
 
-        // switch to default page content
-        browser.switchTo().defaultContent();
-
-        // refresh the page to see changes
-        browser.refresh();
+            // refresh the page to see changes
+            browser.refresh();
+        });
     });
 
 });
