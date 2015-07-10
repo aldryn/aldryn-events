@@ -34,6 +34,12 @@ var eventsPage = {
     editPageLink: element(by.css('.col1 [href*="preview/"]')),
     testLink: element(by.css('.selected a')),
 
+    // adding new apphook config
+    eventsConfigsLink: element(by.css('.model-eventsconfig > th > a')),
+    editEventsConfigsLink: element(by.css('.row1 > th > a')),
+    addEventsConfigsButton: element(by.css('.object-tools .addlink')),
+    namespaceInput: element(by.id('id_namespace')),
+
     // adding new event
     breadcrumbsLinks: element.all(by.css('.breadcrumbs a')),
     addEventLink: element(by.css('.model-event .addlink')),

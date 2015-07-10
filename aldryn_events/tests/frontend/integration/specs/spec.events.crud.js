@@ -104,7 +104,7 @@ describe('Aldryn Events tests: ', function () {
         });
     });
 
-    it('creates a new event', function () {
+    it('creates a new apphook config', function () {
         // check if the focus is on sidebar ifarme
         eventsPage.editPageLink.isPresent().then(function (present) {
             if (present === false) {
@@ -126,17 +126,57 @@ describe('Aldryn Events tests: ', function () {
             eventsPage.breadcrumbsLinks.first().click();
 
             browser.wait(function () {
-                return browser.isElementPresent(eventsPage.addEventLink);
+                return browser.isElementPresent(eventsPage.eventsConfigsLink);
             }, eventsPage.mainElementsWaitTime);
 
-            eventsPage.addEventLink.click();
+            eventsPage.eventsConfigsLink.click();
 
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.titleInput);
-            }, eventsPage.mainElementsWaitTime);
+            // check if the apphook config already exists and return the status
+            return eventsPage.editEventsConfigsLink.isPresent();
+        }).then(function (present) {
+            if (present === false) {
+                // apphook config is absent - create new apphook config
+                browser.wait(function () {
+                    return browser.isElementPresent(eventsPage.addEventsConfigsButton);
+                }, eventsPage.mainElementsWaitTime);
 
-            eventsPage.titleInput.sendKeys(eventName);
-        }).then(function () {
+                eventsPage.addEventsConfigsButton.click();
+
+                browser.wait(function () {
+                    return browser.isElementPresent(eventsPage.namespaceInput);
+                }, eventsPage.mainElementsWaitTime);
+
+                eventsPage.namespaceInput.sendKeys('aldryn_events')
+                    .then(function () {
+                    eventsPage.saveButton.click();
+
+                    browser.wait(function () {
+                        return browser.isElementPresent(eventsPage.editEventsConfigsLink);
+                    }, eventsPage.mainElementsWaitTime);
+                });
+            }
+        });
+    });
+
+    it('creates a new event', function () {
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.breadcrumbsLinks.first());
+        }, eventsPage.mainElementsWaitTime);
+
+        // click the Home link in breadcrumbs
+        eventsPage.breadcrumbsLinks.first().click();
+
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.addEventLink);
+        }, eventsPage.mainElementsWaitTime);
+
+        eventsPage.addEventLink.click();
+
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.titleInput);
+        }, eventsPage.mainElementsWaitTime);
+
+        eventsPage.titleInput.sendKeys(eventName).then(function () {
             // click Today link
             eventsPage.startDateLinks.first().click();
             // click Now link
@@ -156,7 +196,8 @@ describe('Aldryn Events tests: ', function () {
             expect(eventsPage.successNotification.isDisplayed())
                 .toBeTruthy();
             // validate edit event link
-            expect(eventsPage.editEventLinks.first().isDisplayed()).toBeTruthy();
+            expect(eventsPage.editEventLinks.first().isDisplayed())
+                .toBeTruthy();
         });
     });
 
@@ -182,8 +223,8 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.iframeWaitTime);
 
                     // switch to modal iframe
-                    browser.switchTo()
-                        .frame(browser.findElement(By.css('.cms_modal-frame iframe')));
+                    browser.switchTo().frame(browser.findElement(By.css(
+                        '.cms_modal-frame iframe')));
 
                     // wait for Application select to appear
                     browser.wait(function () {
@@ -192,7 +233,8 @@ describe('Aldryn Events tests: ', function () {
 
                     // set Application
                     eventsPage.applicationSelect.click();
-                    eventsPage.applicationSelect.sendKeys('Events').then(function () {
+                    eventsPage.applicationSelect.sendKeys('Events')
+                        .then(function () {
                         eventsPage.applicationSelect.click();
                     });
 
@@ -203,7 +245,8 @@ describe('Aldryn Events tests: ', function () {
                         return browser.isElementPresent(eventsPage.saveModalButton);
                     }, eventsPage.mainElementsWaitTime);
 
-                    browser.actions().mouseMove(eventsPage.saveModalButton).perform();
+                    browser.actions().mouseMove(eventsPage.saveModalButton)
+                        .perform();
                     eventsPage.saveModalButton.click();
                 }).then(function () {
                     // wait for event date and time block to appear
@@ -212,9 +255,11 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.mainElementsWaitTime);
 
                     // validate event date and time block
-                    expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventMetaBlock.isDisplayed())
+                        .toBeTruthy();
                     // validate events calendar block
-                    expect(eventsPage.eventsCalendarBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventsCalendarBlock.isDisplayed())
+                        .toBeTruthy();
 
                     // click the link to go to the event page
                     eventsPage.eventLink.click();
@@ -225,9 +270,11 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.mainElementsWaitTime);
 
                     // validate event date and time block on event page
-                    expect(eventsPage.eventMetaBlock.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.eventMetaBlock.isDisplayed())
+                        .toBeTruthy();
                     // validate Back to Overview link
-                    expect(eventsPage.backToOverviewLink.isDisplayed()).toBeTruthy();
+                    expect(eventsPage.backToOverviewLink.isDisplayed())
+                        .toBeTruthy();
 
                     eventsPage.backToOverviewLink.click();
                 });
