@@ -182,6 +182,15 @@ describe('Aldryn Events tests: ', function () {
             return browser.isElementPresent(eventsPage.titleInput);
         }, eventsPage.mainElementsWaitTime);
 
+
+        // browser.pause();
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.startDateLinks.first());
+        }, eventsPage.mainElementsWaitTime);
+        browser.wait(function () {
+            return browser.isElementPresent(eventsPage.startTimeLinks.first());
+        }, eventsPage.mainElementsWaitTime);
+
         eventsPage.titleInput.sendKeys(eventName).then(function () {
             // click Today link
             eventsPage.startDateLinks.first().click();
