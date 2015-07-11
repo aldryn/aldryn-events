@@ -14,7 +14,7 @@ describe('Aldryn Events tests: ', function () {
     // create random event name
     var eventName = 'Test event ' + (Math.floor(Math.random() * 10001));
 
-    it('logs in to the site with valid username and password', function {
+    it('logs in to the site with valid username and password', function () {
         // go to the main page
         browser.get(eventsPage.site);
 
