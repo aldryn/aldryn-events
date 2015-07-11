@@ -20,5 +20,5 @@ module.exports = {
         ].join(' ');
     },
 
-    sauceLabsBrowsers: b2s()
+    sauceLabsBrowsers: b2s(['chrome 42', 'ff 38', 'ie 9'])
 };
