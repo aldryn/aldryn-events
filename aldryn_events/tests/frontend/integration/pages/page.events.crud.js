@@ -88,9 +88,7 @@ var eventsPage = {
             eventsPage.loginButton.click();
 
             // wait for user menu to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.userMenus.first());
-            }, eventsPage.mainElementsWaitTime);
+            browser.wait(browser.isElementPresent(eventsPage.userMenus.first()));
 
             // validate user menu
             expect(eventsPage.userMenus.first().isDisplayed())
