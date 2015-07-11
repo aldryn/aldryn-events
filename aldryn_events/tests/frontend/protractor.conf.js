@@ -36,7 +36,7 @@ var config = {
 
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 240000
+        defaultTimeoutInterval: 3000000
     }
 
 };

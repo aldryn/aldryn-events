@@ -4,7 +4,7 @@
  */
 
 'use strict';
-/* global describe, it, browser, By, expect */
+/* global describe, it, browser, protractor, By, expect, element */
 
 // #############################################################################
 // INTEGRATION TEST
@@ -14,7 +14,7 @@ describe('Aldryn Events tests: ', function () {
     // create random event name
     var eventName = 'Test event ' + (Math.floor(Math.random() * 10001));
 
-    it('logs in to the site with valid username and password', function () {
+    it('logs in to the site with valid username and password', function {
         // go to the main page
         browser.get(eventsPage.site);
 
@@ -178,18 +178,14 @@ describe('Aldryn Events tests: ', function () {
 
         eventsPage.addEventLink.click();
 
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.titleInput);
-        }, eventsPage.mainElementsWaitTime);
+        var EC = protractor.ExpectedConditions;
 
-
-        // browser.pause();
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.startDateLinks.first());
-        }, eventsPage.mainElementsWaitTime);
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.startTimeLinks.first());
-        }, eventsPage.mainElementsWaitTime);
+        browser.wait(EC.and(
+            EC.presenceOf(eventsPage.titleInput),
+            EC.presenceOf(eventsPage.startDateLinks.first()),
+            EC.presenceOf(eventsPage.startTimeLinks.first()),
+            EC.presenceOf(element(By.css('#cke_id_short_description')))
+        ), eventsPage.mainElementsWaitTime);
 
         eventsPage.titleInput.sendKeys(eventName).then(function () {
             // click Today link
