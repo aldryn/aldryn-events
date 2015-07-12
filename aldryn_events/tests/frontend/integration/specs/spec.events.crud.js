@@ -187,8 +187,6 @@ describe('Aldryn Events tests: ', function () {
             EC.presenceOf(element(By.css('#cke_id_short_description')))
         ), eventsPage.mainElementsWaitTime);
 
-        browser.sleep(1000);
-
         eventsPage.titleInput.sendKeys(eventName).then(function () {
             // click Today link
             eventsPage.startDateLinks.first().click();
