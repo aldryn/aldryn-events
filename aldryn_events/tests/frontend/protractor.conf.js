@@ -13,11 +13,6 @@ var formatTaskName = baseConf.formatTaskName;
 var browsers = baseConf.sauceLabsBrowsers;
 
 var config = {
-    // Maximum number of total browser sessions to run. Tests are queued in
-    // sequence if number of browser sessions is limited by this parameter.
-    // Use a number less than 1 to denote unlimited. Default is unlimited.
-    maxSessions: 1,
-
     // Capabilities to be passed to the webdriver instance.
     capabilities: {
         'browserName': 'phantomjs',
