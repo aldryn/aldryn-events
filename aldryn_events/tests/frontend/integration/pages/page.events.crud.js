@@ -35,6 +35,12 @@ var eventsPage = {
     editPageLink: element(by.css('.col1 [href*="preview/"]')),
     testLink: element(by.css('.selected a')),
 
+    // adding new apphook config
+    eventsConfigsLink: element(by.css('.model-eventsconfig > th > a')),
+    editEventsConfigsLink: element(by.css('.row1 > th > a')),
+    addEventsConfigsButton: element(by.css('.object-tools .addlink')),
+    namespaceInput: element(by.id('id_namespace')),
+
     // adding new event
     breadcrumbsLinks: element.all(by.css('.breadcrumbs a')),
     addEventLink: element(by.css('.model-event .addlink')),
@@ -45,7 +51,7 @@ var eventsPage = {
     endTimeInput: element(by.id('id_end_time')),
     successNotification: element(by.css('.messagelist .success')),
     editEventLinks: element.all(by.css(
-        '.field-title [href*="/aldryn_events/event/"]')),
+        '[href*="/aldryn_events/event/"]')),
 
     // adding event to the page
     advancedSettingsOption: element(by.css(
@@ -82,9 +88,7 @@ var eventsPage = {
             eventsPage.loginButton.click();
 
             // wait for user menu to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.userMenus.first());
-            }, eventsPage.mainElementsWaitTime);
+            browser.wait(browser.isElementPresent(eventsPage.userMenus.first()));
 
             // validate user menu
             expect(eventsPage.userMenus.first().isDisplayed())
