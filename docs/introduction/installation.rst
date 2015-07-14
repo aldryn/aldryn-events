@@ -51,18 +51,20 @@ listed in ``INSTALLED_APPS``, *after* ``'cms'``.
 Aldryn Boilerplates
 ===================
 
-Make sure you follow the installation directions for
-`Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_.
-To get up and running quickly make sure that your other settings conform to::
+This application uses (and will install) `Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_,
+which requires some basic configuration to get you started. 
+
+Edit your settings so that they conform to::
 
     TEMPLATE_CONTEXT_PROCESSORS = [
         ...
         'aldryn_boilerplates.context_processors.boilerplate',
+        ...
     ]
 
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
-        # important! place right before django.contrib.staticfiles.finders.AppDirectoriesFinder
+        # important - place immediately before AppDirectoriesFinder
         'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
@@ -74,7 +76,7 @@ To get up and running quickly make sure that your other settings conform to::
         'django.template.loaders.app_directories.Loader',
     ]
 
-Now set the name of the boilerplate you want to use in your project::
+Now set the name of the boilerplate you'll use in your project::
 
     ALDRYN_BOILERPLATE_NAME = 'bootstrap3'
 
@@ -85,7 +87,7 @@ Now set the name of the boilerplate you want to use in your project::
    multiple different frontend schemes ('Boilerplates')and switch between them without the need for
    project-by-project file overwriting.
 
-   Aldryn Events's templates and staticfiles will be found in named directories inside the
+   Aldryn Events's templates and staticfiles will be found in named directories in the
    ``/boilerplates`` directory.
 
 
