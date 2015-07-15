@@ -48,7 +48,6 @@ CLASSIFIERS = [
     'Topic :: Software Development :: Libraries :: Application Frameworks',
 ]
 
-
 setup(
     name='aldryn-events',
     version=__version__,
