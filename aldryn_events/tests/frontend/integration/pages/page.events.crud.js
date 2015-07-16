@@ -94,7 +94,7 @@ var eventsPage = {
             expect(eventsPage.userMenus.first().isDisplayed())
                 .toBeTruthy();
         });
-    },
+    }
 
 };
 
