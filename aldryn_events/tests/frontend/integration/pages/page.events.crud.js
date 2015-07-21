@@ -55,7 +55,7 @@ var eventsPage = {
 
     // adding event to the page
     advancedSettingsOption: element(by.css(
-        '.cms_toolbar-item-navigation [href*="advanced-settings"]')),
+        '.cms_toolbar-item-navigation [href*="advanced-settings"] span')),
     modalIframe: element(by.css('.cms_modal-frame iframe')),
     applicationSelect: element(by.id('application_urls')),
     saveModalButton: element(by.css('.cms_modal-buttons .cms_btn-action')),
