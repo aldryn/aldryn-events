@@ -81,7 +81,7 @@ describe('Aldryn Events tests: ', function () {
                 eventsPage.titleInput.sendKeys('Test').then(function () {
                     eventsPage.saveButton.click();
 
-                    eventsPage.slugErrorNotification.isPresent();
+                    return eventsPage.slugErrorNotification.isPresent();
                 }).then(function (present) {
                     if (present === false) {
                         browser.wait(function () {
@@ -89,7 +89,7 @@ describe('Aldryn Events tests: ', function () {
                         }, eventsPage.mainElementsWaitTime);
 
                         // wait till the editPageLink will become clickable
-                        browser.sleep(1000);
+                        browser.sleep(500);
 
                         // validate/click edit page link
                         eventsPage.editPageLink.click();
