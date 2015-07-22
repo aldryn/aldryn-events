@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+1.0.1 (2015-07-22)
+------------------
+
+* Adds automated frontend tests and configuration
+* Pin some dependencies to current, known versions
+
+1.0.0 (2015-07-08)
+------------------
+
+* Initial public release
+
 0.8.10 (2015-06-11)
 -------------------
 
