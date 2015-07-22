@@ -81,30 +81,32 @@ describe('Aldryn Events tests: ', function () {
                 eventsPage.titleInput.sendKeys('Test').then(function () {
                     eventsPage.saveButton.click();
 
-                    eventsPage.slugErrorNotification.isPresent()
-                        .then(function (present) {
-                        if (present === false) {
-                            browser.wait(function () {
-                                return browser.isElementPresent(eventsPage.editPageLink);
-                            }, eventsPage.mainElementsWaitTime);
+                    return eventsPage.slugErrorNotification.isPresent();
+                }).then(function (present) {
+                    if (present === false) {
+                        browser.wait(function () {
+                            return browser.isElementPresent(eventsPage.editPageLink);
+                        }, eventsPage.mainElementsWaitTime);
 
-                            // validate/click edit page link
-                            eventsPage.editPageLink.click();
+                        // wait till the editPageLink will become clickable
+                        browser.sleep(500);
 
-                            // switch to default page content
-                            browser.switchTo().defaultContent();
+                        // validate/click edit page link
+                        eventsPage.editPageLink.click();
 
-                            browser.wait(function () {
-                                return browser.isElementPresent(eventsPage.testLink);
-                            }, eventsPage.mainElementsWaitTime);
+                        // switch to default page content
+                        browser.switchTo().defaultContent();
 
-                            // validate test link text
-                            eventsPage.testLink.getText()
-                                .then(function (title) {
-                                expect(title).toEqual('Test');
-                            });
-                        }
-                    });
+                        browser.wait(function () {
+                            return browser.isElementPresent(eventsPage.testLink);
+                        }, eventsPage.mainElementsWaitTime);
+
+                        // validate test link text
+                        eventsPage.testLink.getText()
+                            .then(function (title) {
+                            expect(title).toEqual('Test');
+                        });
+                    }
                 });
             }
         });
