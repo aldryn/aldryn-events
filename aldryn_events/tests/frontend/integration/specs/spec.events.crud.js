@@ -89,7 +89,7 @@ describe('Aldryn Events tests: ', function () {
                         }, eventsPage.mainElementsWaitTime);
 
                         // wait till the editPageLink will become clickable
-                        browser.sleep(500);
+                        browser.sleep(1000);
 
                         // validate/click edit page link
                         eventsPage.editPageLink.click();
