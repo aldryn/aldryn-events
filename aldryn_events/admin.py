@@ -77,7 +77,7 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
+class EventConfigAdmin(BaseAppHookConfig):
 
     def get_config_fields(self):
         return ('config.show_ongoing_first',)
