@@ -18,7 +18,7 @@ REQUIREMENTS = [
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
     'aldryn-translation-tools',
-    'aldryn-reversion>=0.0.2',
+    'aldryn-reversion>=0.0.2,<0.1.0',
     'django-appconf',
     'django-bootstrap3',
     'django-extended-choices',
@@ -33,7 +33,7 @@ REQUIREMENTS = [
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
 CLASSIFIERS = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
     'Framework :: Django',
     'Framework :: Django :: 1.6',
