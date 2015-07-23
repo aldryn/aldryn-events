@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.0.2 (2015-07-22)
+------------------
+
+* Unrestricts Aldryn Translation Tools version.
+* Implements AllTranslationsMixin where appropriate.
+
 1.0.1 (2015-07-22)
 ------------------
 
