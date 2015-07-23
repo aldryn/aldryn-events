@@ -46,7 +46,7 @@ describe('Aldryn Events tests: ', function () {
                 return browser.isElementPresent(eventsPage.userMenuDropdown);
             }, eventsPage.mainElementsWaitTime);
 
-            eventsPage.administrationOptions.first().click();
+            return eventsPage.administrationOptions.first().click();
         }).then(function () {
             // wait for modal iframe to appear
             browser.wait(function () {
@@ -62,6 +62,11 @@ describe('Aldryn Events tests: ', function () {
             }, eventsPage.mainElementsWaitTime);
 
             eventsPage.pagesLink.click();
+
+            // wait for iframe side menu to reload
+            browser.wait(function () {
+                return browser.isElementPresent(eventsPage.addEventsConfigsButton);
+            }, eventsPage.mainElementsWaitTime);
 
             // check if the page already exists and return the status
             return eventsPage.addPageLink.isPresent();
@@ -197,7 +202,7 @@ describe('Aldryn Events tests: ', function () {
             // set End date
             eventsPage.endDateInput.sendKeys('2100-07-09');
             // set End time
-            eventsPage.endTimeInput.sendKeys('12:34:56');
+            return eventsPage.endTimeInput.sendKeys('12:34:56');
         }).then(function () {
             eventsPage.saveButton.click();
 
@@ -246,10 +251,9 @@ describe('Aldryn Events tests: ', function () {
 
                     // set Application
                     eventsPage.applicationSelect.click();
-                    eventsPage.applicationSelect.sendKeys('Events')
-                        .then(function () {
-                        eventsPage.applicationSelect.click();
-                    });
+                    return eventsPage.applicationSelect.sendKeys('Events');
+                }).then(function () {
+                    eventsPage.applicationSelect.click();
 
                     // switch to default page content
                     browser.switchTo().defaultContent();
@@ -260,7 +264,7 @@ describe('Aldryn Events tests: ', function () {
 
                     browser.actions().mouseMove(eventsPage.saveModalButton)
                         .perform();
-                    eventsPage.saveModalButton.click();
+                    return eventsPage.saveModalButton.click();
                 }).then(function () {
                     // wait for event date and time block to appear
                     browser.wait(function () {
@@ -275,7 +279,7 @@ describe('Aldryn Events tests: ', function () {
                         .toBeTruthy();
 
                     // click the link to go to the event page
-                    eventsPage.eventLink.click();
+                    return eventsPage.eventLink.click();
                 }).then(function () {
                     // wait for event date and time block to appear
                     browser.wait(function () {
