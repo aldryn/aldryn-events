@@ -8,12 +8,14 @@ from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
+from aldryn_translation_tools.admin import AllTranslationsMixin
 
 from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
 
 class EventAdmin(
+    AllTranslationsMixin,
     VersionedPlaceholderAdminMixin,
     FrontendEditableAdminMixin,
     PlaceholderAdminMixin,
@@ -77,7 +79,7 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(TranslatableAdmin, BaseAppHookConfig):
+class EventConfigAdmin(BaseAppHookConfig):
 
     def get_config_fields(self):
         return ('config.show_ongoing_first',)
