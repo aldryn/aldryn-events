@@ -127,7 +127,7 @@ describe('Aldryn Events tests: ', function () {
                 }, eventsPage.iframeWaitTime);
 
                 // switch to sidebar menu iframe
-                browser.switchTo().frame(browser.findElement(By.css(
+                return browser.switchTo().frame(browser.findElement(By.css(
                     '.cms_sideframe-frame iframe')));
             }
         }).then(function () {
@@ -317,17 +317,17 @@ describe('Aldryn Events tests: ', function () {
         // validate edit event links texts to find proper event for deletion
         eventsPage.editEventLinks.first().getText().then(function (text) {
             if (text === eventName) {
-                eventsPage.editEventLinks.first().click();
+                return eventsPage.editEventLinks.first().click();
             } else {
                 eventsPage.editEventLinks.get(1).getText()
                     .then(function (text) {
                     if (text === eventName) {
-                        eventsPage.editEventLinks.get(1).click();
+                        return eventsPage.editEventLinks.get(1).click();
                     } else {
                         eventsPage.editEventLinks.get(2).getText()
                             .then(function (text) {
                             if (text === eventName) {
-                                eventsPage.editEventLinks.get(2).click();
+                                return eventsPage.editEventLinks.get(2).click();
                             }
                         });
                     }

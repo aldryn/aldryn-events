@@ -51,7 +51,7 @@ var eventsPage = {
     endTimeInput: element(by.id('id_end_time')),
     successNotification: element(by.css('.messagelist .success')),
     editEventLinks: element.all(by.css(
-        '[href*="/aldryn_events/event/"]')),
+        '.results th > [href*="/aldryn_events/event/"]')),
 
     // adding event to the page
     advancedSettingsOption: element(by.css(
