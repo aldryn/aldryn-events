@@ -82,7 +82,7 @@ var eventsPage = {
             eventsPage.passwordInput.clear();
 
             // fill in password field
-            eventsPage.passwordInput.sendKeys(
+            return eventsPage.passwordInput.sendKeys(
                 credentials.password);
         }).then(function () {
             eventsPage.loginButton.click();
