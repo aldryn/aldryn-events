@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.0.3 (2015-07-28)
+------------------
+
+* Allows operation on versions of Django with non-standard version numbers.
+* Adds more configuration for frontend testing.
+
 1.0.2 (2015-07-22)
 ------------------
 
