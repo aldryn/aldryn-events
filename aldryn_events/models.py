@@ -2,7 +2,7 @@
 import reversion
 from reversion.revisions import RegistrationError
 from django.utils.importlib import import_module
-from distutils.version import StrictVersion
+from distutils.version import LooseVersion
 
 from django import get_version
 from django.core.exceptions import ValidationError
@@ -34,9 +34,11 @@ from .managers import EventManager
 from .utils import get_additional_styles, date_or_datetime
 
 STANDARD = 'standard'
-strict_version = StrictVersion(get_version())
+strict_version = LooseVersion(get_version())
 
-if strict_version < StrictVersion('1.7.0'):
+# NOTE: We're using LooseVersion instead of StrictVersion because Aldryn
+# sometimes uses patched versions of Django in the form X.Y.Z.postN.
+if strict_version < LooseVersion('1.7.0'):
     # Prior to 1.7 it is pretty straight forward
     user_model = get_user_model()
     revision_manager = reversion.default_revision_manager
