@@ -319,12 +319,12 @@ describe('Aldryn Events tests: ', function () {
             if (text === eventName) {
                 return eventsPage.editEventLinks.first().click();
             } else {
-                eventsPage.editEventLinks.get(1).getText()
+                return eventsPage.editEventLinks.get(1).getText()
                     .then(function (text) {
                     if (text === eventName) {
                         return eventsPage.editEventLinks.get(1).click();
                     } else {
-                        eventsPage.editEventLinks.get(2).getText()
+                        return eventsPage.editEventLinks.get(2).getText()
                             .then(function (text) {
                             if (text === eventName) {
                                 return eventsPage.editEventLinks.get(2).click();
