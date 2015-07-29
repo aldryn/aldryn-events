@@ -322,12 +322,12 @@ describe('Aldryn Events tests: ', function () {
                 return eventsPage.editEventLinks.get(1).getText()
                     .then(function (text) {
                     if (text === eventName) {
-                        eventsPage.editEventLinks.get(1).click();
+                        return eventsPage.editEventLinks.get(1).click();
                     } else {
                         return eventsPage.editEventLinks.get(2).getText()
                             .then(function (text) {
                             if (text === eventName) {
-                                eventsPage.editEventLinks.get(2).click();
+                                return eventsPage.editEventLinks.get(2).click();
                             }
                         });
                     }
