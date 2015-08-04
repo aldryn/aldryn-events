@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from django.utils.translation import override
+try:
+    from django.utils.translation import force_text
+except:
+    from django.utils.translation import force_unicode as force_text
 from aldryn_events.models import Event
+from cms import api
 
 from .base import EventBaseTestCase, tz_datetime
 
@@ -58,6 +64,9 @@ class EventManagerTestCase(EventBaseTestCase):
             publish_at=tz_datetime(2014, 4, 1),
         )
 
+
+class TestEventsManager(EventManagerTestCase):
+
     def test_ongoing(self):
         now = tz_datetime(2014, 4, 7, 9, 30)
         entries = [event.pk for event in Event.objects.ongoing(now)]
@@ -105,3 +114,68 @@ class EventManagerTestCase(EventBaseTestCase):
         expected2 = [event.pk for event in
                      [self.ev2, self.ev3, self.ev4, self.ev5]]
         self.assertEqual(actual2, expected2)
+
+
+class EventManagerAppConfigTestCase(EventBaseTestCase):
+    """
+    Please add this TO THE LEFT of EventManagerTestCase if used with it.
+    """
+    def setUp(self):
+        super(EventManagerAppConfigTestCase, self).setUp()
+        # Ensure that all test events are assigned to an app_config
+        self.events = [self.ev1, self.ev2, self.ev3, self.ev4, self.ev5,
+                       self.ev6, self.ev7]
+        for event in self.events:
+            event.app_config = self.app_config
+
+        self.root_page = self.create_root_page()
+        self.page = api.create_page(
+            'Events en', self.template, 'en', published=True,
+            parent=self.root_page,
+            apphook='EventListAppHook',
+            apphook_namespace=self.app_config.namespace,
+            publication_date=tz_datetime(2014, 1, 8)
+        )
+        api.create_title('de', 'Events de', self.page)
+        self.page.publish('en')
+        self.page.publish('de')
+        self.page.reload()
+        # aldryn apphook reload needs a page load to work
+        with override('en'):
+            page_url = self.page.get_absolute_url()
+        self.client.get(page_url)
+
+
+class TestEventsAppConfigManager(EventManagerAppConfigTestCase,
+                                 EventManagerTestCase):
+
+    def setUp(self):
+        super(TestEventsAppConfigManager, self).setUp()
+        self.oldest_first = [self.ev1, self.ev7, self.ev2,
+                             self.ev3, self.ev4, self.ev5]
+
+    def test_normal_ordering(self):
+        """
+        Ensure that events are ordered oldest-first, which is the default
+        for app-configs.
+        """
+        page_url = self.page.get_absolute_url()
+        response = force_text(self.client.get(page_url).render())
+        # NOTE: This list should be ordered in the events natural order
+        for e in range(0, len(self.oldest_first) - 1):
+            self.assertLess(response.find(self.oldest_first[e].title),
+                            response.find(self.oldest_first[e + 1].title))
+
+    def test_latest_first_ordering(self):
+        """
+        Ensure that events are ordered latest-first when app is configured
+        to do so.
+        """
+        page_url = self.page.get_absolute_url()
+        response = force_text(self.client.get(page_url).render())
+        latest_first = reversed(self.oldest_first)
+        self.app_config.latest_first = True
+        # NOTE: This list should be ordered in the events natural order
+        for e in range(0, len([latest_first]) - 1):
+            self.assertLess(response.find(latest_first[e].title),
+                            response.find(latest_first[e + 1].title))

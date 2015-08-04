@@ -16,6 +16,9 @@ class EventsConfig(TranslatableModel, AppHookConfig):
         app_title=models.CharField(_('application title'), max_length=234),
     )
 
+    latest_first = models.BooleanField(_('Show latest events first?'),
+                                       default=False)
+
     # Category List PHFs
     placeholder_events_top = PlaceholderField(
         'events_top', related_name='aldryn_events_top')
