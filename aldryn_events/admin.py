@@ -13,6 +13,7 @@ from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 from aldryn_translation_tools.admin import AllTranslationsMixin
 
+from .cms_appconfig import EventsConfig
 from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
@@ -82,10 +83,10 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(BaseAppHookConfig):
-
+class EventConfigAdmin(AllTranslationsMixin, PlaceholderAdminMixin,
+                       BaseAppHookConfig, TranslatableAdmin):
     def get_config_fields(self):
-        return ('config.show_ongoing_first',)
+        return ('app_title', 'latest_first', 'config.show_ongoing_first', )
 
 
 admin.site.register(Event, EventAdmin)
