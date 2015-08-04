@@ -11,7 +11,6 @@ from .menu import EventsMenu
 class EventListAppHook(CMSConfigApp):
     app_name = 'aldryn_events'
     app_config = EventsConfig
-    menus = [EventsMenu]
     name = _('Events')
     urls = ['aldryn_events.urls']
 
