@@ -17,7 +17,7 @@ class EventsConfig(TranslatableModel, AppHookConfig):
     )
 
     latest_first = models.BooleanField(_('Show latest events first?'),
-                                       default=False)
+        default=False, help_text=_('(Changes here may require a restart.)'))
 
     # Category List PHFs
     placeholder_events_top = PlaceholderField(
