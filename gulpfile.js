@@ -89,6 +89,7 @@ gulp.task('tests:sauce:start', function (done) {
 
 gulp.task('tests:sauce:end', function (done) {
     if (!process.env.CI) {
+        console.log('Failed to create Sauce tunnel, skipping tests');
         done();
         return;
     }
