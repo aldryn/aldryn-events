@@ -79,6 +79,7 @@ gulp.task('tests:sauce:start', function (done) {
     tunnel.start(function (isCreated) {
         isTunnelCreated = isCreated;
         if (!isCreated) {
+            console.log('Failed to create Sauce tunnel, skipping tests');
             done();
             return false;
         }
@@ -89,7 +90,6 @@ gulp.task('tests:sauce:start', function (done) {
 
 gulp.task('tests:sauce:end', function (done) {
     if (!process.env.CI) {
-        console.log('Failed to create Sauce tunnel, skipping tests');
         done();
         return;
     }
