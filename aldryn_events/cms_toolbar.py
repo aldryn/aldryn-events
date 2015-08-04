@@ -82,11 +82,11 @@ class EventsToolbar(CMSToolbar):
 
     def populate(self):
         config = self.get_app_config(EventsConfig)
-        event = get_obj_from_request(Event, self.request)
-        redirect_url = self.get_on_delete_redirect_url(event)
 
         if not config:
             return
+
+        event = get_obj_from_request(Event, self.request)
 
         if self.request.user:
             user = self.request.user
@@ -127,6 +127,7 @@ class EventsToolbar(CMSToolbar):
                     menu.add_modal_item(_('Edit event'), url=url, active=True)
 
                 if del_event_perm and event:
+                    redirect_url = self.get_on_delete_redirect_url(event)
                     url = admin_reverse('aldryn_events_event_delete',
                                         args=[event.pk, ])
                     menu.add_modal_item(_('Delete event'), url=url,
