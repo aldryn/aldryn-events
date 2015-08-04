@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -25,10 +28,10 @@ class EventAdmin(
     search_fields = ('translations__title', )
     list_display = (
         'title', 'start_date', 'start_time', 'end_date', 'end_time',
-        'is_published', 'app_config', 'slug', 'location'
+        'location', 'is_published', 'app_config',
     )
-    list_editable = ('is_published',)
-    list_filter = ('is_published',)
+    list_editable = ('is_published', 'app_config', )
+    list_filter = ('is_published', 'app_config', )
     filter_horizontal = ('event_coordinators', )
     date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
