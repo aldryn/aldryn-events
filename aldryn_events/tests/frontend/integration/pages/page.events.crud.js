@@ -40,6 +40,7 @@ var eventsPage = {
     editEventsConfigsLink: element(by.css('.row1 > th > a')),
     addEventsConfigsButton: element(by.css('.object-tools .addlink')),
     namespaceInput: element(by.id('id_namespace')),
+    applicationTitleInput: element(by.id('id_app_title')),
 
     // adding new event
     breadcrumbsLinks: element.all(by.css('.breadcrumbs a')),
