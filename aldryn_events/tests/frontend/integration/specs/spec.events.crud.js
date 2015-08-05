@@ -159,8 +159,10 @@ describe('Aldryn Events tests: ', function () {
                     return browser.isElementPresent(eventsPage.namespaceInput);
                 }, eventsPage.mainElementsWaitTime);
 
-                eventsPage.namespaceInput.sendKeys('aldryn_events')
+                return eventsPage.namespaceInput.sendKeys('aldryn_events')
                     .then(function () {
+                    return eventsPage.applicationTitleInput.sendKeys('Test application');
+                }).then(function () {
                     eventsPage.saveButton.click();
 
                     browser.wait(function () {
