@@ -18,6 +18,7 @@ HELPER_SETTINGS = {
         'aldryn_common',
         'aldryn_events',
         'aldryn_reversion',
+        'aldryn_translation_tools',
         'reversion',
         'appconf',
         'bootstrap3',

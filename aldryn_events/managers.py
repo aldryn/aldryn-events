@@ -6,6 +6,8 @@ from aldryn_apphooks_config.managers.parler import (
     AppHookConfigTranslatableManager, AppHookConfigTranslatableQueryset
 )
 
+from .cms_appconfig import EventsConfig
+
 from . import ARCHIVE_ORDERING_FIELDS, ORDERING_FIELDS
 
 
@@ -56,6 +58,17 @@ class EventQuerySet(AppHookConfigTranslatableQueryset):
             Q(end_date__isnull=True, start_date=_date) |
             Q(start_date__lte=_date, end_date__gte=_date)
         )
+
+    def namespace(self, namespace, to=None):
+        """
+        Overrides the 'normal' namespace QS to also use the 'latest_first'
+        flag on the namespace to set the ordering accordingly.
+        """
+        qs = super(EventQuerySet, self).namespace(namespace, to)
+        app = EventsConfig.objects.filter(namespace=namespace).first()
+        if app and app.latest_first:
+            qs = qs.reverse()
+        return qs
 
 
 class EventManager(AppHookConfigTranslatableManager):

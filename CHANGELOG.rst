@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+1.0.4 (2015-08-04)
+------------------
+
+* Make CMSAttachMenu usage optional
+* CMSAttachMenu respects published flag
+* Add "latest first" flag on apphook for reversing the natural order of events
+* Enhance Events list view for easier apphook assignment
+* Enhance the CMSToolbar for consistency and ease-of-use
+
+
 1.0.3 (2015-07-28)
 ------------------
 

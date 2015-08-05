@@ -165,6 +165,12 @@ class Event(TranslationHelperMixin, TranslatableModel):
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
+        # NOTE: Ordering is returning older events first. Please DO NOT CHANGE
+        # this without also considering:
+        #     `cms_appconfig.EventsConfig.latest_first`
+        # and the QuerySet method:
+        #     `managers.EventsQuerySet.namespace()`
+        # which reverses this ordering when the option is set.
         ordering = ('start_date', 'start_time', 'end_date', 'end_time')
 
     def get_title(self):

@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,6 +13,7 @@ from django_tablib.admin import TablibAdmin
 from parler.admin import TranslatableAdmin
 from aldryn_translation_tools.admin import AllTranslationsMixin
 
+from .cms_appconfig import EventsConfig
 from .models import Event, EventCoordinator, Registration, EventsConfig
 from .forms import EventAdminForm
 
@@ -25,10 +29,10 @@ class EventAdmin(
     search_fields = ('translations__title', )
     list_display = (
         'title', 'start_date', 'start_time', 'end_date', 'end_time',
-        'is_published', 'app_config', 'slug', 'location'
+        'location', 'is_published', 'app_config',
     )
-    list_editable = ('is_published',)
-    list_filter = ('is_published',)
+    list_editable = ('is_published', 'app_config', )
+    list_filter = ('is_published', 'app_config', )
     filter_horizontal = ('event_coordinators', )
     date_hierarchy = 'start_date'
     frontend_editable_fields = ('title', 'short_description', 'location')
@@ -79,10 +83,10 @@ class RegistrationAdmin(TablibAdmin):
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(BaseAppHookConfig):
-
+class EventConfigAdmin(AllTranslationsMixin, PlaceholderAdminMixin,
+                       BaseAppHookConfig, TranslatableAdmin):
     def get_config_fields(self):
-        return ('config.show_ongoing_first',)
+        return ('app_title', 'latest_first', 'config.show_ongoing_first', )
 
 
 admin.site.register(Event, EventAdmin)

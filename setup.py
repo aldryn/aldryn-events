@@ -21,6 +21,7 @@ REQUIREMENTS = [
     'aldryn-reversion>=0.0.2,<0.1.0',
     'django-appconf',
     'django-bootstrap3',
+    'django-cms>=3.0.12',
     'django-extended-choices',
     'django-filer',
     'django-parler',
