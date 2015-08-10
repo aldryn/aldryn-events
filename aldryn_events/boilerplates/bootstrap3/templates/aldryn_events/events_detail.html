@@ -8,8 +8,9 @@
     </div>
     {% if event.enable_registration %}
         {% include "aldryn_events/includes/registration.html" %}
-    {% endif %}{% endblock events_content %}
+    {% endif %}
     {% render_placeholder view.config.placeholder_events_detail_bottom %}
+{% endblock events_content %}
 {% block events_footer %}
     <div class="aldryn-events-pager">
         <ul class="pager">
