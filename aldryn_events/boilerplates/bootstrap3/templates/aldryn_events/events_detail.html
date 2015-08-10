@@ -6,9 +6,10 @@
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
+    {% if event.enable_registration %}
+        {% include "aldryn_events/includes/registration.html" %}
+    {% endif %}{% endblock events_content %}
     {% render_placeholder view.config.placeholder_events_detail_bottom %}
-{% endblock events_content %}
-
 {% block events_footer %}
     <div class="aldryn-events-pager">
         <ul class="pager">
@@ -64,10 +65,6 @@
                 <p class="detail-link">
                     <a href="{{ event.detail_link }}">{% trans "More information" %}</a>
                 </p>
-            {% endif %}
-
-            {% if event.enable_registration %}
-                {% include "aldryn_events/includes/registration.html" %}
             {% endif %}
         </div>
     </div>
