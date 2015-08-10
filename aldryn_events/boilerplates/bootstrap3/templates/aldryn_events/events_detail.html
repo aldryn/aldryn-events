@@ -6,6 +6,9 @@
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
+    {% if event.enable_registration %}
+        {% include "aldryn_events/includes/registration.html" %}
+    {% endif %}
     {% render_placeholder view.config.placeholder_events_detail_bottom %}
 {% endblock events_content %}
 
@@ -64,10 +67,6 @@
                 <p class="detail-link">
                     <a href="{{ event.detail_link }}">{% trans "More information" %}</a>
                 </p>
-            {% endif %}
-
-            {% if event.enable_registration %}
-                {% include "aldryn_events/includes/registration.html" %}
             {% endif %}
         </div>
     </div>
