@@ -6,14 +6,13 @@ from aldryn_events import __version__
 py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
 py27 = sys.version_info < (2, 8, 0) and sys.version_info >= (2, 7, 0)
 
-if not py27:
+if not py26 and not py27:
     raise ValueError(
-        "Aldryn Events currently support only python 2.7 at this time, "
+        "Aldryn Events currently support only python 2.6 to 2.7, "
         "not {0}".format(sys.version_info)
     )
 
 REQUIREMENTS = [
-    'Django>=1.6,<1.8',
     'aldryn-apphooks-config>=0.1.4',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
@@ -27,12 +26,23 @@ REQUIREMENTS = [
     'django-parler',
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
-    'django-tablib>=3.0',
     'djangocms-text-ckeditor',
     'python-dateutil',
 ]
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+if py26:
+    REQUIREMENTS += [
+        'Django>=1.6,<1.7',
+        'South>=1.0.2,<1.1',
+    ]
+
+if py27:
+    REQUIREMENTS += [
+        'Django>=1.6,<1.8',
+        'django-tablib>=3.0',
+    ]
+
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',

@@ -6,10 +6,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from aldryn_apphooks_config.models import AppHookConfig
+from aldryn_reversion.core import version_controlled_content
 from cms.models.fields import PlaceholderField
 from parler.models import TranslatableModel, TranslatedFields
 
 
+@version_controlled_content
 class EventsConfig(TranslatableModel, AppHookConfig):
     """Adds some translatable, per-app-instance fields."""
     translations = TranslatedFields(
