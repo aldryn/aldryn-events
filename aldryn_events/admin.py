@@ -78,7 +78,8 @@ class EventCoordinatorAdmin(VersionedPlaceholderAdminMixin, admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 
-class RegistrationAdmin(TablibAdmin if TablibAdmin is not None else admin.ModelAdmin):
+class RegistrationAdmin(TablibAdmin if TablibAdmin is not None
+                        else admin.ModelAdmin):
     # html is giving me Unicode Error when using accentuated characters,
     # related issue create on django-tablib:
     # https://github.com/joshourisman/django-tablib/issues/43
