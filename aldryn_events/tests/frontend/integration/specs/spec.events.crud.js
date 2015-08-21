@@ -341,6 +341,8 @@ describe('Aldryn Events tests: ', function () {
                 return browser.isElementPresent(eventsPage.deleteButton);
             }, eventsPage.mainElementsWaitTime);
 
+            // move the mouse and scroll the screen to deleteButton
+            browser.actions().mouseMove(eventsPage.deleteButton).perform();
             eventsPage.deleteButton.click();
 
             // wait for confirmation button to appear
