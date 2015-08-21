@@ -47,6 +47,10 @@ listed in ``INSTALLED_APPS``, *after* ``'cms'``.
 .. note::
    If you are using Django 1.6, add ``south`` to  ``INSTALLED_APPS``.
 
+   If you are using Python 2.6 please remove ``django_tablib`` from
+   ``INSTALLED_APPS`` because this package does not supports both
+   Python 2.6 and Django 1.6.
+
 
 Aldryn Boilerplates
 ===================
