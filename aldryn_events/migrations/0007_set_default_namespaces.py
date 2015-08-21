@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations, transaction
 from django.db.models import get_model
-from django.db.utils import ProgrammingError
+from django.db.utils import ProgrammingError, OperationalError
 
 
 def create_default_namespaces(apps, schema_editor):
@@ -21,7 +21,7 @@ def create_default_namespaces(apps, schema_editor):
         # if cms migrations migrated to latest and after that we will try to
         # migrate this - we would get an exception because apps.get_model
         # contains cms models at point of dependency migration
-        # so if that is the case - import latest model.
+        # so if that is the case - import real model.
         try:
             # to avoid the following error:
             #   django.db.utils.InternalError: current transaction is aborted,
@@ -30,7 +30,7 @@ def create_default_namespaces(apps, schema_editor):
             with transaction.atomic():
                 model_objects = list(model.objects.filter(
                     app_config__isnull=True))
-        except ProgrammingError:
+        except (ProgrammingError, OperationalError):
             new_model = get_model('aldryn_events.{0}'.format(model.__name__))
             with transaction.atomic():
                 model_objects = new_model.objects.filter(
@@ -48,6 +48,7 @@ def remove_namespaces(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('cms', '0003_auto_20140926_2347'),
         ('aldryn_events', '0006_add_app_config_to_events_and_plugins'),
     ]
 
