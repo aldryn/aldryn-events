@@ -22,7 +22,6 @@ HELPER_SETTINGS = {
         'reversion',
         'appconf',
         'bootstrap3',
-        'django_tablib',
         'djangocms_text_ckeditor',
         'easy_thumbnails',
         'extended_choices',
@@ -132,6 +131,14 @@ HELPER_SETTINGS = {
         'django.template.loaders.eggs.Loader'
     ),
 }
+
+# tablib does not supports py2.6/django1.6
+import imp
+try:
+    imp.find_module('django_tablib')
+    HELPER_SETTINGS['INSTALLED_APPS'].append('django_tablib')
+except ImportError:
+    pass
 
 
 def run():

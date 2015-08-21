@@ -29,9 +29,13 @@ request, please review our `guidelines for Aldryn addons <http://docs.aldryn.com
 Requirements
 ************
 
+* Python 2.6 or 2.7
 * django CMS 3.0.12 or later
 * Django 1.6 or 1.7
 
+**Python 2.6 note:** If you are planning to use aldryn-events with Python 2.6
+be aware that events/registration export functions will not work because
+django-tablib package has Python 2.6/Django 1.6+ compatibility issues.
 
 .. |PyPI Version| image:: http://img.shields.io/pypi/v/aldryn-events.svg
    :target: https://pypi.python.org/pypi/aldryn-events

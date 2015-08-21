@@ -6,4 +6,3 @@ easy-thumbnails
 importlib
 mock
 pyquery
-pysqlite

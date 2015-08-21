@@ -9,7 +9,12 @@ from aldryn_apphooks_config.admin import BaseAppHookConfig
 from aldryn_reversion.admin import VersionedPlaceholderAdminMixin
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
-from django_tablib.admin import TablibAdmin
+
+try:
+    from django_tablib.admin import TablibAdmin
+except ImportError:
+    TablibAdmin = None
+
 from parler.admin import TranslatableAdmin
 from aldryn_translation_tools.admin import AllTranslationsMixin
 
@@ -73,7 +78,8 @@ class EventCoordinatorAdmin(VersionedPlaceholderAdminMixin, admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 
-class RegistrationAdmin(TablibAdmin):
+class RegistrationAdmin(TablibAdmin if TablibAdmin is not None
+                        else admin.ModelAdmin):
     # html is giving me Unicode Error when using accentuated characters,
     # related issue create on django-tablib:
     # https://github.com/joshourisman/django-tablib/issues/43
