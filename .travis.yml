@@ -5,12 +5,12 @@ env:
   matrix:
     - TOX_ENV=pep8
     - TOX_ENV=py27-dj18-cms31-fe
-    - TOX_ENV=py27-dj17-cms31-fe
+    - TOX_ENV=py27-dj17-cms31
     - TOX_ENV=py27-dj17-cms30-fe
-    - TOX_ENV=py27-dj16-cms31-fe
-    - TOX_ENV=py27-dj16-cms30-fe
+    - TOX_ENV=py27-dj16-cms31
+    - TOX_ENV=py27-dj16-cms30
     - TOX_ENV=py26-dj16-cms31-fe
-    - TOX_ENV=py26-dj16-cms30-fe
+    - TOX_ENV=py26-dj16-cms30
   global:
     # encrypted Sauce Labs sub-account user name
     - secure: dMNs8zHP+CRy7JeHy1x6YJHGfIeOLWFr04dMU/A/tP6D8zKOBiOybCiSdJTKdxXNTN3tyskjH/z1oZbeyFcsW4zUZWT5pa6aA+tc00z9CHrkHIdMyUQ1+FQmSU5AWYPjfuNL+h5LkYIoB7pP4jDPgMRxOz52yCUuhF/ICi85ccTnK94ul04vemyLzps7c3Ea5oWGt3BnsB3tiK1ZeSnFTRxTzDLmx+apWTEIQToqr3hDu0kgMi20d6XsHBMcb2jI9BPI7cSf8/NLqSoJfMPd9Yrfm7GHHzNT5+8RIqyGAsAUoOoJODwKs/LWoti2FOsfaKnUDIIhriP/5Exxr90hXmaMl5IIuJRn/EQ60Vq5RJfvSIbsTWvP/NU4U2+4BveN1D0i0DsLUNIjJ2oenBFAQ10itlrpgmVQSkC6AZhvBGaMK9g9EHkuCtmB7OxS3mj8ErcAlD1MKSy6kbpmKO7T1BojZM/PR+5501bQdWORB2oMA+YS7lFPXH/0GAh4WR7Dcy8W+TVBSuW7ATz6+UDivugqx0FAxITZamMVJz7neFT6cX3esyRj4H6oOlvwptpd/y8Cp0eeAnDMv2np23gkskUHxirVdBQ+DOpRMIWgZwvxwkuSDiJgbBdFrkWgWH+/PaCcsivg+IPUAQFHLAA2earf/i26sOKZVGSioEYpeE0=
