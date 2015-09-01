@@ -59,6 +59,7 @@ var eventsPage = {
         '.cms_toolbar-item-navigation [href*="advanced-settings"]')),
     modalIframe: element(by.css('.cms_modal-frame iframe')),
     applicationSelect: element(by.id('application_urls')),
+    eventsOption: element(by.css('option[value="EventListAppHook"]')),
     saveModalButton: element(by.css('.cms_modal-buttons .cms_btn-action')),
     eventMetaBlock: element(by.css('.aldryn-events-meta')),
     eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),

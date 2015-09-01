@@ -252,8 +252,10 @@ describe('Aldryn Events tests: ', function () {
                     }, eventsPage.mainElementsWaitTime);
 
                     // set Application
-                    eventsPage.applicationSelect.click();
-                    return eventsPage.applicationSelect.sendKeys('Events');
+                    return eventsPage.applicationSelect.click();
+                }).then(function () {
+                    eventsPage.applicationSelect.sendKeys('Events');
+                    return eventsPage.eventsOption.click();
                 }).then(function () {
                     eventsPage.applicationSelect.click();
 
