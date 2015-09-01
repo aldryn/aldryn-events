@@ -41,7 +41,6 @@ if py26:
 if py27:
     REQUIREMENTS += [
         'Django>=1.6,<1.9',
-        'django-tablib>=3.0',
     ]
 
 CLASSIFIERS = [
