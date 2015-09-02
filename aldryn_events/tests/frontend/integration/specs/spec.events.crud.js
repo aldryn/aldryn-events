@@ -9,6 +9,7 @@
 // #############################################################################
 // INTEGRATION TEST
 var eventsPage = require('../pages/page.events.crud.js');
+var cmsProtractorHelper = require('cms-protractor-helper');
 
 describe('Aldryn Events tests: ', function () {
     // create random event name
@@ -246,18 +247,8 @@ describe('Aldryn Events tests: ', function () {
                     browser.switchTo().frame(browser.findElement(By.css(
                         '.cms_modal-frame iframe')));
 
-                    // wait for Application select to appear
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.applicationSelect);
-                    }, eventsPage.mainElementsWaitTime);
-
-                    // set Application
-                    return eventsPage.applicationSelect.click();
-                }).then(function () {
-                    eventsPage.applicationSelect.sendKeys('Events');
-                    return eventsPage.eventsOption.click();
-                }).then(function () {
-                    eventsPage.applicationSelect.click();
+                    cmsProtractorHelper.selectOption(eventsPage.applicationSelect,
+                        'Events', eventsPage.eventsOption);
 
                     // switch to default page content
                     browser.switchTo().defaultContent();
