@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 from aldryn_apphooks_config.models import AppHookConfig
 from aldryn_reversion.core import version_controlled_content
@@ -11,6 +12,7 @@ from cms.models.fields import PlaceholderField
 from parler.models import TranslatableModel, TranslatedFields
 
 
+@python_2_unicode_compatible
 @version_controlled_content
 class EventsConfig(TranslatableModel, AppHookConfig):
     """Adds some translatable, per-app-instance fields."""
@@ -53,7 +55,7 @@ class EventsConfig(TranslatableModel, AppHookConfig):
         'events_registration_footer',
         related_name='aldryn_events_registration_footer')
 
-    def __unicode__(self):
+    def __str__(self):
         # use app_title if it was provided, otherwise use namespace
         title = getattr(self, 'app_title', self.namespace)
         if self.cmsapp:

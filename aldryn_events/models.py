@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import override, ugettext_lazy as _, ugettext
 
 from cms.models import CMSPlugin
@@ -96,7 +96,7 @@ else:
     except RegistrationError:
         pass
 
-
+@python_2_unicode_compatible
 @version_controlled_content(follow=['event_coordinators'])
 class Event(TranslationHelperMixin, TranslatableModel):
 
@@ -178,7 +178,7 @@ class Event(TranslationHelperMixin, TranslatableModel):
     def get_title(self):
         return self.safe_translation_getter('title', any_language=True)
 
-    def __unicode__(self):
+    def __str__(self):
         # since we now have app configs, it is pretty handy to display them
         return unicode('{0} ({1})'.format(
             self.get_title(),
@@ -318,6 +318,7 @@ def set_event_slug(instance, **kwargs):
 post_save.connect(set_event_slug, sender=Event)
 
 
+@python_2_unicode_compatible
 @version_controlled_content(follow=['user'])
 class EventCoordinator(models.Model):
 
@@ -331,7 +332,7 @@ class EventCoordinator(models.Model):
         unique=True
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.full_name or self.email_address
 
     def clean(self):
@@ -414,6 +415,7 @@ class BaseEventPlugin(CMSPlugin):
         abstract = True
 
 
+@python_2_unicode_compatible
 class UpcomingPluginItem(BaseEventPlugin):
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
@@ -443,12 +445,13 @@ class UpcomingPluginItem(BaseEventPlugin):
         help_text=_('The number of latests events to be displayed.')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return force_text(
             self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
         )
 
 
+@python_2_unicode_compatible
 class EventListPlugin(BaseEventPlugin):
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
@@ -462,7 +465,7 @@ class EventListPlugin(BaseEventPlugin):
     )
     events = SortedManyToManyField(Event, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return force_text(self.pk)
 
     def copy_relations(self, oldinstance):
@@ -474,7 +477,8 @@ class EventListPlugin(BaseEventPlugin):
         self.events = Event.objects.filter(eventlistplugin__pk=oldinstance.pk)
 
 
+@python_2_unicode_compatible
 class EventCalendarPlugin(BaseEventPlugin):
 
-    def __unicode__(self):
+    def __str__(self):
         return force_text(self.pk)
