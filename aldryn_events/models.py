@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import reversion
 from reversion.revisions import RegistrationError
 from django.utils.importlib import import_module
@@ -177,12 +179,10 @@ class Event(TranslationHelperMixin, TranslatableModel):
         return self.safe_translation_getter('title', any_language=True)
 
     def __unicode__(self):
-        # since we now have app configs, it is pretty handy to display it
-        # FIXME: change this to use app_config.app_title instead after it would
-        # be migrated properly.
-        app_config_namespace = self.app_config.namespace
-        return unicode(u'{0} ({1})'.format(
-            self.get_title(), app_config_namespace))
+        # since we now have app configs, it is pretty handy to display them
+        return unicode('{0} ({1})'.format(
+            self.get_title(),
+            getattr(self.app_config, 'app_title', self.app_config.namespace)))
 
     @property
     def start_at(self):

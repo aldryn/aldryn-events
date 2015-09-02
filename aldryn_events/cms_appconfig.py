@@ -52,3 +52,11 @@ class EventsConfig(TranslatableModel, AppHookConfig):
     placeholder_events_registration_footer = PlaceholderField(
         'events_registration_footer',
         related_name='aldryn_events_registration_footer')
+
+    def __unicode__(self):
+        # use app_title if it was provided, otherwise use namespace
+        title = getattr(self, 'app_title', self.namespace)
+        if self.cmsapp:
+            return '{0} / {1}'.format(self.cmsapp.name, title)
+        else:
+            return '{0} / {1}'.format(self.type, title)
