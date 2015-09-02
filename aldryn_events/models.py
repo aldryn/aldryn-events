@@ -98,7 +98,7 @@ else:
 
 
 @python_2_unicode_compatible
-@version_controlled_content(follow=['event_coordinators'])
+@version_controlled_content(follow=['event_coordinators', 'app_config'])
 class Event(TranslationHelperMixin, TranslatableModel):
 
     start_date = models.DateField(_('start date'))
