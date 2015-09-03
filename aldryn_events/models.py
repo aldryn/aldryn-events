@@ -96,6 +96,7 @@ else:
     except RegistrationError:
         pass
 
+
 @python_2_unicode_compatible
 @version_controlled_content(follow=['event_coordinators'])
 class Event(TranslationHelperMixin, TranslatableModel):
