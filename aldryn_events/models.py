@@ -181,7 +181,7 @@ class Event(TranslationHelperMixin, TranslatableModel):
         # FIXME: change this to use app_config.app_title instead after it would
         # be migrated properly.
         app_config_namespace = self.app_config.namespace
-        return unicode('{0} ({1})'.format(
+        return unicode(u'{0} ({1})'.format(
             self.get_title(), app_config_namespace))
 
     @property

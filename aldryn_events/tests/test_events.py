@@ -186,6 +186,20 @@ class EventTestCase(EventBaseTestCase):
         self.assertEqual(Event.objects.translated('en').count(), 1)
         self.assertEqual(Event.objects.translated('de').count(), 1)
 
+    def test_specific_language_characters_in_title(self):
+
+        test_title = u"Sprachgefühl"
+        with force_language('de'):
+            event = Event.objects.create(
+                title=test_title, slug='sprachgefuhl',
+                start_date=tz_datetime(2014, 9, 10),
+                publish_at=tz_datetime(2014, 9, 9),
+                app_config=self.app_config
+            )
+        self.assertEqual(Event.objects.translated('de').count(), 1)
+        self.assertEqual(test_title, event.title)
+        self.assertIn(test_title, unicode(event))
+
     def test_behaviour_of_active_translations_and_hide_untranslated(self):
         self.create_event(title='test event', start_date='2015-01-01')
 
