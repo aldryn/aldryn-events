@@ -17,7 +17,7 @@ REQUIREMENTS = [
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
     'aldryn-translation-tools>=0.0.7',
-    'aldryn-reversion>=0.0.2,<0.1.0',
+    'aldryn-reversion>=1.0.0,<1.1.0',
     'django-appconf',
     'django-appdata<0.2',
     'django-bootstrap3',
@@ -40,8 +40,7 @@ if py26:
 
 if py27:
     REQUIREMENTS += [
-        'Django>=1.6,<1.8',
-        'django-tablib>=3.0',
+        'Django>=1.6,<1.9',
     ]
 
 CLASSIFIERS = [

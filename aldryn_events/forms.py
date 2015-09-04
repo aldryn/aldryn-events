@@ -27,6 +27,9 @@ class EventAdminForm(TranslatableModelForm):
 
     class Meta:
         model = Event
+        # since form is intended to be only for internal use we can allow all
+        # fields
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(EventAdminForm, self).__init__(*args, **kwargs)

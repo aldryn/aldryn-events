@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 def noop_gettext(s):
@@ -14,9 +15,7 @@ HELPER_SETTINGS = {
     'INSTALLED_APPS': [
         'aldryn_apphook_reload',  # for tests
         'aldryn_apphooks_config',
-        'aldryn_boilerplates',
         'aldryn_common',
-        'aldryn_events',
         'aldryn_reversion',
         'aldryn_translation_tools',
         'reversion',
@@ -93,7 +92,6 @@ HELPER_SETTINGS = {
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.doc.XViewMiddleware',
         'django.middleware.common.CommonMiddleware',
         'cms.middleware.language.LanguageCookieMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
@@ -101,35 +99,6 @@ HELPER_SETTINGS = {
         'cms.middleware.toolbar.ToolbarMiddleware'
     ],
     'ALDRYN_BOILERPLATE_NAME': 'bootstrap3',
-    'STATICFILES_FINDERS': [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        # important! place right before
-        # django.contrib.staticfiles.finders.AppDirectoriesFinder
-        'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    ],
-    'TEMPLATE_CONTEXT_PROCESSORS': (
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages',
-        'django.core.context_processors.i18n',
-        'django.core.context_processors.debug',
-        'django.core.context_processors.request',
-        'django.core.context_processors.media',
-        'django.core.context_processors.csrf',
-        'django.core.context_processors.tz',
-        'sekizai.context_processors.sekizai',
-        'django.core.context_processors.static',
-        'cms.context_processors.cms_settings',
-        'aldryn_boilerplates.context_processors.boilerplate'
-    ),
-    'TEMPLATE_LOADERS': (
-        'django.template.loaders.filesystem.Loader',
-        # important! place right before
-        # django.template.loaders.app_directories.Loader
-        'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
-        'django.template.loaders.app_directories.Loader',
-        'django.template.loaders.eggs.Loader'
-    ),
 }
 
 # tablib does not supports py2.6/django1.6
@@ -143,7 +112,7 @@ except ImportError:
 
 def run():
     from djangocms_helper import runner
-    runner.cms('aldryn_events')
+    runner.cms('aldryn_events', extra_args=['--boilerplate'])
 
 if __name__ == "__main__":
     run()
