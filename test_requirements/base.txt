@@ -6,3 +6,4 @@ easy-thumbnails
 importlib
 mock
 pyquery
+tox
