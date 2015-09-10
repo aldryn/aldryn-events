@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
+from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import (
     get_language_from_request,
     ugettext_lazy as _,
@@ -31,12 +36,18 @@ class EventsMenu(CMSAttachMenu):
                 events = events.namespace(self.instance.application_namespace)
 
         for event in events:
-            node = NavigationNode(
-                event.title,
-                event.get_absolute_url(language=language),
-                event.pk,
-            )
-            nodes.append(node)
+            try:
+                url = event.get_absolute_url(language=language)
+            except NoReverseMatch:
+                url = None
+
+            if url:
+                node = NavigationNode(
+                    event.title,
+                    event.get_absolute_url(language=language),
+                    event.pk,
+                )
+                nodes.append(node)
 
         return nodes
 

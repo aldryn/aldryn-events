@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+1.0.5 (2015-09-09)
+------------------
+
+* Fix unicode issue
+* Support Django 1.8
+* Update test matrix
+* Fix Django migration issue
+* Enhanced integration tests
+* Make CMS menu more resilient
+* Use Translations Tools 0.1.2
+
 1.0.4 (2015-08-04)
 ------------------
 
@@ -9,7 +20,6 @@ CHANGELOG
 * Add "latest first" flag on apphook for reversing the natural order of events
 * Enhance Events list view for easier apphook assignment
 * Enhance the CMSToolbar for consistency and ease-of-use
-
 
 1.0.3 (2015-07-28)
 ------------------
