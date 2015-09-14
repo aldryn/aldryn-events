@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.0.X (XXXX-XX-XX)
+------------------
+
+* Fix for models.set_event_slug unhandled exception (recover deleted event)
+
 1.0.5 (2015-09-09)
 ------------------
 
