@@ -311,7 +311,8 @@ def set_event_slug(instance, **kwargs):
     translation = None
     try:
         if not instance.slug:
-            translation = instance.get_translation(instance.get_current_language())
+            translation = instance.get_translation(
+                instance.get_current_language())
     except ObjectDoesNotExist:
         pass
     else:
