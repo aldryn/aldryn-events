@@ -7,7 +7,7 @@ from django.utils.importlib import import_module
 from distutils.version import LooseVersion
 
 from django import get_version
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -306,8 +306,19 @@ class Event(TranslationHelperMixin, TranslatableModel):
 
 
 def set_event_slug(instance, **kwargs):
-    if not instance.slug:
-        translation = instance.get_translation(instance.get_current_language())
+    # avoid accessing slug if no translations present. we cannot fix missing
+    # translations from here, either they are not restored or corrupted.
+    translation = None
+    try:
+        if not instance.slug:
+            translation = instance.get_translation(
+                instance.get_current_language())
+    except ObjectDoesNotExist:
+        pass
+    else:
+        if not translation:
+            return
+
         unique_slugify(
             instance=instance.get_translation(instance.get_current_language()),
             value=translation.title or uuid4().hex[:8],
