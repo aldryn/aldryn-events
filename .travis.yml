@@ -1,6 +1,12 @@
 language: python
 
 sudo: false
+
+addons:
+  apt:
+    packages:
+    - enchant
+
 env:
   matrix:
     - TOX_ENV=pep8
