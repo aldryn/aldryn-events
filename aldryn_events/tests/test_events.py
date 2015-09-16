@@ -263,37 +263,3 @@ class EventTestCase(EventBaseTestCase):
         )
         event.save()
         self.assertEqual(event.slug, 'gotchaa')
-
-    def test_event_save_does_not_crashes_if_no_translations(self):
-        event = Event(
-            title='show me the slug', slug='gotchaa',
-            start_date=tz_datetime(2015, 2, 4),
-            app_config=self.app_config
-        )
-        event.save()
-        self.assertEqual(event.slug, 'gotchaa')
-        # delete translations, emulate data corruption or recover process
-        # when there is no translations recovered yet.
-        translations = event.translations.all()
-        translations.delete()
-        self.assertEqual(event.translations.count(), 0)
-        # Refresh event from db and fail with exception if there are errors
-        # in models.set_event_slug
-        event = Event.objects.get(pk=event.pk)
-        event.save()
-        # create a translation to to test that models.set_event_slug still
-        # picks up and does the correct thing
-        event.translations.create(
-            title='test_event_save_does_not_crashes_if_no_translations',
-            language_code='en')
-        event = Event.objects.get(pk=event.pk)
-        event.set_current_language('en')
-        # ensure slug is not set.
-        if event.slug:
-            self.assertTrue(False, msg='Slug is not empty, something wrong..')
-        # recreate slug
-        event.save()
-        self.assertEqual(event.title,
-                         'test_event_save_does_not_crashes_if_no_translations')
-        self.assertEqual(event.slug,
-                         'test_event_save_does_not_crashes_if_no_translations')

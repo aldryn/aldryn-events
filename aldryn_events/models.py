@@ -7,11 +7,10 @@ from django.utils.importlib import import_module
 from distutils.version import LooseVersion
 
 from django import get_version
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import override, ugettext_lazy as _, ugettext
@@ -20,8 +19,9 @@ from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from cms.utils.i18n import get_current_language, get_redirect_on_fallback
 
-from aldryn_common.slugs import unique_slugify
-from aldryn_translation_tools.models import TranslationHelperMixin
+from aldryn_translation_tools.models import (
+    TranslationHelperMixin, TranslatedAutoSlugifyMixin,
+)
 from aldryn_reversion.core import version_controlled_content
 from djangocms_text_ckeditor.fields import HTMLField
 from extended_choices import Choices
@@ -99,7 +99,11 @@ else:
 
 @python_2_unicode_compatible
 @version_controlled_content(follow=['event_coordinators', 'app_config'])
-class Event(TranslationHelperMixin, TranslatableModel):
+class Event(TranslatedAutoSlugifyMixin,
+            TranslationHelperMixin,
+            TranslatableModel):
+
+    slug_source_field_name = 'title'
 
     start_date = models.DateField(_('start date'))
     start_time = models.TimeField(_('start time'), null=True, blank=True)
@@ -194,16 +198,6 @@ class Event(TranslationHelperMixin, TranslatableModel):
         return self.end()
 
     def clean(self):
-        if not self.pk:
-            # the translations don't exist yet so we can't access title
-            unique_slugify(
-                instance=self.get_translation(self.get_current_language()),
-                value=self.slug or uuid4().hex[:8],
-                queryset=self.translations.filter(
-                    language_code=self.get_current_language()
-                )
-            )
-
         # there is a start date and end date
         if self.start_date and self.end_date:
             if self.end_date < self.start_date:
@@ -303,31 +297,6 @@ class Event(TranslationHelperMixin, TranslatableModel):
 
         with override(language):
             return reverse('{0}events_detail'.format(namespace), kwargs=kwargs)
-
-
-def set_event_slug(instance, **kwargs):
-    # avoid accessing slug if no translations present. we cannot fix missing
-    # translations from here, either they are not restored or corrupted.
-    translation = None
-    try:
-        if not instance.slug:
-            translation = instance.get_translation(
-                instance.get_current_language())
-    except ObjectDoesNotExist:
-        pass
-    else:
-        if not translation:
-            return
-
-        unique_slugify(
-            instance=instance.get_translation(instance.get_current_language()),
-            value=translation.title or uuid4().hex[:8],
-            queryset=instance.translations.filter(
-                language_code=instance.get_current_language()
-            )
-        )
-
-post_save.connect(set_event_slug, sender=Event)
 
 
 @python_2_unicode_compatible
