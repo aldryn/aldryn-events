@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import mock
 
 from django.conf import settings
@@ -349,7 +351,7 @@ class RegistrationTestCase(EventBaseTestCase):
             'last_name': 'Somename',
             'address': 'My Street, 77, Brazil, Earth, Solar system',
             'address_zip': '00000-000',
-            'address_city': u'São Paulo',
+            'address_city': 'São Paulo',
             'phone': '+55 (11) 1234-5678',
             'mobile': '+55 (11) 1234-5678',
             'email': 'myemail@gmail.com',
@@ -400,7 +402,7 @@ class RegistrationTestCase(EventBaseTestCase):
             last_name='Somename',
             address='My Street, 77, Brazil, Earth, Solar system',
             address_zip='00000-000',
-            address_city=u'São Paulo',
+            address_city='São Paulo',
             phone='+55 (11) 1234-5678',
             mobile='+55 (11) 1234-5678',
             email='myemail@gmail.com',
