@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import random
 import string
 from cms.utils.i18n import force_language
@@ -41,8 +43,8 @@ def get_page_request(page, user=None, path=None, edit=False, language='en'):
     return request
 
 
-def rand_str(prefix=u'', length=23, chars=string.ascii_letters):
-    return prefix + u''.join(random.choice(chars) for _ in range(length))
+def rand_str(prefix='', length=23, chars=string.ascii_letters):
+    return prefix + ''.join(random.choice(chars) for _ in range(length))
 
 
 class EventBaseTestCase(TransactionTestCase):
