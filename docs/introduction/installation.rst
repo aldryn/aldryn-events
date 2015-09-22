@@ -29,6 +29,7 @@ In your project's ``settings.py`` make sure you have all of::
 
     'aldryn_apphooks_config',
     'aldryn_boilerplates',
+    'aldryn_translation_tools',
     'aldryn_common',
     'aldryn_events',
     'appconf',
@@ -56,7 +57,12 @@ Aldryn Boilerplates
 ===================
 
 This application uses (and will install) `Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_,
-which requires some basic configuration to get you started. 
+which requires some basic configuration to get you started.
+
+.. note::
+    If you are using Django 1.8 please follow the configuration instructions on
+    `Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_
+    Github page.
 
 Edit your settings so that they conform to::
 
