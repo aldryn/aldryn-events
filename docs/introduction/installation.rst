@@ -30,6 +30,7 @@ In your project's ``settings.py`` make sure you have all of::
     'aldryn_apphooks_config',
     'aldryn_boilerplates',
     'aldryn_translation_tools',
+    'aldryn_reversion',
     'aldryn_common',
     'aldryn_events',
     'appconf',
