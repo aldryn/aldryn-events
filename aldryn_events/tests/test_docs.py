@@ -86,7 +86,7 @@ class DocsTestCase(CMSTestCase):
                     status=status,
                     confoverrides={
                         'extensions': [
-                            # 'djangocms',
+                            # 'djangocms', # https://github.com/divio/django-cms/blob/develop/docs/_ext/djangocms.py
                             # 'sphinx.ext.intersphinx',
                             'sphinxcontrib.spelling'
                         ]
