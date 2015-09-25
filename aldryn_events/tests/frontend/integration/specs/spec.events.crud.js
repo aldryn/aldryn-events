@@ -13,7 +13,7 @@ var cmsProtractorHelper = require('cms-protractor-helper');
 
 describe('Aldryn Events tests: ', function () {
     // create random event name
-    var eventName = 'Test event ' + (Math.floor(Math.random() * 10001));
+    var eventName = 'Test event ' + cmsProtractorHelper.randomDigits(4);
 
     it('logs in to the site with valid username and password', function () {
         // go to the main page
@@ -30,9 +30,7 @@ describe('Aldryn Events tests: ', function () {
             }
 
             // wait for username input to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.usernameInput);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.usernameInput);
 
             // login to the site
             eventsPage.cmsLogin();
@@ -41,58 +39,44 @@ describe('Aldryn Events tests: ', function () {
 
     it('creates a new test page', function () {
         // click the example.com link in the top menu
-        eventsPage.userMenus.first().click().then(function () {
+        return eventsPage.userMenus.first().click().then(function () {
             // wait for top menu dropdown options to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.userMenuDropdown);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.userMenuDropdown);
 
             return eventsPage.administrationOptions.first().click();
         }).then(function () {
             // wait for modal iframe to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.sideMenuIframe);
-            }, eventsPage.iframeWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.sideMenuIframe);
 
             // switch to sidebar menu iframe
             browser.switchTo().frame(browser.findElement(
                 By.css('.cms_sideframe-frame iframe')));
 
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.pagesLink);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.pagesLink);
 
             eventsPage.pagesLink.click();
 
             // wait for iframe side menu to reload
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.addEventsConfigsButton);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.addEventsConfigsButton);
 
             // check if the page already exists and return the status
             return eventsPage.addPageLink.isPresent();
         }).then(function (present) {
             if (present === true) {
                 // page is absent - create new page
-                browser.wait(function () {
-                    return browser.isElementPresent(eventsPage.addPageLink);
-                }, eventsPage.mainElementsWaitTime);
+                cmsProtractorHelper.waitFor(eventsPage.addPageLink);
 
                 eventsPage.addPageLink.click();
 
-                browser.wait(function () {
-                    return browser.isElementPresent(eventsPage.titleInput);
-                }, eventsPage.mainElementsWaitTime);
+                cmsProtractorHelper.waitFor(eventsPage.titleInput);
 
-                eventsPage.titleInput.sendKeys('Test').then(function () {
+                return eventsPage.titleInput.sendKeys('Test').then(function () {
                     eventsPage.saveButton.click();
 
                     return eventsPage.slugErrorNotification.isPresent();
                 }).then(function (present) {
                     if (present === false) {
-                        browser.wait(function () {
-                            return browser.isElementPresent(eventsPage.editPageLink);
-                        }, eventsPage.mainElementsWaitTime);
+                        cmsProtractorHelper.waitFor(eventsPage.editPageLink);
 
                         // wait till the editPageLink will become clickable
                         browser.sleep(500);
@@ -103,13 +87,10 @@ describe('Aldryn Events tests: ', function () {
                         // switch to default page content
                         browser.switchTo().defaultContent();
 
-                        browser.wait(function () {
-                            return browser.isElementPresent(eventsPage.testLink);
-                        }, eventsPage.mainElementsWaitTime);
+                        cmsProtractorHelper.waitFor(eventsPage.testLink);
 
                         // validate test link text
-                        eventsPage.testLink.getText()
-                            .then(function (title) {
+                        return eventsPage.testLink.getText().then(function (title) {
                             expect(title).toEqual('Test');
                         });
                     }
@@ -120,28 +101,22 @@ describe('Aldryn Events tests: ', function () {
 
     it('creates a new apphook config', function () {
         // check if the focus is on sidebar ifarme
-        eventsPage.editPageLink.isPresent().then(function (present) {
+        return eventsPage.editPageLink.isPresent().then(function (present) {
             if (present === false) {
                 // wait for modal iframe to appear
-                browser.wait(function () {
-                    return browser.isElementPresent(eventsPage.sideMenuIframe);
-                }, eventsPage.iframeWaitTime);
+                cmsProtractorHelper.waitFor(eventsPage.sideMenuIframe);
 
                 // switch to sidebar menu iframe
                 return browser.switchTo().frame(browser.findElement(By.css(
                     '.cms_sideframe-frame iframe')));
             }
         }).then(function () {
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.breadcrumbsLinks.first());
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.breadcrumbsLinks.first());
 
             // click the Home link in breadcrumbs
             eventsPage.breadcrumbsLinks.first().click();
 
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.eventsConfigsLink);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.eventsConfigsLink);
 
             eventsPage.eventsConfigsLink.click();
 
@@ -150,15 +125,11 @@ describe('Aldryn Events tests: ', function () {
         }).then(function (present) {
             if (present === false) {
                 // apphook config is absent - create new apphook config
-                browser.wait(function () {
-                    return browser.isElementPresent(eventsPage.addEventsConfigsButton);
-                }, eventsPage.mainElementsWaitTime);
+                cmsProtractorHelper.waitFor(eventsPage.addEventsConfigsButton);
 
                 eventsPage.addEventsConfigsButton.click();
 
-                browser.wait(function () {
-                    return browser.isElementPresent(eventsPage.namespaceInput);
-                }, eventsPage.mainElementsWaitTime);
+                cmsProtractorHelper.waitFor(eventsPage.namespaceInput);
 
                 return eventsPage.namespaceInput.sendKeys('aldryn_events')
                     .then(function () {
@@ -166,25 +137,19 @@ describe('Aldryn Events tests: ', function () {
                 }).then(function () {
                     eventsPage.saveButton.click();
 
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.editEventsConfigsLink);
-                    }, eventsPage.mainElementsWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.editEventsConfigsLink);
                 });
             }
         });
     });
 
     it('creates a new event', function () {
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.breadcrumbsLinks.first());
-        }, eventsPage.mainElementsWaitTime);
+        cmsProtractorHelper.waitFor(eventsPage.breadcrumbsLinks.first());
 
         // click the Home link in breadcrumbs
         eventsPage.breadcrumbsLinks.first().click();
 
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.addEventLink);
-        }, eventsPage.mainElementsWaitTime);
+        cmsProtractorHelper.waitFor(eventsPage.addEventLink);
 
         eventsPage.addEventLink.click();
 
@@ -195,9 +160,9 @@ describe('Aldryn Events tests: ', function () {
             EC.presenceOf(eventsPage.startDateLinks.first()),
             EC.presenceOf(eventsPage.startTimeLinks.first()),
             EC.presenceOf(element(By.css('#cke_id_short_description')))
-        ), eventsPage.mainElementsWaitTime);
+        ), cmsProtractorHelper.mainElementsWaitTime);
 
-        eventsPage.titleInput.sendKeys(eventName).then(function () {
+        return eventsPage.titleInput.sendKeys(eventName).then(function () {
             // click Today link
             eventsPage.startDateLinks.first().click();
             // click Now link
@@ -209,9 +174,7 @@ describe('Aldryn Events tests: ', function () {
         }).then(function () {
             eventsPage.saveButton.click();
 
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.successNotification);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.successNotification);
 
             // validate success notification
             expect(eventsPage.successNotification.isDisplayed())
@@ -227,21 +190,17 @@ describe('Aldryn Events tests: ', function () {
         browser.switchTo().defaultContent();
 
         // add events to the page only if they were not added before
-        eventsPage.eventsCalendarBlock.isPresent().then(function (present) {
+        return eventsPage.eventsCalendarBlock.isPresent().then(function (present) {
             if (present === false) {
                 // click the Page link in the top menu
                 eventsPage.userMenus.get(1).click().then(function () {
                     // wait for top menu dropdown options to appear
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.userMenuDropdown);
-                    }, eventsPage.mainElementsWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.userMenuDropdown);
 
                     eventsPage.advancedSettingsOption.click();
 
                     // wait for modal iframe to appear
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.modalIframe);
-                    }, eventsPage.iframeWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.modalIframe);
 
                     // switch to modal iframe
                     browser.switchTo().frame(browser.findElement(By.css(
@@ -253,18 +212,14 @@ describe('Aldryn Events tests: ', function () {
                     // switch to default page content
                     browser.switchTo().defaultContent();
 
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.saveModalButton);
-                    }, eventsPage.mainElementsWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.saveModalButton);
 
                     browser.actions().mouseMove(eventsPage.saveModalButton)
                         .perform();
                     return eventsPage.saveModalButton.click();
                 }).then(function () {
                     // wait for event date and time block to appear
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.eventMetaBlock);
-                    }, eventsPage.mainElementsWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.eventMetaBlock);
 
                     // validate event date and time block
                     expect(eventsPage.eventMetaBlock.isDisplayed())
@@ -277,9 +232,7 @@ describe('Aldryn Events tests: ', function () {
                     return eventsPage.eventLink.click();
                 }).then(function () {
                     // wait for event date and time block to appear
-                    browser.wait(function () {
-                        return browser.isElementPresent(eventsPage.eventMetaBlock);
-                    }, eventsPage.mainElementsWaitTime);
+                    cmsProtractorHelper.waitFor(eventsPage.eventMetaBlock);
 
                     // validate event date and time block on event page
                     expect(eventsPage.eventMetaBlock.isDisplayed())
@@ -296,21 +249,17 @@ describe('Aldryn Events tests: ', function () {
 
     it('deletes event', function () {
         // wait for modal iframe to appear
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.sideMenuIframe);
-        }, eventsPage.iframeWaitTime);
+        cmsProtractorHelper.waitFor(eventsPage.sideMenuIframe);
 
         // switch to sidebar menu iframe
         browser.switchTo()
             .frame(browser.findElement(By.css('.cms_sideframe-frame iframe')));
 
         // wait for edit event link to appear
-        browser.wait(function () {
-            return browser.isElementPresent(eventsPage.editEventLinks.first());
-        }, eventsPage.mainElementsWaitTime);
+        cmsProtractorHelper.waitFor(eventsPage.editEventLinks.first());
 
         // validate edit event links texts to find proper event for deletion
-        eventsPage.editEventLinks.first().getText().then(function (text) {
+        return eventsPage.editEventLinks.first().getText().then(function (text) {
             if (text === eventName) {
                 return eventsPage.editEventLinks.first().click();
             } else {
@@ -330,24 +279,18 @@ describe('Aldryn Events tests: ', function () {
             }
         }).then(function () {
             // wait for delete button to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.deleteButton);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.deleteButton);
 
             // move the mouse and scroll the screen to deleteButton
             browser.actions().mouseMove(eventsPage.deleteButton).perform();
             eventsPage.deleteButton.click();
 
             // wait for confirmation button to appear
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.sidebarConfirmationButton);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.sidebarConfirmationButton);
 
             eventsPage.sidebarConfirmationButton.click();
 
-            browser.wait(function () {
-                return browser.isElementPresent(eventsPage.successNotification);
-            }, eventsPage.mainElementsWaitTime);
+            cmsProtractorHelper.waitFor(eventsPage.successNotification);
 
             // validate success notification
             expect(eventsPage.successNotification.isDisplayed()).toBeTruthy();
