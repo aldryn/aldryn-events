@@ -21,9 +21,9 @@ or to install from the latest source tree::
     pip install -e git+https://github.com/aldryn/aldryn-events.git#egg=aldryn-events
 
 
-***********
-settings.py
-***********
+********************
+Edit ``settings.py``
+********************
 
 In your project's ``settings.py`` make sure you have all of::
 
@@ -98,14 +98,14 @@ Now set the name of the boilerplate you'll use in your project::
    multiple different frontend schemes ('Boilerplates')and switch between them without the need for
    project-by-project file overwriting.
 
-   Aldryn Events's templates and staticfiles will be found in named directories in the
+   Aldryn Events's templates and static files will be found in named directories in the
    ``/boilerplates`` directory.
 
 
 Filer
 =====
 
-Aldryn Events also depends on Filer, be sure to follow 
+Aldryn Events also depends on Filer, be sure to follow
 `Filer's installation instructions <http://django-filer.readthedocs.org/en/latest/installation.html>`_.
 To get up and running quickly, make sure you adapt your settings to include the
 ``filer.thumbnail_processors.scale_and_crop_with_subject_location`` thumbnail processor: ::

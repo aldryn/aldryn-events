@@ -84,13 +84,6 @@ class DocsTestCase(CMSTestCase):
                     buildername="spelling",
                     warningiserror=True,
                     status=status,
-                    confoverrides={
-                        'extensions': [
-                            # 'djangocms', # https://github.com/divio/django-cms/blob/develop/docs/_ext/djangocms.py
-                            # 'sphinx.ext.intersphinx',
-                            'sphinxcontrib.spelling'
-                        ]
-                    }
                 )
                 try:
                     app.build()
