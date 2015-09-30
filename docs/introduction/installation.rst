@@ -61,9 +61,9 @@ This application uses (and will install) `Aldryn Boilerplates <https://github.co
 which requires some basic configuration to get you started.
 
 .. note::
-    If you are using Django 1.8 please follow the configuration instructions on
-    `Aldryn Boilerplates <https://github.com/aldryn/aldryn-boilerplates>`_
-    Github page.
+
+    If you are using Django 1.8 please note the `configuration instructions for Aldryn Boilerplates
+    <https://github.com/aldryn/aldryn-boilerplates#django-18>`_.
 
 Edit your settings so that they conform to::
 
