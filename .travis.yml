@@ -10,6 +10,7 @@ addons:
 env:
   matrix:
     - TOX_ENV=pep8
+    - TOX_ENV=doctest
     - TOX_ENV=py27-dj18-cms31-fe
     - TOX_ENV=py27-dj17-cms31
     - TOX_ENV=py27-dj17-cms30-fe
