@@ -6,6 +6,7 @@ from django import forms
 
 from cms.api import add_plugin
 from cms.utils import permissions
+from cms.utils.conf import get_cms_setting
 from cms.wizards.wizard_pool import wizard_pool
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.forms import BaseFormMixin
@@ -78,8 +79,9 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
         # If 'content' field has value, create a TextPlugin with same and add
         # it to the PlaceholderField
         description = self.cleaned_data.get('description', '')
+        content_plugin = get_cms_setting('WIZARD_CONTENT_PLUGIN')
         if description and permissions.has_plugin_permission(
-                self.user, 'TextPlugin', 'add'):
+                self.user, content_plugin, 'add'):
 
             # If the event has not been saved, then there will be no
             # Placeholder set-up for this event yet, so, ensure we have saved
@@ -88,12 +90,15 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                 event.save()
 
             if event and event.description:
-                add_plugin(
-                    placeholder=event.description,
-                    plugin_type='TextPlugin',
-                    language=self.language_code,
-                    body=description,
-                )
+                # we have to use kwargs because we don't know in advance what
+                # is the 'body' field for configured plugin
+                plugin_kwargs = {
+                    'placeholder': event.description,
+                    'plugin_type': content_plugin,
+                    'language': self.language_code,
+                    get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY'): description,
+                }
+                add_plugin(**plugin_kwargs)
 
         if commit:
             event.save()
