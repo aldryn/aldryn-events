@@ -72,6 +72,12 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
         if len(app_configs) == 1:
             self.fields['app_config'].widget = forms.HiddenInput()
             self.fields['app_config'].initial = app_configs[0].pk
+        self.fields['start_date'].help_text = _(
+            'Date Acceptable Formats: 2015-11-11, 11/11/2015, 11/11/15'
+        )
+        self.fields['end_date'].help_text = _(
+            'Date Acceptable Formats: 2015-11-11, 11/11/2015, 11/11/15'
+        )
 
     def save(self, commit=True):
         event = super(CreateEventForm, self).save(commit=False)
