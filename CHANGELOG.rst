@@ -1,10 +1,12 @@
 CHANGELOG
 =========
 
-1.0.X (XXXX-XX-XX)
+1.0.6 (2015-11-12)
 ------------------
 
-* Fix for models.set_event_slug unhandled exception (recover deleted event)
+* Use aldryn-translation-tools >=0.2.1
+* Wizard for CMS 3.2
+
 
 1.0.5 (2015-09-09)
 ------------------
