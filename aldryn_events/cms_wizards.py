@@ -28,12 +28,12 @@ class EventWizard(Wizard):
         :param kwargs: Ignored here
         :return: True if user has add permission, else False
         """
-        # No one can create an Article, if there is no app_config yet.
+        # No one can create an Event, if there is no app_config yet.
         configs = EventsConfig.objects.all()
         if not configs or not any([namespace_is_apphooked(config.namespace)
                                    for config in configs]):
             return False
-        # Ensure user has permission to create articles.
+        # Ensure user has permission to create event.
         if user.is_superuser or user.has_perm(self.perm_string):
             return True
 
@@ -73,10 +73,10 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
             self.fields['app_config'].widget = forms.HiddenInput()
             self.fields['app_config'].initial = app_configs[0].pk
         self.fields['start_date'].help_text = _(
-            'Date Acceptable Formats: 2015-11-11, 11/11/2015, 11/11/15'
+            'Date Acceptable Formats: 2015-11-30, 11/30/2015, 11/301/15'
         )
         self.fields['end_date'].help_text = _(
-            'Date Acceptable Formats: 2015-11-11, 11/11/2015, 11/11/15'
+            'Date Acceptable Formats: 2015-11-30, 11/30/2015, 11/301/15'
         )
 
     def save(self, commit=True):
