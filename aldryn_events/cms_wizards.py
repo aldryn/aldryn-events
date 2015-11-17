@@ -34,7 +34,7 @@ class EventWizard(Wizard):
                                    for config in configs]):
             return False
         # Ensure user has permission to create event.
-        if user.is_superuser or user.has_perm(self.perm_string):
+        if user.is_superuser or user.has_perm('aldryn_events.add_event'):
             return True
 
         # By default, no permission.
