@@ -4,7 +4,7 @@
     {% if namespace_error %}
         {% if request.user.is_staff or request.user.is_superuser %}
           <div class="events-calendar events-calendar-error">
-              <p>{{ namespace_error }}</p>
+              <p class="config-errors">{{ namespace_error }}</p>
           </div>
         {% endif %}
     {% else %}
