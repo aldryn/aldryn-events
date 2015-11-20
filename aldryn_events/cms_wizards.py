@@ -22,8 +22,7 @@ class EventWizard(Wizard):
 
     def user_has_add_permission(self, user, **kwargs):
         """
-        Return True if the current user has permission to add a Category or
-        Question (depending on value of `perm_string` class variable.
+        Return True if the current user has permission to add an Event.
         :param user: The current user
         :param kwargs: Ignored here
         :return: True if user has add permission, else False
@@ -50,7 +49,7 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
     description = forms.CharField(
         label="description", help_text=_(
             "Optional. If provided, will be added to the main "
-            "body of the Question answer."),
+            "body of the Event."),
         required=False, widget=forms.Textarea()
     )
 
