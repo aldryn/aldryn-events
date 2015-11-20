@@ -23,7 +23,7 @@ from menus.utils import set_language_changer
 
 from . import request_events_event_identifier, ORDERING_FIELDS
 from .forms import EventRegistrationForm
-from .models import Event, Registration, EventCalendarPlugin
+from .models import Event, Registration, EventCalendarPlugin, EventsConfig
 from .templatetags.aldryn_events import build_calendar_context
 from .utils import (
     build_events_by_year,
@@ -71,9 +71,13 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         )
 
     def get_queryset(self):
-        qs = (super(EventListView, self).get_queryset()
-                                        .namespace(self.namespace))
-
+        # do not fail and do not try to resolve events if corresponding
+        # EventsConfig does not exist (rare situation)
+        if not EventsConfig.objects.filter(namespace=self.namespace).exists():
+            qs = Event.objects.none()
+        else:
+            qs = (super(EventListView, self).get_queryset()
+                                            .namespace(self.namespace))
         if not self.request.GET.get('all_languages', False):
             language = get_language_from_request(self.request, check_path=True)
             qs = qs.active_translations(language).language(language)

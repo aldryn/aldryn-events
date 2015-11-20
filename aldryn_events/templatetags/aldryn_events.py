@@ -6,6 +6,7 @@ from django import template
 from django.template.loader import get_template
 from django.utils.dates import MONTHS
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from ..models import EventsConfig
 from ..utils import build_calendar
@@ -13,13 +14,25 @@ from ..utils import build_calendar
 register = template.Library()
 
 
+ERROR_MESSAGE = _(
+    'Seems that EventsConfig for this page is missing. Tried to look for {0}. '
+    'To be able to see calendar and events againg - you need to create or '
+    'select another EventsConfig for this page.'
+)
+
+
 @register.simple_tag(takes_context=True)
 def calendar(context, year, month, language, namespace):
     template_name = 'aldryn_events/includes/calendar.html'
 
     t = get_template(template_name)
-    context['calendar_tag'] = build_calendar_context(year, month, language,
-                                                     namespace)
+    try:
+        EventsConfig.objects.get(namespace=namespace)
+    except EventsConfig.DoesNotExist:
+        context['namespace_error'] = ERROR_MESSAGE.format(namespace)
+    else:
+        context['calendar_tag'] = build_calendar_context(
+            year, month, language, namespace)
     rendered = t.render(context)
     return rendered
 
@@ -33,15 +46,6 @@ def build_calendar_context(year, month, language, namespace):
 
     year, month = int(year), int(month)
     current_date = date(year, month, 1)
-
-    if namespace:
-        try:
-            EventsConfig.objects.get(namespace=namespace)
-        except EventsConfig.DoesNotExist:
-            raise template.TemplateSyntaxError(
-                "'namespace' must be a existent EventConfig namespace, "
-                "not '{0}'.".format(namespace)
-            )
 
     context = {
         'today': today,
