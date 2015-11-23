@@ -29,11 +29,19 @@
 </script>
 {% endaddtoblock %}
 <div class="events-calendar">
-  <h3>{{ calendar_tag.label }}</h3>
-  <p class="controls">
-    <a href="" class="back">{% trans "Previous month" %}</a>
-    <a href="" class="next">{% trans "Next month" %}</a>
-  </p>
-  {% include "aldryn_events/includes/calendar_table.html" %}
+    {% if namespace_error %}
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <div class="events-calendar events-calendar-error">
+                <p class="config-errors">{{ namespace_error }}</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <h3>{{ calendar_tag.label }}</h3>
+        <p class="controls">
+            <a href="" class="back">{% trans "Previous month" %}</a>
+            <a href="" class="next">{% trans "Next month" %}</a>
+        </p>
+    {% include "aldryn_events/includes/calendar_table.html" %}
+  {% endif %}
 </div>
 {% endblock %}

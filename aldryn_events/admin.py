@@ -19,7 +19,7 @@ from parler.admin import TranslatableAdmin
 from aldryn_translation_tools.admin import AllTranslationsMixin
 
 from .cms_appconfig import EventsConfig
-from .models import Event, EventCoordinator, Registration, EventsConfig
+from .models import Event, EventCoordinator, Registration
 from .forms import EventAdminForm
 
 
@@ -89,8 +89,10 @@ class RegistrationAdmin(TablibAdmin if TablibAdmin is not None
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(AllTranslationsMixin, PlaceholderAdminMixin,
-                       BaseAppHookConfig, TranslatableAdmin):
+class EventConfigAdmin(VersionedPlaceholderAdminMixin,
+                       AllTranslationsMixin,
+                       BaseAppHookConfig,
+                       TranslatableAdmin):
     def get_config_fields(self):
         return ('app_title', 'latest_first', 'config.show_ongoing_first', )
 
