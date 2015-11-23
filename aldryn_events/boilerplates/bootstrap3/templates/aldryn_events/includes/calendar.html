@@ -3,9 +3,9 @@
 {% block events_calendar %}
     {% if namespace_error %}
         {% if request.user.is_staff or request.user.is_superuser %}
-          <div class="events-calendar events-calendar-error">
-              <p class="config-errors">{{ namespace_error }}</p>
-          </div>
+            <div class="events-calendar events-calendar-error">
+                <p class="config-errors">{{ namespace_error }}</p>
+            </div>
         {% endif %}
     {% else %}
         <div class="events-calendar js-events-calendar"
