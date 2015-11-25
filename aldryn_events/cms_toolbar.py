@@ -12,12 +12,11 @@ from django.utils.translation import (
 from aldryn_apphooks_config.utils import get_app_instance
 from aldryn_translation_tools.utils import (
     get_object_from_request,
-    get_admin_url,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.toolbar_base import CMSToolbar
+from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
-from parler.models import TranslatableModel
 
 from .models import Event
 from .cms_appconfig import EventsConfig
@@ -27,7 +26,12 @@ from .cms_appconfig import EventsConfig
 class EventsToolbar(CMSToolbar):
 
     def get_on_delete_redirect_url(self, event):
-        return reverse('{0}:events_list'.format(event.app_config.namespace))
+        language = getattr(
+            self, 'current_lang', get_language_from_request(
+                self.request, check_path=True))
+        with force_language(language):
+            return reverse('{0}:events_list'.format(
+                event.app_config.namespace))
 
     def get_app_config(self, config_model):
         try:
