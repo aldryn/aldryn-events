@@ -19,7 +19,7 @@ from .models import (
 )
 from .utils import (
     send_user_confirmation_email, send_manager_confirmation_email,
-    namespace_is_apphooked,
+    is_valid_namespace,
 )
 
 
@@ -135,7 +135,7 @@ class AppConfigPluginFormMixin(object):
 
         published_configs_pks = [
             config.pk for config in available_configs
-            if namespace_is_apphooked(config.namespace)]
+            if is_valid_namespace(config.namespace)]
 
         self.fields['app_config'].queryset = available_configs.filter(
             pk__in=published_configs_pks)
@@ -169,7 +169,9 @@ class AppConfigPluginFormMixin(object):
         # to reverse, in case of success that would mean that the app_config
         # is correct and can be used.
         data = super(AppConfigPluginFormMixin, self).clean()
-        if not namespace_is_apphooked(data['app_config'].namespace):
+        app_config = data.get('app_config', None)
+        namespace = getattr(app_config, 'namespace', None)
+        if not is_valid_namespace(namespace):
             raise ValidationError(
                 _('Seems that selected Job config is not plugged to any page, '
                   'or maybe that page is not published.'

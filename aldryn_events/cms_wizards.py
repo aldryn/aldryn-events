@@ -15,7 +15,7 @@ from parler.forms import TranslatableModelForm
 
 from .cms_appconfig import EventsConfig
 from .models import Event
-from .utils import namespace_is_apphooked
+from .utils import is_valid_namespace
 
 
 class EventWizard(Wizard):
@@ -29,7 +29,7 @@ class EventWizard(Wizard):
         """
         # No one can create an Event, if there is no app_config yet.
         configs = EventsConfig.objects.all()
-        if not configs or not any([namespace_is_apphooked(config.namespace)
+        if not configs or not any([is_valid_namespace(config.namespace)
                                    for config in configs]):
             return False
         # Ensure user has permission to create event.
@@ -67,7 +67,7 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
         # check if app config is apphooked
         app_configs = [app_config
                        for app_config in app_configs
-                       if namespace_is_apphooked(app_config.namespace)]
+                       if is_valid_namespace(app_config.namespace)]
         if len(app_configs) == 1:
             self.fields['app_config'].widget = forms.HiddenInput()
             self.fields['app_config'].initial = app_configs[0].pk

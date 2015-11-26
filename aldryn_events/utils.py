@@ -243,7 +243,7 @@ def date_or_datetime(d, t):
         return None
 
 
-def namespace_is_apphooked(namespace):
+def is_valid_namespace(namespace):
     """
     Check if provided namespace has an app-hooked page.
     Returns True or False.
