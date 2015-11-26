@@ -164,7 +164,7 @@ class AppConfigPluginFormMixin(object):
     def clean(self):
         # since namespace is not a unique thing we need to validate it
         # additionally because it is possible that there is a page with same
-        # namespace as a jobs config but which is using other app_config,
+        # namespace as a events config but which is using other app_config,
         # which also would lead to same 500 error. The easiest way is to try
         # to reverse, in case of success that would mean that the app_config
         # is correct and can be used.
@@ -173,9 +173,9 @@ class AppConfigPluginFormMixin(object):
         namespace = getattr(app_config, 'namespace', None)
         if not is_valid_namespace(namespace):
             raise ValidationError(
-                _('Seems that selected Job config is not plugged to any page, '
-                  'or maybe that page is not published.'
-                  'Please select Job config that is being used.'),
+                _('Seems that selected Event config is not plugged to any '
+                  'page, or maybe that page is not published.'
+                  'Please select Event config that is being used.'),
                 code='invalid')
         return data
 
