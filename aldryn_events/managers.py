@@ -55,8 +55,8 @@ class EventQuerySet(AppHookConfigTranslatableQueryset):
         now = now or timezone.now()
         _date = now.date()
         return self.published(now).filter(
-            Q(end_date__isnull=True, start_date=_date) |
-            Q(start_date__lte=_date, end_date__gte=_date)
+            Q(start_date__lte=_date),
+            Q(end_date__isnull=True) | Q(end_date__gte=_date)
         )
 
     def namespace(self, namespace, to=None):

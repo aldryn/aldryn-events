@@ -70,8 +70,11 @@ class TestEventsManager(EventManagerTestCase):
 
     def test_ongoing(self):
         now = tz_datetime(2014, 4, 7, 9, 30)
-        entries = [event.pk for event in Event.objects.ongoing(now)]
-        expected = [event.pk for event in [self.ev2, self.ev3]]
+        entries = [event.pk for event in
+                   Event.objects.ongoing(now).order_by('pk')]
+        # events with start date < now and end > now or is null
+        expected = [event.pk for event in
+                    [self.ev1, self.ev2, self.ev3, self.ev7]]
         self.assertEqual(entries, expected)
 
     def test_published(self):

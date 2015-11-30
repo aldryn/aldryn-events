@@ -24,11 +24,13 @@ class TagsTestCase(EventBaseTestCase):
         self.create_event(
             title='ev1',
             start_date=tz_datetime(2015, 1, 13),
+            end_date=tz_datetime(2015, 1, 14),
             publish_at=tz_datetime(2015, 1, 10)
         )
         self.create_event(
             title='ev2',
             start_date=tz_datetime(2015, 1, 15),
+            end_date=tz_datetime(2015, 1, 15),
             publish_at=tz_datetime(2015, 1, 10)
         )
         self.create_event(
@@ -66,13 +68,11 @@ class TagsTestCase(EventBaseTestCase):
             table = PyQuery(html)('table.table-calendar')
             page_url_en = page_with_apphook.get_absolute_url()
         links = table.find('td.events, td.multiday-events').find('a')
-
         # test if tag rendered important elements
         self.assertEqual('1', table.attr('data-month-numeric'), )
         self.assertEqual('2015', table.attr('data-year'))
         self.assertEqual('10', table.find('td.today').text())
-        self.assertEqual(8, links.length)  # 13, 15, 22, 23, 24, 25, 26, 27
-        expected_days = (13, 15, 22, 23, 24, 25, 26, 27)
+        expected_days = (13, 14, 15, 22, 23, 24, 25, 26, 27)
         for position, day in enumerate(expected_days):
             event_url = '{0}2015/1/{1}/'.format(page_url_en, day)
             rendered_url = links[position].attrib['href']

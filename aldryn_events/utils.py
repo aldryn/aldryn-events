@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import date, datetime, timedelta
+import datetime
 import calendar
 
 from django.contrib.sites.models import Site
@@ -23,7 +23,7 @@ def build_months(year, is_archive_view=False):
         months[month] = {
             'year': year,
             'month': month,
-            'date': date(year, month, 1),
+            'date': datetime.date(year, month, 1),
             'events': []
         }
     return months
@@ -61,7 +61,7 @@ def build_events_by_year(events, **config):
         if year not in events_by_year:
             events_by_year[year] = {
                 'year': year,
-                'date': date(year, 1, 1),
+                'date': datetime.date(year, 1, 1),
                 'months': build_months(year=year,
                                        is_archive_view=is_archive_view)
             }
@@ -175,6 +175,26 @@ def get_monthdates(month, year):
     return cal.itermonthdates(year, month)
 
 
+def update_monthdates(monthdates, event, first_date, last_date):
+    """
+    Updates monthdates events in place. Returns monthdates.
+    :param monthdates: OrderedDict to update
+    :param event: Event that should be processed
+    :param first_date: first date of monthdates
+    :param last_date: last date of monthdates
+    :return: OrderedDict, link to monthdates (updated in place!)
+    """
+    if event.start_date < first_date:
+        day = first_date
+    else:
+        day = event.start_date
+    while ((event.end_date is None or day <= event.end_date) and
+           day <= last_date):
+        monthdates[day].append(event)
+        day += datetime.timedelta(days=1)
+    return monthdates
+
+
 def build_calendar(year, month, language, namespace=None):
     """
     Returns complete list of monthdates with events happening in that day
@@ -185,31 +205,35 @@ def build_calendar(year, month, language, namespace=None):
 
     # Get a list of all dates in this month (with pre/succeeding for nice
     # layout)
-    monthdates = [(x, []) for x in get_monthdates(month, year)]
+    monthdates = [x for x in get_monthdates(month, year)]
     if len(monthdates) < 6 * 7:
         # always display six weeks to keep the table layout consistent
         if month == 12:
             month = 0
             year += 1
 
-        next_month = [(x, []) for x in get_monthdates(month + 1, year)]
-        if next_month[0][0].month == month + 1:
+        next_month = [x for x in get_monthdates(month + 1, year)]
+        if next_month[0].month == month + 1:
             monthdates += next_month[:7]
         else:
             monthdates += next_month[7:14]
+    # shortcuts
+    first_date = monthdates[0]
+    last_date = monthdates[-1]
+    q_start_in_month_dates = Q(start_date__gte=first_date,
+                               start_date__lte=last_date)
+    q_end_in_month_dates = Q(end_date__gte=first_date,
+                             end_date__lte=last_date)
+    q_end_is_null = Q(end_date__isnull=True)
+    q_end_is_null_or_greater = Q(q_end_is_null | Q(end_date__gt=last_date))
+
+    # actual filter arguments
+    filter_args = (
+        q_start_in_month_dates |
+        Q(q_end_is_null_or_greater | q_end_in_month_dates,
+          start_date__lte=first_date))
 
     # get all upcoming events, ordered by start_date
-    filter_args = (
-        Q(start_date__gte=monthdates[0][0],
-          start_date__lte=monthdates[-1][0]) |
-        Q(
-            Q(end_date__isnull=True) | Q(
-                end_date__gte=monthdates[0][0],
-                end_date__lte=monthdates[-1][0]
-            ),
-            start_date__lte=monthdates[0][0]
-        )
-    )
     events = (Event.objects.namespace(namespace)
               .published()
               .active_translations(language)
@@ -217,17 +241,19 @@ def build_calendar(year, month, language, namespace=None):
               .filter(filter_args)
               .order_by('start_date'))
 
-    # merge events into monthdates, but do the grouping manually
-    # because need to consider all event duration, not only start date
-    monthdates = SortedDict(monthdates)
+    events_outside_ongoing = events.filter(q_end_is_null_or_greater,
+                                           start_date__lt=first_date)
+    all_dates_events = list(events_outside_ongoing)
 
-    def get_event_dates(obj):
-        return [obj.start_date + timedelta(days=i) for i in range(obj.days)]
+    def all_dates_events_copy():
+        """Return a copy of events list that should be present on each day"""
+        return all_dates_events[:]
 
-    for event in events:
-        for day in get_event_dates(event):
-            if day in monthdates:
-                monthdates[day].append(event)
+    monthdates = SortedDict((date, all_dates_events_copy())
+                            for date in monthdates)
+
+    for event in events.exclude(pk__in=events_outside_ongoing):
+        update_monthdates(monthdates, event, first_date, last_date)
 
     return monthdates
 
