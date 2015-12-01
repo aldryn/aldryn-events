@@ -19,7 +19,7 @@ from .models import (
 )
 from .utils import (
     send_user_confirmation_email, send_manager_confirmation_email,
-    namespace_is_apphooked,
+    is_valid_namespace,
 )
 
 
@@ -135,7 +135,7 @@ class AppConfigPluginFormMixin(object):
 
         published_configs_pks = [
             config.pk for config in available_configs
-            if namespace_is_apphooked(config.namespace)]
+            if is_valid_namespace(config.namespace)]
 
         self.fields['app_config'].queryset = available_configs.filter(
             pk__in=published_configs_pks)
@@ -164,16 +164,18 @@ class AppConfigPluginFormMixin(object):
     def clean(self):
         # since namespace is not a unique thing we need to validate it
         # additionally because it is possible that there is a page with same
-        # namespace as a jobs config but which is using other app_config,
+        # namespace as a events config but which is using other app_config,
         # which also would lead to same 500 error. The easiest way is to try
         # to reverse, in case of success that would mean that the app_config
         # is correct and can be used.
         data = super(AppConfigPluginFormMixin, self).clean()
-        if not namespace_is_apphooked(data['app_config'].namespace):
+        app_config = data.get('app_config', None)
+        namespace = getattr(app_config, 'namespace', None)
+        if not is_valid_namespace(namespace):
             raise ValidationError(
-                _('Seems that selected Job config is not plugged to any page, '
-                  'or maybe that page is not published.'
-                  'Please select Job config that is being used.'),
+                _('Seems that selected Event config is not plugged to any '
+                  'page, or maybe that page is not published.'
+                  'Please select Event config that is being used.'),
                 code='invalid')
         return data
 

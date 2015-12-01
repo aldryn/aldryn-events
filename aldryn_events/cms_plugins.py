@@ -9,7 +9,7 @@ from django.utils.translation import (
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
-from .utils import build_calendar, namespace_is_apphooked
+from .utils import build_calendar, is_valid_namespace
 from .models import (
     UpcomingPluginItem, Event, EventListPlugin, EventCalendarPlugin
 )
@@ -45,7 +45,7 @@ class UpcomingPlugin(CMSPluginBase):
         context['instance'] = instance
         # check if we can reverse list view for configured namespace
         # if no prepare a message to admin users.
-        if not namespace_is_apphooked(namespace):
+        if not is_valid_namespace(namespace):
             # add message, should be properly handled in template
             context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
             return context
@@ -85,7 +85,7 @@ class EventListCMSPlugin(CMSPluginBase):
         namespace = instance.app_config_id and instance.app_config.namespace
         # check if we can reverse list view for configured namespace
         # if no prepare a message to admin users.
-        if not namespace_is_apphooked(namespace):
+        if not is_valid_namespace(namespace):
             # add message, should be properly handled in template
             context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
             return context
@@ -116,7 +116,7 @@ class CalendarPlugin(CMSPluginBase):
         # # check if we can reverse list view for configured namespace
         # # if no prepare a message to admin users.
         namespace = instance.app_config_id and instance.app_config.namespace
-        if not namespace_is_apphooked(namespace):
+        if not is_valid_namespace(namespace):
             # add message, should be properly handled in template
             context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
             return context

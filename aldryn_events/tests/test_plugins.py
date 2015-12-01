@@ -12,7 +12,7 @@ from aldryn_events.models import Event, EventsConfig
 from aldryn_events.tests.base import (
     EventBaseTestCase, tz_datetime
 )
-from aldryn_events.utils import namespace_is_apphooked
+from aldryn_events.utils import is_valid_namespace
 
 
 def calendar_url(year, month, language, namespace):
@@ -37,7 +37,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
         # though this test is (or at least it should be) pretty useful.
         default_events_config = EventsConfig.objects.get_or_create(
             namespace='aldryn_events')[0]
-        if not namespace_is_apphooked(default_events_config.namespace):
+        if not is_valid_namespace(default_events_config.namespace):
             page = api.create_page(
                 title='default events config en', template=self.template,
                 language='en',
@@ -83,7 +83,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
         # test EventsConfig placeholder content if it is attached to a page
         skipped = []
         for cfg in configs:
-            if not namespace_is_apphooked(cfg.namespace):
+            if not is_valid_namespace(cfg.namespace):
                 skipped.append(cfg)
                 continue
 
