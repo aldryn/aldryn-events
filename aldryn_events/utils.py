@@ -195,31 +195,15 @@ def update_monthdates(monthdates, event, first_date, last_date):
     return monthdates
 
 
-def build_calendar(year, month, language, namespace=None):
+def get_event_q_filters(first_date, last_date):
     """
-    Returns complete list of monthdates with events happening in that day
+    Returns tuple of filters applicable to event QuerySet for filtering events
+    that are happening/visible in between first_date (included) and
+    last_date (included).
+    :param first_date: datetime.date object, first date for range
+    :param last_date: datetime.date object, last date for range
+    :return: tuple of Q objects for .filter() method
     """
-    from .models import Event
-    month = int(month)
-    year = int(year)
-
-    # Get a list of all dates in this month (with pre/succeeding for nice
-    # layout)
-    monthdates = [x for x in get_monthdates(month, year)]
-    if len(monthdates) < 6 * 7:
-        # always display six weeks to keep the table layout consistent
-        if month == 12:
-            month = 0
-            year += 1
-
-        next_month = [x for x in get_monthdates(month + 1, year)]
-        if next_month[0].month == month + 1:
-            monthdates += next_month[:7]
-        else:
-            monthdates += next_month[7:14]
-    # shortcuts
-    first_date = monthdates[0]
-    last_date = monthdates[-1]
     q_start_in_month_dates = Q(start_date__gte=first_date,
                                start_date__lte=last_date)
     q_end_in_month_dates = Q(end_date__gte=first_date,
@@ -232,6 +216,35 @@ def build_calendar(year, month, language, namespace=None):
         q_start_in_month_dates |
         Q(q_end_is_null_or_greater | q_end_in_month_dates,
           start_date__lte=first_date))
+    return filter_args
+
+
+def build_calendar(year, month, language, namespace=None):
+    """
+    Returns complete list of monthdates with events happening in that day
+    """
+    from .models import Event
+    month = int(month)
+    year = int(year)
+
+    # Get a list of all dates in this month (with pre/succeeding for nice
+    # layout)
+    monthdates = list(get_monthdates(month, year))
+    if len(monthdates) < 6 * 7:
+        # always display six weeks to keep the table layout consistent
+        if month == 12:
+            month = 0
+            year += 1
+
+        next_month = list(get_monthdates(month + 1, year))
+        if next_month[0].month == month + 1:
+            monthdates += next_month[:7]
+        else:
+            monthdates += next_month[7:14]
+
+    first_date = monthdates[0]
+    last_date = monthdates[-1]
+    filter_args = get_event_q_filters(first_date, last_date)
 
     # get all upcoming events, ordered by start_date
     events = (Event.objects.namespace(namespace)
@@ -241,8 +254,9 @@ def build_calendar(year, month, language, namespace=None):
               .filter(filter_args)
               .order_by('start_date'))
 
-    events_outside_ongoing = events.filter(q_end_is_null_or_greater,
-                                           start_date__lt=first_date)
+    events_outside_ongoing = events.filter(
+        Q(Q(end_date__isnull=True) | Q(end_date__gt=last_date)),
+        start_date__lt=first_date)
     all_dates_events = list(events_outside_ongoing)
 
     def all_dates_events_copy():

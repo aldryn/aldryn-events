@@ -259,10 +259,10 @@ class TestEventViews(EventBaseTestCase):
 
         response1 = self.client.get(view_url1)
         self.response_contains(
-            response1, [0, 2, 3, 5], events_list, events_urls)
+            response1, [0, 2, 3], events_list, events_urls)
         # ensure response does not contains past ended event
-        self.assertContains(response1, events_list[6].get_title())
-        self.assertContains(response1, events_urls[6])
+        self.assertNotContains(response1, events_list[6].get_title())
+        self.assertNotContains(response1, events_urls[6])
 
         response2 = self.client.get(view_url2)
         # should contain event 2 event 3 and event 4
