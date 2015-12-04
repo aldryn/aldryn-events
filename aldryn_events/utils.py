@@ -184,10 +184,7 @@ def update_monthdates(monthdates, event, first_date, last_date):
     :param last_date: last date of monthdates
     :return: OrderedDict, link to monthdates (updated in place!)
     """
-    if event.start_date < first_date:
-        day = first_date
-    else:
-        day = event.start_date
+    day = max(event.start_date, first_date)
     while ((event.end_date is None or day <= event.end_date) and
            day <= last_date):
         monthdates[day].append(event)
