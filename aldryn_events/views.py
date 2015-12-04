@@ -2,7 +2,6 @@
 from dateutil.relativedelta import relativedelta
 
 from django import forms
-from django.db.models.query import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -26,7 +25,7 @@ from .forms import EventRegistrationForm
 from .models import Event, Registration, EventCalendarPlugin, EventsConfig
 from .templatetags.aldryn_events import build_calendar_context
 from .utils import (
-    build_events_by_year,
+    build_events_by_year, get_event_q_filters,
 )
 
 
@@ -89,43 +88,22 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         self.archive_qs = []
 
         if year or month or day:
-            tz = get_current_timezone()
             if year and month and day:
                 year, month, day = map(int, [year, month, day])
-                _date = date(year, month, day)
+                first_date = last_date = date(year, month, day)
 
-                qs = qs.filter(
-                    Q(start_date=_date, end_date__isnull=True) |
-                    Q(start_date__lte=_date, end_date__gte=_date)
-                ).published()
             elif year and month:
                 year, month = map(int, [year, month])
-                date_start = date(year, month, 1)
-                date_end = date_start + relativedelta(months=1, days=-1)
+                first_date = date(year, month, 1)
+                last_date = first_date + relativedelta(months=1, days=-1)
 
-                qs = qs.filter(
-                    Q(start_date__range=(date_start, date_end),
-                      end_date__isnull=True) |
-                    Q(start_date__range=(date_start, date_end),
-                      end_date__lte=date_end) |
-                    Q(start_date__lt=date_start,
-                      end_date__range=(date_start, date_end)) |
-                    Q(start_date__lt=date_start,
-                      end_date__gte=date_end)
-                ).published()
             else:
                 year = int(year)
-                date_start = date(year, 1, 1)
-                date_end = date_start + relativedelta(years=1, days=-1)
+                first_date = date(year, 1, 1)
+                last_date = first_date + relativedelta(years=1, days=-1)
 
-                qs = qs.filter(
-                    Q(start_date__range=(date_start, date_end),
-                      end_date__isnull=True) |
-                    Q(start_date__range=(date_start, date_end),
-                      end_date__lte=date_end) |
-                    Q(start_date__lt=date_start,
-                      end_date__range=(date_start, date_end))
-                ).published()
+            filter_args = get_event_q_filters(first_date, last_date)
+            qs = qs.filter(filter_args).published()
         else:
             if self.archive:
                 qs = qs.archive()
