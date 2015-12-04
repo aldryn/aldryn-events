@@ -16,10 +16,8 @@ from .base import EventBaseTestCase, tz_datetime
 
 class TagsTestCase(EventBaseTestCase):
 
-    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
-    def test_calendar_tag_rendering(self, timezone_mock):
-        timezone_mock.now.return_value = tz_datetime(2015, 1, 10, 12)
-        page_with_apphook = self.create_base_pages()
+    def setUp(self):
+        super(TagsTestCase, self).setUp()
         other_config = EventsConfig.objects.create(namespace='other')
         self.create_event(
             title='ev1',
@@ -37,6 +35,7 @@ class TagsTestCase(EventBaseTestCase):
             de=dict(
                 title='ev3',
                 start_date=tz_datetime(2015, 1, 16),
+                end_date=tz_datetime(2015, 1, 17),
                 publish_at=tz_datetime(2015, 1, 10)
             )
         )
@@ -56,13 +55,22 @@ class TagsTestCase(EventBaseTestCase):
             title='ev6',
             start_date=tz_datetime(2015, 1, 25),
         )
-        # make use of default tests self.app_config namespace, instead of
-        # hard coding it
+
+    def get_template(self, namespace):
         template_str = """
         {%% load aldryn_events %%}
         {%% calendar 2015 1 'en' '%s' %%}
-        """ % self.app_config.namespace
-        t = Template(template_str)
+        """ % namespace
+        template = Template(template_str)
+        return template
+
+    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
+    def test_calendar_tag_rendering_en_only(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2015, 1, 10, 12)
+        page_with_apphook = self.create_base_pages(multilang=False)
+        # make use of default tests self.app_config namespace, instead of
+        # hard coding it
+        t = self.get_template(self.app_config.namespace)
         with override('en'):
             html = t.render(SekizaiContext({}))
             table = PyQuery(html)('table.table-calendar')
@@ -73,6 +81,29 @@ class TagsTestCase(EventBaseTestCase):
         self.assertEqual('2015', table.attr('data-year'))
         self.assertEqual('10', table.find('td.today').text())
         expected_days = (13, 14, 15, 22, 23, 24, 25, 26, 27)
+        for position, day in enumerate(expected_days):
+            event_url = '{0}2015/1/{1}/'.format(page_url_en, day)
+            rendered_url = links[position].attrib['href']
+            self.assertEqual(event_url, rendered_url)
+
+    @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
+    def test_calendar_tag_rendering_en_and_de(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2015, 1, 10, 12)
+        page_with_apphook = self.create_base_pages(multilang=True)
+        # make use of default tests self.app_config namespace, instead of
+        # hard coding it
+        t = self.get_template(self.app_config.namespace)
+        with override('en'):
+            html = t.render(SekizaiContext({}))
+            table = PyQuery(html)('table.table-calendar')
+            page_url_en = page_with_apphook.get_absolute_url()
+        links = table.find('td.events, td.multiday-events').find('a')
+        # test if tag rendered important elements
+        self.assertEqual('1', table.attr('data-month-numeric'), )
+        self.assertEqual('2015', table.attr('data-year'))
+        self.assertEqual('10', table.find('td.today').text())
+        # should include DE only event as well
+        expected_days = (13, 14, 15, 16, 17, 22, 23, 24, 25, 26, 27)
         for position, day in enumerate(expected_days):
             event_url = '{0}2015/1/{1}/'.format(page_url_en, day)
             rendered_url = links[position].attrib['href']

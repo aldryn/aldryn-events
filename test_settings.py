@@ -35,13 +35,22 @@ HELPER_SETTINGS = {
         ('de', 'German'),
     ),
     'PARLER_LANGUAGES': {
-        1: (
-            {'code': 'en'},
-            {'code': 'de'},
-        ),
+        1: [
+            {
+                'code': u'en',
+                'fallbacks': [u'de'],
+                'hide_untranslated': False
+            },
+            {
+                'code': u'de',
+                'fallbacks': [u'en'],
+                'hide_untranslated': False
+            }
+        ],
         'default': {
-            'hide_untranslated': False,
-        }
+            'code': u'en',
+            'fallbacks': [u'en'],
+            'hide_untranslated': False}
     },
     'PARLER_ENABLE_CACHING': False,
     'CMS_LANGUAGES': {
@@ -55,6 +64,7 @@ HELPER_SETTINGS = {
             {
                 'public': True,
                 'code': 'en',
+                'fallbacks': [u'de'],
                 'hide_untranslated': False,
                 'name': gettext('en'),
                 'redirect_on_fallback': True,
@@ -62,6 +72,7 @@ HELPER_SETTINGS = {
             {
                 'public': True,
                 'code': 'de',
+                'fallbacks': [u'en'],
                 'hide_untranslated': False,
                 'name': gettext('de'),
                 'redirect_on_fallback': True,

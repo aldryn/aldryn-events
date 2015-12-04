@@ -2,6 +2,7 @@
 import datetime
 import calendar
 
+from cms.utils.i18n import force_language, get_language_object
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -216,7 +217,7 @@ def get_event_q_filters(first_date, last_date):
     return filter_args
 
 
-def build_calendar(year, month, language, namespace=None):
+def build_calendar(year, month, language, namespace=None, site_id=None):
     """
     Returns complete list of monthdates with events happening in that day
     """
@@ -242,14 +243,17 @@ def build_calendar(year, month, language, namespace=None):
     first_date = monthdates[0]
     last_date = monthdates[-1]
     filter_args = get_event_q_filters(first_date, last_date)
+    valid_languages = get_valid_languages(namespace, language, site_id)
 
     # get all upcoming events, ordered by start_date
     events = (Event.objects.namespace(namespace)
               .published()
               .active_translations(language)
               .language(language)
-              .filter(filter_args)
-              .order_by('start_date'))
+              .filter(filter_args))
+    # use events that can be resolved for this namespace and language
+    # with respect to language fallback settings
+    events = events.translated(*valid_languages).order_by('start_date')
 
     events_outside_ongoing = events.filter(
         Q(Q(end_date__isnull=True) | Q(end_date__gt=last_date)),
@@ -290,3 +294,26 @@ def is_valid_namespace(namespace):
     except (NoReverseMatch, AttributeError):
         return False
     return True
+
+
+def is_valid_namespace_for_language(namespace, language_code):
+    """
+    Check if provided namespace has an app-hooked page for given language_code.
+    Returns True or False.
+    """
+    with force_language(language_code):
+        return namespace_is_apphooked(namespace)
+
+
+def get_valid_languages(namespace, language_code, site_id=None):
+        langs = [language_code]
+        if site_id is None:
+            site_id = getattr(Site.objects.get_current(), 'pk', None)
+        current_language = get_language_object(language_code, site_id)
+        fallbacks = current_language.get('fallbacks', None)
+        if fallbacks:
+            langs += list(fallbacks)
+        valid_translations = [
+            language_code for language_code in langs
+            if is_valid_namespace_for_language(namespace, language_code)]
+        return valid_translations

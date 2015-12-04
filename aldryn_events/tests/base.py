@@ -74,7 +74,7 @@ class EventBaseTestCase(TransactionTestCase):
         root_page.publish('de')
         return root_page.reload()
 
-    def create_base_pages(self):
+    def create_base_pages(self, multilang=True):
         root_page = self.create_root_page(
             publication_date=tz_datetime(2014, 6, 8)
         )
@@ -91,9 +91,10 @@ class EventBaseTestCase(TransactionTestCase):
             apphook_namespace=self.app_config.namespace,
             publication_date=tz_datetime(2014, 6, 8)
         )
-        api.create_title('de', 'Events de', page)
         page.publish('en')
-        page.publish('de')
+        if multilang:
+            api.create_title('de', 'Events de', page)
+            page.publish('de')
         return page.reload()
 
     def create_event(self, de={}, **en):
@@ -116,7 +117,7 @@ class EventBaseTestCase(TransactionTestCase):
                     event = Event.objects.language('de').create(**de)
             else:
                 event.create_translation('de', **de)
-        return Event.objects.language('en').get(pk=event.pk)
+        return Event.objects.get(pk=event.pk)
 
     def create_default_event(self):
         en = {
