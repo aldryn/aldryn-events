@@ -37,7 +37,7 @@ def calendar(context, year, month, language, namespace):
     return rendered
 
 
-def build_calendar_context(year, month, language, namespace):
+def build_calendar_context(year, month, language, namespace, site_id=None):
     # if not have a selected date
     today = timezone.now().date()
     if not all([year, month]):
@@ -58,7 +58,7 @@ def build_calendar_context(year, month, language, namespace):
 
     # add css classes here instead in template
     # TODO: can configure css classes in appconfig ;)
-    _calendar = build_calendar(year, month, language, namespace)
+    _calendar = build_calendar(year, month, language, namespace, site_id)
     calendar_list = []
     for day, events in _calendar.items():
         css = []

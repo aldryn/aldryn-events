@@ -10,7 +10,6 @@ gettext = noop_gettext
 
 
 HELPER_SETTINGS = {
-    # 'ROOT_URLCONF': 'aldryn_events.tests.urls',
     'TIME_ZONE': 'UTC',
     'INSTALLED_APPS': [
         'aldryn_apphook_reload',  # for tests
@@ -35,13 +34,22 @@ HELPER_SETTINGS = {
         ('de', 'German'),
     ),
     'PARLER_LANGUAGES': {
-        1: (
-            {'code': 'en'},
-            {'code': 'de'},
-        ),
+        1: [
+            {
+                'code': u'en',
+                'fallbacks': [u'de'],
+                'hide_untranslated': False
+            },
+            {
+                'code': u'de',
+                'fallbacks': [u'en'],
+                'hide_untranslated': False
+            }
+        ],
         'default': {
-            'hide_untranslated': False,
-        }
+            'code': u'en',
+            'fallbacks': [u'en'],
+            'hide_untranslated': False}
     },
     'PARLER_ENABLE_CACHING': False,
     'CMS_LANGUAGES': {
@@ -55,6 +63,7 @@ HELPER_SETTINGS = {
             {
                 'public': True,
                 'code': 'en',
+                'fallbacks': [u'de'],
                 'hide_untranslated': False,
                 'name': gettext('en'),
                 'redirect_on_fallback': True,
@@ -62,6 +71,7 @@ HELPER_SETTINGS = {
             {
                 'public': True,
                 'code': 'de',
+                'fallbacks': [u'en'],
                 'hide_untranslated': False,
                 'name': gettext('de'),
                 'redirect_on_fallback': True,
@@ -80,8 +90,7 @@ HELPER_SETTINGS = {
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/aldryn_events_test_cache',
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     },
     'MIDDLEWARE_CLASSES': [
