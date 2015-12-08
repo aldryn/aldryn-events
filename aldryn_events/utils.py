@@ -302,7 +302,7 @@ def is_valid_namespace_for_language(namespace, language_code):
     Returns True or False.
     """
     with force_language(language_code):
-        return namespace_is_apphooked(namespace)
+        return is_valid_namespace(namespace)
 
 
 def get_valid_languages(namespace, language_code, site_id=None):

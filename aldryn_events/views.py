@@ -4,7 +4,11 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.contrib.sites.shortcuts import get_current_site
+try:
+    from django.contrib.sites.shortcuts import get_current_site
+except ImportError:
+    # Django 1.6
+    from django.contrib.sites.models import get_current_site
 from django.http import Http404
 from django.utils import timezone
 from django.utils.translation import get_language_from_request
@@ -17,7 +21,7 @@ from django.views.generic import (
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_apphooks_config.utils import get_app_instance
-from datetime import date, datetime
+from datetime import date
 from menus.utils import set_language_changer
 
 from . import request_events_event_identifier, ORDERING_FIELDS

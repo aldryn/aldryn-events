@@ -1,23 +1,32 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import sys
 import random
 import string
-from cms.utils.i18n import force_language
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, clear_url_caches
+
 from django.test import RequestFactory, TransactionTestCase
 from django.utils.timezone import get_current_timezone
 
 from cms import api
+from cms.apphook_pool import apphook_pool
+from cms.appresolver import clear_app_resolvers
 from cms.middleware.toolbar import ToolbarMiddleware
+from cms.utils.i18n import force_language
+from cms.exceptions import AppAlreadyRegistered
 from cms.utils import get_cms_setting
 from datetime import datetime
 
+from aldryn_events.cms_app import EventListAppHook
 from aldryn_events.models import EventsConfig, Event
+
+
+APP_MODULE = 'aldryn_events.cms_app'
 
 
 def tz_datetime(*args, **kwargs):
@@ -47,10 +56,10 @@ def rand_str(prefix='', length=23, chars=string.ascii_letters):
     return prefix + ''.join(random.choice(chars) for _ in range(length))
 
 
-class EventBaseTestCase(TransactionTestCase):
+class EventTestCaseSetupMixin(object):
 
     def setUp(self):
-        super(EventBaseTestCase, self).setUp()
+        super(EventTestCaseSetupMixin, self).setUp()
         # since aldryn_events namespace is created inside of a migration 0016
         # use something different for test purposes
         self.app_config = EventsConfig.objects.create(
@@ -60,9 +69,86 @@ class EventBaseTestCase(TransactionTestCase):
         self.language = settings.LANGUAGES[0][0]
 
     def tearDown(self):
-        super(EventBaseTestCase, self).tearDown()
+        """
+        Do a proper cleanup, delete everything what is preventing us from
+        clean environment for tests.
+        :return: None
+        """
         self.app_config.delete()
+        self.reset_all()
         cache.clear()
+
+    def reset_apphook_cmsapp(self):
+        """
+        For tests that should not be polluted by previous setup we need to
+        ensure that app hooks are reloaded properly. One of the steps is to
+        reset the relation between EventListAppHook and EventsConfig
+        """
+        app_config = getattr(EventListAppHook, 'app_config', None)
+        if (app_config and
+                getattr(app_config, 'cmsapp', None)):
+            delattr(EventListAppHook.app_config, 'cmsapp')
+        if getattr(EventsConfig, 'cmsapp', None):
+            delattr(EventsConfig, 'cmsapp')
+
+    def reset_all(self):
+        """
+        Reset all that could leak from previous test to current/next test.
+        :return: None
+        """
+        self.delete_app_module()
+        self.reload_urls()
+        self.apphook_clear()
+
+    def delete_app_module(self):
+        """
+        Remove APP_MODULE from sys.modules. Taken from cms.
+        :return: None
+        """
+        if APP_MODULE in sys.modules:
+            del sys.modules[APP_MODULE]
+
+    def apphook_clear(self):
+        """
+        Clean up apphook_pool and sys.modules. Taken from cms with slight
+        adjustments and fixes.
+        :return: None
+        """
+        try:
+            apphooks = apphook_pool.get_apphooks()
+        except AppAlreadyRegistered:
+            # there is an issue with discover apps, or i'm using it wrong.
+            # setting discovered to True solves it. Maybe that is due to import
+            # from aldryn_events.cms_app which registers EventListAppHook
+            apphook_pool.discovered = True
+            apphooks = apphook_pool.get_apphooks()
+
+        for name, label in list(apphooks):
+            if apphook_pool.apps[name].__class__.__module__ in sys.modules:
+                del sys.modules[apphook_pool.apps[name].__class__.__module__]
+        apphook_pool.clear()
+        self.reset_apphook_cmsapp()
+
+    def reload_urls(self):
+        """
+        Clean up url related things (caches, app resolvers, modules).
+        Taken from cms.
+        :return: None
+        """
+        clear_app_resolvers()
+        clear_url_caches()
+        url_modules = [
+            'cms.urls',
+            'aldryn_events.urls',
+            settings.ROOT_URLCONF
+        ]
+
+        for module in url_modules:
+            if module in sys.modules:
+                del sys.modules[module]
+
+
+class EventBaseTestCase(EventTestCaseSetupMixin, TransactionTestCase):
 
     def create_root_page(self, publication_date=None):
         root_page = api.create_page(

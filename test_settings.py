@@ -10,7 +10,6 @@ gettext = noop_gettext
 
 
 HELPER_SETTINGS = {
-    # 'ROOT_URLCONF': 'aldryn_events.tests.urls',
     'TIME_ZONE': 'UTC',
     'INSTALLED_APPS': [
         'aldryn_apphook_reload',  # for tests
@@ -91,8 +90,7 @@ HELPER_SETTINGS = {
     'ALDRYN_EVENTS_USER_REGISTRATION_EMAIL': True,
     'CACHES': {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/aldryn_events_test_cache',
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         }
     },
     'MIDDLEWARE_CLASSES': [
