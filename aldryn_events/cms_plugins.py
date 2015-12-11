@@ -105,13 +105,13 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
     form = EventListPluginForm
 
     def render(self, context, instance, placeholder):
+        self.render_template = (
+            'aldryn_events/plugins/list/%s/list.html' % instance.style
+        )
         context = super(EventListCMSPlugin, self).render(context, instance,
                                                          placeholder)
         if context.get('plugin_configuration_error') is not None:
             return context
-        self.render_template = (
-            'aldryn_events/plugins/list/%s/list.html' % instance.style
-        )
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
         site_id = getattr(get_current_site(context['request']), 'id', None)

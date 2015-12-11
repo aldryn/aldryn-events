@@ -153,12 +153,14 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         self.request_language = get_language(request)
-        self.queryset = (
-            Event.objects.namespace(self.namespace)
-                         .published()
-                         .language(self.request_language)
-                         .order_by(*ORDERING_FIELDS)
-        )
+        qs = (Event.objects.namespace(self.namespace)
+                           .published()
+                           .language(self.request_language))
+        site_id = getattr(get_current_site(request), 'id')
+        valid_languages = get_valid_languages(
+            self.namespace, self.request_language, site_id)
+        self.queryset = qs.translated(*valid_languages).order_by(
+            *ORDERING_FIELDS)
         self.event = self.queryset.active_translations(
             self.request_language, slug=kwargs['slug']).first()
         if not self.event:
@@ -280,7 +282,7 @@ class EventDatesView(AppConfigMixin, TemplateView):
             language = plugin.language
 
         # calendar is the calendar tag
-        site_id = getattr(get_current_site(self.request), 'id')
+        site_id = getattr(get_current_site(self.request), 'id', None)
         ctx['calendar_tag'] = build_calendar_context(
             year, month, language, namespace, site_id
         )
