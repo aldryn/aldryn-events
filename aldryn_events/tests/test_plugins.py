@@ -502,3 +502,94 @@ class EventPluginsTestCase(EventBaseTestCase):
                 rendered_html_p2, rendered[language]['p2'],
                 message.format(rendered_html_p2, language)
             )
+
+
+class LanguageFallbackMixin(object):
+
+    def setup_pages(self, multilang=False):
+        root_page = self.create_root_page()
+        app_page = self.create_base_pages(multilang=multilang)
+        return root_page, app_page
+
+    def create_de_only_event(self):
+        event_de = self.create_event(de={
+            'title': 'German event only',
+            'start_date': tz_datetime(2014, 1, 1, 9),
+            'end_date': tz_datetime(2014, 1, 2, 9),
+            'publish_at': tz_datetime(2014, 1, 1, 9),
+        })
+        return event_de
+
+
+class TestEventListPluginFallbacks(LanguageFallbackMixin, EventBaseTestCase):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_a_event_list_plugin_with_en(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
+        root_page, app_page = self.setup_pages(multilang=False)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.events = [event_de]
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'German event only')
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_b_event_list_plugin_with_en_and_de(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
+        root_page, app_page = self.setup_pages(multilang=True)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.events = [event_de]
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'German event only')
+
+
+class TestEventPastEventsPlugin(LanguageFallbackMixin, EventBaseTestCase):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_a_event_upcoming_past_plugin_with_en(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
+        root_page, app_page = self.setup_pages(multilang=False)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'UpcomingPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.past_events = True
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'German event only')
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_b_event_upcoming_past_plugin_with_en_and_de(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
+        root_page, app_page = self.setup_pages(multilang=True)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'UpcomingPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.past_events = True
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'German event only')

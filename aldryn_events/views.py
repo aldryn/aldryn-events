@@ -48,24 +48,13 @@ class NavigationMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
-        events_by_year = build_events_by_year(
-            events=(
-                Event.objects.namespace(self.namespace)
-                             .future()
-                             .active_translations(self.request_language)
-                             .language(self.request_language)
-            )
-        )
+        qs = (Event.objects.namespace(self.namespace)
+                           .active_translations(self.request_language)
+                           .language(self.request_language))
+        events_by_year = build_events_by_year(qs.future())
         context['events_by_year'] = events_by_year
-        archived_events_by_year = build_events_by_year(
-            events=(
-                Event.objects.namespace(self.namespace)
-                             .archive()
-                             .active_translations(self.request_language)
-                             .language(self.request_language)
-            ),
-            is_archive_view=True,
-        )
+        archived_events_by_year = build_events_by_year(qs.archive(),
+                                                       is_archive_view=True)
         context['archived_events_by_year'] = archived_events_by_year
         context['event_year'] = self.kwargs.get('year')
         context['event_month'] = self.kwargs.get('month')
