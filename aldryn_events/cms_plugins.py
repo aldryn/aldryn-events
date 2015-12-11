@@ -38,8 +38,9 @@ NO_APPHOOK_ERROR_MESSAGE = _(
 class NameSpaceCheckMixin(object):
 
     def get_namespace(self, instance):
-        namespace = instance.app_config_id and instance.app_config.namespace
-        return namespace
+        if instance.app_config_id and instance.app_config.namespace:
+            return instance.app_config.namespace
+        return ''
 
     def get_language(self, request):
         return get_language_from_request(request, check_path=True)
@@ -78,7 +79,7 @@ class UpcomingPlugin(NameSpaceCheckMixin, CMSPluginBase):
         context['instance'] = instance
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-        site_id = getattr(get_current_site(context['request']), 'id')
+        site_id = getattr(get_current_site(context['request']), 'id', None)
         valid_languages = get_valid_languages(
             namespace, language_code=language, site_id=site_id)
         events = (Event.objects.namespace(namespace)
@@ -113,7 +114,7 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
         )
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-        site_id = getattr(get_current_site(context['request']), 'id')
+        site_id = getattr(get_current_site(context['request']), 'id', None)
         valid_languages = get_valid_languages(
             namespace, language_code=language, site_id=site_id)
         context['instance'] = instance
@@ -143,7 +144,7 @@ class CalendarPlugin(NameSpaceCheckMixin, CMSPluginBase):
             return context
         namespace = self.get_namespace(instance)
         language = self.get_language(context['request'])
-        site_id = getattr(get_current_site(context['request']), 'id')
+        site_id = getattr(get_current_site(context['request']), 'id', None)
         year = context.get('event_year')
         month = context.get('event_month')
 
