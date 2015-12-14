@@ -31,7 +31,7 @@ class Migration(DataMigration):
 
                 placeholder_name = field.name
                 placeholder_id_name = '{0}_id'.format(placeholder_name)
-                placeholder_id = getattr(cfg, placeholder_id_name)
+                placeholder_id = getattr(cfg, placeholder_id_name, None)
 
                 if placeholder_id is not None:
                     # do not process if it has a reference to placeholder field.

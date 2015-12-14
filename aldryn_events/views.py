@@ -89,7 +89,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         day = self.kwargs.get('day')
 
         # prepare language properties for filtering
-        site_id = getattr(get_current_site(self.request), 'id')
+        site_id = getattr(get_current_site(self.request), 'id', None)
         valid_languages = get_valid_languages(
             self.namespace, self.request_language, site_id)
 
@@ -156,7 +156,7 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
         qs = (Event.objects.namespace(self.namespace)
                            .published()
                            .language(self.request_language))
-        site_id = getattr(get_current_site(request), 'id')
+        site_id = getattr(get_current_site(request), 'id', None)
         valid_languages = get_valid_languages(
             self.namespace, self.request_language, site_id)
         self.queryset = qs.translated(*valid_languages).order_by(

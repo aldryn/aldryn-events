@@ -70,7 +70,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
             # make sure that we have an empty list to store plugins content
             plugins_content[cfg] = []
             for placeholder_name in placeholders_names:
-                placeholder_instance = getattr(cfg, placeholder_name)
+                placeholder_instance = getattr(cfg, placeholder_name, None)
                 self.assertNotEqual(type(placeholder_instance), type(None))
                 plugin_text = plugin_content_raw.format(
                     cfg.namespace, 'en', placeholder_name)
