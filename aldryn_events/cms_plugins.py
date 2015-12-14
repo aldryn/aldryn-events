@@ -47,13 +47,17 @@ class NameSpaceCheckMixin(object):
 
     def render(self, context, instance, placeholder):
         # translated filter the events, language set current language
-        language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-
+        language = self.get_language(context['request'])
+        self.valid_languages = get_valid_languages(namespace, language)
         # check if we can reverse list view for configured namespace
         # if no prepare a message to admin users.
-        if not is_valid_namespace_for_language(namespace,
-                                               language_code=language):
+        valid = False
+        for lang_code in self.valid_languages:
+            if is_valid_namespace_for_language(namespace, lang_code):
+                valid = True
+                break
+        if not valid:
             # add message, should be properly handled in template
             context['plugin_configuration_error'] = NO_APPHOOK_ERROR_MESSAGE
         return super(NameSpaceCheckMixin, self).render(
@@ -79,13 +83,10 @@ class UpcomingPlugin(NameSpaceCheckMixin, CMSPluginBase):
         context['instance'] = instance
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-        site_id = getattr(get_current_site(context['request']), 'id', None)
-        valid_languages = get_valid_languages(
-            namespace, language_code=language, site_id=site_id)
         events = (Event.objects.namespace(namespace)
                                .active_translations(language)
                                .language(language))
-        events = events.translated(*valid_languages)
+        events = events.translated(*self.valid_languages)
         if instance.past_events:
             events = events.past(count=instance.latest_entries)
         else:
@@ -114,15 +115,12 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
             return context
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-        site_id = getattr(get_current_site(context['request']), 'id', None)
-        valid_languages = get_valid_languages(
-            namespace, language_code=language, site_id=site_id)
         context['instance'] = instance
 
         events = (instance.events.namespace(namespace)
                                  .active_translations(language)
                                  .language(language))
-        events = events.translated(*valid_languages)
+        events = events.translated(*self.valid_languages)
         context['events'] = events
         return context
 
@@ -163,7 +161,6 @@ class CalendarPlugin(NameSpaceCheckMixin, CMSPluginBase):
         context['next_month'] = current_date + datetime.timedelta(days=35)
         context['calendar_label'] = u'%s %s' % (MONTHS.get(int(month)), year)
         context['calendar_namespace'] = namespace
-        context['calendar_language'] = language
         return context
 
 plugin_pool.register_plugin(CalendarPlugin)

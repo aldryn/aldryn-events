@@ -11,7 +11,7 @@ from sekizai.context import SekizaiContext
 
 from aldryn_events.models import EventsConfig
 
-from .base import EventBaseTestCase, tz_datetime
+from .base import EventBaseTestCase, tz_datetime, get_page_request
 
 
 class TagsTestCase(EventBaseTestCase):
@@ -59,10 +59,17 @@ class TagsTestCase(EventBaseTestCase):
     def get_template(self, namespace):
         template_str = """
         {%% load aldryn_events %%}
-        {%% calendar 2015 1 'en' '%s' %%}
+        {%% calendar 2015 1 '%s' %%}
         """ % namespace
         template = Template(template_str)
         return template
+
+    def get_context(self, page):
+        request = get_page_request(page)
+        context = {
+            'request': request,
+        }
+        return context
 
     @mock.patch('aldryn_events.templatetags.aldryn_events.timezone')
     def test_calendar_tag_rendering_en_only(self, timezone_mock):
@@ -71,8 +78,9 @@ class TagsTestCase(EventBaseTestCase):
         # make use of default tests self.app_config namespace, instead of
         # hard coding it
         t = self.get_template(self.app_config.namespace)
+        context = self.get_context(page_with_apphook)
         with override('en'):
-            html = t.render(SekizaiContext({}))
+            html = t.render(SekizaiContext(context))
             table = PyQuery(html)('table.table-calendar')
             page_url_en = page_with_apphook.get_absolute_url()
         links = table.find('td.events, td.multiday-events').find('a')
@@ -93,8 +101,9 @@ class TagsTestCase(EventBaseTestCase):
         # make use of default tests self.app_config namespace, instead of
         # hard coding it
         t = self.get_template(self.app_config.namespace)
+        context = self.get_context(page_with_apphook)
         with override('en'):
-            html = t.render(SekizaiContext({}))
+            html = t.render(SekizaiContext(context))
             table = PyQuery(html)('table.table-calendar')
             page_url_en = page_with_apphook.get_absolute_url()
         links = table.find('td.events, td.multiday-events').find('a')
