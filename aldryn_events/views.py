@@ -48,24 +48,13 @@ class NavigationMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(NavigationMixin, self).get_context_data(**kwargs)
-        events_by_year = build_events_by_year(
-            events=(
-                Event.objects.namespace(self.namespace)
-                             .future()
-                             .active_translations(self.request_language)
-                             .language(self.request_language)
-            )
-        )
+        qs = (Event.objects.namespace(self.namespace)
+                           .active_translations(self.request_language)
+                           .language(self.request_language))
+        events_by_year = build_events_by_year(qs.future())
         context['events_by_year'] = events_by_year
-        archived_events_by_year = build_events_by_year(
-            events=(
-                Event.objects.namespace(self.namespace)
-                             .archive()
-                             .active_translations(self.request_language)
-                             .language(self.request_language)
-            ),
-            is_archive_view=True,
-        )
+        archived_events_by_year = build_events_by_year(qs.archive(),
+                                                       is_archive_view=True)
         context['archived_events_by_year'] = archived_events_by_year
         context['event_year'] = self.kwargs.get('year')
         context['event_month'] = self.kwargs.get('month')
@@ -100,7 +89,7 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         day = self.kwargs.get('day')
 
         # prepare language properties for filtering
-        site_id = getattr(get_current_site(self.request), 'id')
+        site_id = getattr(get_current_site(self.request), 'id', None)
         valid_languages = get_valid_languages(
             self.namespace, self.request_language, site_id)
 
@@ -164,12 +153,14 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         self.request_language = get_language(request)
-        self.queryset = (
-            Event.objects.namespace(self.namespace)
-                         .published()
-                         .language(self.request_language)
-                         .order_by(*ORDERING_FIELDS)
-        )
+        qs = (Event.objects.namespace(self.namespace)
+                           .published()
+                           .language(self.request_language))
+        site_id = getattr(get_current_site(request), 'id', None)
+        valid_languages = get_valid_languages(
+            self.namespace, self.request_language, site_id)
+        self.queryset = qs.translated(*valid_languages).order_by(
+            *ORDERING_FIELDS)
         self.event = self.queryset.active_translations(
             self.request_language, slug=kwargs['slug']).first()
         if not self.event:
@@ -291,7 +282,7 @@ class EventDatesView(AppConfigMixin, TemplateView):
             language = plugin.language
 
         # calendar is the calendar tag
-        site_id = getattr(get_current_site(self.request), 'id')
+        site_id = getattr(get_current_site(self.request), 'id', None)
         ctx['calendar_tag'] = build_calendar_context(
             year, month, language, namespace, site_id
         )

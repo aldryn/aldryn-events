@@ -1,4 +1,4 @@
-{% load i18n apphooks_config_tags %}
+{% load i18n aldryn_events %}
 
 {% spaceless %}
     <table class="table table-calendar"
@@ -23,7 +23,7 @@
             {% endif %}
                 <td{% if css_classes %} class="{{ css_classes }}"{% endif %}>
                 {% if events %}
-                    <a href="{% namespace_url 'events_list-by-day' namespace=calendar_tag.namespace year=day|date:'Y' month=day|date:'n' day=day|date:'j' %}">{{ day|date:'d' }}</a>
+                    <a href="{% fallback_aware_namespace_url 'events_list-by-day' calendar_tag.namespace year=day|date:'Y' month=day|date:'n' day=day|date:'j'  %}">{{ day|date:'d' }}</a>
                 {% else %}
                     <span>{{ day|date:'d' }}</span>
                 {% endif %}

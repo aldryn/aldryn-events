@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
 from cms import api
 from cms.models import Placeholder
 from cms.utils.i18n import force_language
@@ -69,7 +70,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
             # make sure that we have an empty list to store plugins content
             plugins_content[cfg] = []
             for placeholder_name in placeholders_names:
-                placeholder_instance = getattr(cfg, placeholder_name)
+                placeholder_instance = getattr(cfg, placeholder_name, None)
                 self.assertNotEqual(type(placeholder_instance), type(None))
                 plugin_text = plugin_content_raw.format(
                     cfg.namespace, 'en', placeholder_name)
@@ -502,3 +503,153 @@ class EventPluginsTestCase(EventBaseTestCase):
                 rendered_html_p2, rendered[language]['p2'],
                 message.format(rendered_html_p2, language)
             )
+
+
+class LanguageFallbackMixin(object):
+
+    def setup_pages(self, multilang=False):
+        root_page = self.create_root_page()
+        app_page = self.create_base_pages(multilang=multilang)
+        return root_page, app_page
+
+    def create_de_only_event(self, date_start=None, date_end=None):
+        if date_start is None:
+            date_start = tz_datetime(2014, 1, 1, 9)
+        if date_end is None:
+            date_end = tz_datetime(2014, 1, 2, 9)
+        event_de = self.create_event(de={
+            'title': 'German event only',
+            'start_date': date_start,
+            'end_date': date_end,
+            'publish_at': tz_datetime(2014, 1, 1, 9),
+        })
+        return event_de
+
+
+class TestEventListPluginFallback(LanguageFallbackMixin, EventBaseTestCase):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_a_event_list_plugin_with_en(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
+        root_page, app_page = self.setup_pages(multilang=False)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.events = [event_de]
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'German event only')
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_b_event_list_plugin_with_en_and_de(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 1, 2, 12)
+        root_page, app_page = self.setup_pages(multilang=True)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'EventListCMSPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.events = [event_de]
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'German event only')
+
+
+class TestEventPastEventsPluginFallback(LanguageFallbackMixin,
+                                        EventBaseTestCase):
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_a_event_upcoming_past_plugin_with_en(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
+        root_page, app_page = self.setup_pages(multilang=False)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'UpcomingPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.past_events = True
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, 'German event only')
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_b_event_upcoming_past_plugin_with_en_and_de(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
+        root_page, app_page = self.setup_pages(multilang=True)
+        event_de = self.create_de_only_event()
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'UpcomingPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.past_events = True
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'German event only')
+
+
+class TestCalendarPluginFallback(LanguageFallbackMixin, EventBaseTestCase):
+
+    def get_list_by_day_url(self, app_config, date):
+        kwargs = {
+            'year': date.year,
+            'month': date.month,
+            'day': date.day}
+        url = reverse(
+            '{0}:events_list-by-day'.format(app_config.namespace),
+            kwargs=kwargs)
+        return url
+
+    def test_a_calendar_plugin_with_en(self):
+        root_page, app_page = self.setup_pages(multilang=False)
+        now = datetime.date.today()
+        today = tz_datetime(year=now.year, month=now.month, day=now.day)
+        tomorrow = today + datetime.timedelta(days=1)
+        event_de = self.create_de_only_event(date_start=today,
+                                             date_end=tomorrow)
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'CalendarPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            date_view_url = self.get_list_by_day_url(event_de.app_config,
+                                                     event_de.start_date)
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, date_view_url)
+
+    def test_b_calendar_plugin_with_en_and_de(self):
+        root_page, app_page = self.setup_pages(multilang=True)
+        now = datetime.date.today()
+        today = tz_datetime(year=now.year, month=now.month, day=now.day)
+        tomorrow = today + datetime.timedelta(days=1)
+        event_de = self.create_de_only_event(date_start=today,
+                                             date_end=tomorrow)
+
+        ph = root_page.placeholders.get(slot='content')
+        plugin_en = api.add_plugin(
+            ph, 'CalendarPlugin', 'en', app_config=self.app_config,
+        )
+        plugin_en.save()
+        root_page.publish('en')
+        with force_language('en'):
+            date_view_url = self.get_list_by_day_url(event_de.app_config,
+                                                     event_de.start_date)
+            response = self.client.get(root_page.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, date_view_url)

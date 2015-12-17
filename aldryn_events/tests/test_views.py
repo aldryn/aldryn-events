@@ -114,7 +114,7 @@ class TestEventViews(EventBaseTestCase):
             date_values=dates)
         kwargs = {}
         for att_name in arg_list:
-            kwargs[att_name] = getattr(start_date, att_name)
+            kwargs[att_name] = getattr(start_date, att_name, None)
         return event_data, kwargs
 
     def get_list_view_kwargs(self, year, month, day=None):
