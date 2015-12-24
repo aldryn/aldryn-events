@@ -69,16 +69,16 @@ class UtilsTestCase(EventBaseTestCase):
             return sorted(dates[date], key=attrgetter('pk'))
         # (start less, end in) and (start in, end in)
         # + out of calendar events (active)
-        self.assertEqual(sorted_events_for_date(2015, 2, 1), [ev1, ev3, ev4])
+        self.assertEqual(sorted_events_for_date(2015, 2, 1), [ev1, ev3])
         # (start in, end greater) and (start less, end in)
         # + out of calendar events (active)
-        self.assertEqual(sorted_events_for_date(2015, 2, 15), [ev2, ev3, ev4])
+        self.assertEqual(sorted_events_for_date(2015, 2, 15), [ev2, ev3])
         # Should not contain DE event, but this date includes ev2
         # + out of calendar events (active)
-        self.assertEqual(sorted_events_for_date(2015, 2, 16), [ev2, ev4])
+        self.assertEqual(sorted_events_for_date(2015, 2, 16), [ev2])
         # Should not contain events from other namespace, but should contain
         # out of calendar events (active)
-        self.assertEqual(sorted_events_for_date(2015, 2, 18), [ev2, ev4])
+        self.assertEqual(sorted_events_for_date(2015, 2, 18), [ev2])
 
     def test_build_calendar_ongoing_event_ends_this_month(self):
         # tests that event that was started outside of calendar tag scope
@@ -144,8 +144,8 @@ class UtilsTestCase(EventBaseTestCase):
         self.assertIn(event, output[day_before.date()])
 
     def test_build_calendar_ongoing_event_starts_out_of_calendar_no_end(self):
-        # tests that event that was started and without end date is present
-        # in the output
+        # tests that event that was started and without end date is
+        # not present in the output
         now = timezone.now()
         start = now - datetime.timedelta(days=180)
 
@@ -160,7 +160,7 @@ class UtilsTestCase(EventBaseTestCase):
             'en',
             self.app_config.namespace)
         day_before = now - datetime.timedelta(days=1)
-        self.assertIn(event, output[day_before.date()])
+        self.assertNotIn(event, output[day_before.date()])
 
 
 class EventTestCase(EventBaseTestCase):

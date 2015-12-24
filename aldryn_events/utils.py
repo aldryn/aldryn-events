@@ -186,8 +186,8 @@ def update_monthdates(monthdates, event, first_date, last_date):
     :return: OrderedDict, link to monthdates (updated in place!)
     """
     day = max(event.start_date, first_date)
-    while ((event.end_date is None or day <= event.end_date) and
-           day <= last_date):
+    end_date = day if event.end_date is None else event.end_date
+    while day <= end_date and day <= last_date:
         monthdates[day].append(event)
         day += datetime.timedelta(days=1)
     return monthdates
@@ -208,11 +208,11 @@ def get_event_q_filters(first_date, last_date):
                              end_date__lte=last_date)
     q_end_is_null = Q(end_date__isnull=True)
     q_end_is_null_or_greater = Q(q_end_is_null | Q(end_date__gt=last_date))
-
+    q_end_is_greater = Q(end_date__gt=last_date)
     # actual filter arguments
     filter_args = (
         q_start_in_month_dates |
-        Q(q_end_is_null_or_greater | q_end_in_month_dates,
+        Q(q_end_in_month_dates | q_end_is_greater,
           start_date__lte=first_date))
     return filter_args
 
@@ -277,7 +277,7 @@ def date_or_datetime(d, t):
     # either a date or a datetime
     if d and t:
         # TODO: not timezone aware!
-        return datetime(d.year, d.month, d.day, t.hour, t.minute)
+        return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute)
     elif d:
         return d
     else:
