@@ -259,7 +259,8 @@ class TestEventViews(EventBaseTestCase):
 
         response1 = self.client.get(view_url1)
         self.response_contains(
-            response1, [0, 2, 3], events_list, events_urls)
+            response1, [0, 2], events_list, events_urls)
+        self.response_not_contains(response1, [3], events_list, events_urls)
         # ensure response does not contains past ended event
         self.assertNotContains(response1, events_list[6].get_title())
         self.assertNotContains(response1, events_urls[6])
@@ -267,14 +268,14 @@ class TestEventViews(EventBaseTestCase):
         response2 = self.client.get(view_url2)
         # should contain event 2 event 3 and event 4
         self.response_contains(
-            response2, [1, 2, 3], events_list, events_urls)
+            response2, [1, 2], events_list, events_urls)
         # ensure does not contains invalid events
         self.response_not_contains(
             response2, [0, 4, 5, 6], events_list, events_urls)
 
         response3 = self.client.get(view_url3)
         self.response_contains(
-            response3, [1, 3], events_list, events_urls)
+            response3, [1], events_list, events_urls)
 
         # ensure does not contains invalid events
         self.response_not_contains(
@@ -282,7 +283,7 @@ class TestEventViews(EventBaseTestCase):
 
         response4 = self.client.get(view_url4)
         self.response_contains(
-            response4, [1, 3], events_list, events_urls)
+            response4, [1], events_list, events_urls)
 
         # ensure does not contains invalid events
         self.response_not_contains(
@@ -307,7 +308,7 @@ class TestEventViews(EventBaseTestCase):
         response1 = self.client.get(view_url1)
         # should contain all event valid event cases
         self.response_contains(
-            response1, [0, 1, 2, 3], events_list, events_urls)
+            response1, [0, 1, 2], events_list, events_urls)
 
         # ensure does not contains invalid events
         self.response_not_contains(
@@ -319,8 +320,8 @@ class TestEventViews(EventBaseTestCase):
             response2, range(len(events_list)), events_list, events_urls)
 
         response3 = self.client.get(view_url3)
-        # should contain events with no end
-        self.response_contains(
+        # should not contain events with no end
+        self.response_not_contains(
             response3, [3, 4], events_list, events_urls)
 
         # ensure does not contains invalid events
@@ -401,19 +402,18 @@ class TestEventViews(EventBaseTestCase):
             response1, [0, 1, 4, 5, 6], events_list, events_urls)
 
         response2 = self.client.get(view_url_2015)
-        # should contain all 2015 events + no end event
+        # should contain all 2015 events
         self.response_contains(
-            response2, [0, 1, 2, 3, 5], events_list, events_urls)
-
+            response2, [0, 1, 2, 5], events_list, events_urls)
         # ensure past and future event is not present
         self.response_not_contains(
-            response2, [4, 6], events_list, events_urls)
+            response2, [3, 4, 6], events_list, events_urls)
 
         response3 = self.client.get(view_url_2016)
         # should contain events valid for 2016
         self.response_contains(
-            response3, [1, 3, 4], events_list, events_urls)
+            response3, [1, 4], events_list, events_urls)
 
         # ensure past events are not present
         self.response_not_contains(
-            response3, [0, 2, 5, 6], events_list, events_urls)
+            response3, [0, 3, 2, 5, 6], events_list, events_urls)

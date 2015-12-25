@@ -373,7 +373,11 @@ class EventPluginsTestCase(EventBaseTestCase):
                 end_date=tz_datetime(2014, 7, 5),
                 publish_at=tz_datetime(2014, 6, 20, 12)
             )
-
+        start_date = tz_datetime(2014, 6, 29)
+        start_time = start_date.now().time()
+        e0 = Event.objects.filter(start_date=start_date)[0]
+        e0.start_time = start_time
+        e0.save()
         # Test plugin rendering for both languages in a forloop. I don't
         # like it but save lot of text space since we test for 5 entries
         rendered = {}
