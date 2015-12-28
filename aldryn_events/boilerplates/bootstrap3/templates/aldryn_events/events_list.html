@@ -39,6 +39,6 @@
 {% block events_sidebar %}
     {% get_current_language as language %}
     <div class="aldryn-events-calendar">
-        {% calendar event_year event_month view.namespace %}
+        {% calendar event_year event_month namespace=view.namespace %}
     </div>
 {% endblock events_sidebar %}

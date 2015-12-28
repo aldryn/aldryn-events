@@ -12,5 +12,5 @@
 
 {% block content_sidebar %}
 {% get_current_language as language %}
-{% calendar event_year event_month view.namespace %}
+{% calendar event_year event_month namespace=view.namespace %}
 {% endblock content_sidebar %}

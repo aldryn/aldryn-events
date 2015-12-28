@@ -59,7 +59,7 @@ class TagsTestCase(EventBaseTestCase):
     def get_template(self, namespace):
         template_str = """
         {%% load aldryn_events %%}
-        {%% calendar 2015 1 '%s' %%}
+        {%% calendar 2015 1 namespace='%s' %%}
         """ % namespace
         template = Template(template_str)
         return template
