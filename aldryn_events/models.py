@@ -143,8 +143,7 @@ class Event(TranslatedAutoSlugifyMixin,
         _('allow registration until'), null=True, blank=True, default=None
     )
     event_coordinators = models.ManyToManyField(
-        'EventCoordinator', verbose_name=_('event coordinators'),
-        null=True, blank=True
+        'EventCoordinator', verbose_name=_('event coordinators'), blank=True
     )
     description = PlaceholderField(
         'aldryn_events_event_description', verbose_name=_('description')
@@ -453,7 +452,7 @@ class EventListPlugin(BaseEventPlugin):
         default=STANDARD,
         max_length=50
     )
-    events = SortedManyToManyField(Event, blank=True, null=True)
+    events = SortedManyToManyField(Event, blank=True)
 
     def __str__(self):
         return force_text(self.pk)
