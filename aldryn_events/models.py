@@ -3,8 +3,17 @@ from __future__ import unicode_literals
 
 import reversion
 from reversion.revisions import RegistrationError
-from django.utils.importlib import import_module
 from distutils.version import LooseVersion
+
+try:
+    # Python>=2.7
+    from importlib import import_module
+except ImportError:
+    # Python==2.6
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        from django.utils.importlib import import_module
 
 from django import get_version
 from django.core.exceptions import ValidationError
