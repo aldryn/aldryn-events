@@ -12,6 +12,8 @@ from django.utils.translation import (
 )
 from cms.utils.i18n import force_language
 
+from aldryn_apphooks_config.utils import get_app_instance
+
 from ..models import EventsConfig
 from ..utils import build_calendar, get_valid_languages
 
@@ -51,9 +53,13 @@ def fallback_aware_namespace_url(context, view_name, namespace, **kwargs):
 
 
 @register.simple_tag(takes_context=True)
-def calendar(context, year, month, namespace):
+def calendar(context, year, month, language=None, namespace=None):
     template_name = 'aldryn_events/includes/calendar.html'
-    language = get_language_from_request(context['request'], check_path=True)
+    if namespace is None:
+        namespace, config = get_app_instance(context['request'])
+    if language is None:
+        language = get_language_from_request(
+            context['request'], check_path=True)
     t = get_template(template_name)
     try:
         EventsConfig.objects.get(namespace=namespace)
