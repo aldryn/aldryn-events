@@ -313,12 +313,11 @@ class EventCoordinator(models.Model):
 
     name = models.CharField(max_length=200, blank=True)
     email = models.EmailField(max_length=80, blank=True)
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         to=getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         verbose_name=_('user'),
         null=True,
         blank=True,
-        unique=True
     )
 
     def __str__(self):
