@@ -11,6 +11,8 @@ from cms.wizards.wizard_pool import wizard_pool
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.forms import BaseFormMixin
 
+from djangocms_text_ckeditor.widgets import TextEditorWidget
+from djangocms_text_ckeditor.html import clean_html
 from parler.forms import TranslatableModelForm
 
 from .cms_appconfig import EventsConfig
@@ -47,10 +49,9 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
     """
 
     description = forms.CharField(
-        label="description", help_text=_(
-            "Optional. If provided, will be added to the main "
-            "body of the Event."),
-        required=False, widget=forms.Textarea()
+        label="description", required=False, widget=TextEditorWidget,
+        help_text=_("Optional. If provided, will be added to the main body of "
+                    "the Event.")
     )
 
     class Meta:
@@ -83,11 +84,11 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
 
         # If 'content' field has value, create a TextPlugin with same and add
         # it to the PlaceholderField
-        description = self.cleaned_data.get('description', '')
+        description = clean_html(
+            self.cleaned_data.get('description', ''), False)
         content_plugin = get_cms_setting('WIZARD_CONTENT_PLUGIN')
         if description and permissions.has_plugin_permission(
                 self.user, content_plugin, 'add'):
-
             # If the event has not been saved, then there will be no
             # Placeholder set-up for this event yet, so, ensure we have saved
             # first.
