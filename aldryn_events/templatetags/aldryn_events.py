@@ -55,9 +55,9 @@ def fallback_aware_namespace_url(context, view_name, namespace, **kwargs):
 @register.simple_tag(takes_context=True)
 def calendar(context, year, month, language=None, namespace=None):
     template_name = 'aldryn_events/includes/calendar.html'
-    if namespace is None:
+    if not namespace:
         namespace, config = get_app_instance(context['request'])
-    if language is None:
+    if not language:
         language = get_language_from_request(
             context['request'], check_path=True)
     t = get_template(template_name)
