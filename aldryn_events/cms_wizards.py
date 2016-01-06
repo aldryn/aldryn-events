@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.db import transaction
+from django.utils.translation import ugettext, ugettext_lazy as _
+
+import reversion
 
 from cms.api import add_plugin
 from cms.utils import permissions
@@ -82,6 +85,9 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
     def save(self, commit=True):
         event = super(CreateEventForm, self).save(commit=False)
 
+        if not commit:
+            return event
+
         # If 'content' field has value, create a TextPlugin with same and add
         # it to the PlaceholderField
         description = clean_html(
@@ -106,9 +112,13 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                 }
                 add_plugin(**plugin_kwargs)
 
-        if commit:
-            event.save()
+        with transaction.atomic():
+            with reversion.create_revision():
+                event.save()
 
+                if self.user:
+                    reversion.set_user(self.user)
+                reversion.set_comment(ugettext("Initial version."))
         return event
 
 event_wizard = EventWizard(
