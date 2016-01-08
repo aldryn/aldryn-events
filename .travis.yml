@@ -57,7 +57,7 @@ after_script:
   - codeclimate < tests/coverage/**/lcov.info
 
 script:
-  - tox -e $TOX_ENV
+  - tox -e $TOXENV
 
 after_success:
   - coveralls
