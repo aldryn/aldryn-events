@@ -10,7 +10,7 @@ from django.db import transaction
 from cms import api
 from cms.utils.i18n import force_language
 from aldryn_events.models import Event
-from aldryn_reversion.core import create_revision_with_placeholders
+from aldryn_reversion.core import create_revision
 
 from parler.utils.context import switch_language
 
@@ -476,7 +476,7 @@ class ReversionTestCase(EventBaseTestCase):
                 plugin = plugins[0].get_plugin_instance()[0]
                 plugin.body = content2
                 plugin.save()
-                create_revision_with_placeholders(event)
+                create_revision(event)
 
         self.assertEqual(len(reversion.get_for_object(event)), 2)
 
