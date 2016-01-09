@@ -37,7 +37,7 @@ class UtilsTestCase(EventBaseTestCase):
             end_date=tz_datetime(2015, 2, 15),
             publish_at=tz_datetime(2015, 1, 1)
         )
-        ev4 = self.create_event(
+        self.create_event(
             title='Start less, end is Null',
             start_date=tz_datetime(2015, 1, 1),
             publish_at=tz_datetime(2015, 1, 1)

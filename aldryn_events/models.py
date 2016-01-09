@@ -37,7 +37,6 @@ from extended_choices import Choices
 from filer.fields.image import FilerImageField
 from parler.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
-from uuid import uuid4
 
 from .cms_appconfig import EventsConfig
 from .conf import settings

@@ -206,8 +206,6 @@ def get_event_q_filters(first_date, last_date):
                                start_date__lte=last_date)
     q_end_in_month_dates = Q(end_date__gte=first_date,
                              end_date__lte=last_date)
-    q_end_is_null = Q(end_date__isnull=True)
-    q_end_is_null_or_greater = Q(q_end_is_null | Q(end_date__gt=last_date))
     q_end_is_greater = Q(end_date__gt=last_date)
     # actual filter arguments
     filter_args = (
@@ -314,6 +312,6 @@ def get_valid_languages(namespace, language_code, site_id=None):
         if fallbacks:
             langs += list(fallbacks)
         valid_translations = [
-            language_code for language_code in langs
-            if is_valid_namespace_for_language(namespace, language_code)]
+            lang_code for lang_code in langs
+            if is_valid_namespace_for_language(namespace, lang_code)]
         return valid_translations
