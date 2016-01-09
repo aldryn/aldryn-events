@@ -24,7 +24,6 @@ env:
     - TOXENV=flake8
     - TOXENV=py27-dj18-cms32
     - TOXENV=py27-dj18-cms31
-    - TOXENV=py34-dj17-cms32
     - TOXENV=py27-dj17-cms32
     - TOXENV=py27-dj17-cms31
     - TOXENV=py27-dj17-cms30
