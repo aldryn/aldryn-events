@@ -5,7 +5,6 @@ from aldryn_apphooks_config.app_base import CMSConfigApp
 from cms.apphook_pool import apphook_pool
 
 from .models import EventsConfig
-from .menu import EventsMenu
 
 
 class EventListAppHook(CMSConfigApp):

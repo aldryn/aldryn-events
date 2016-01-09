@@ -74,7 +74,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
                 self.assertNotEqual(type(placeholder_instance), type(None))
                 plugin_text = plugin_content_raw.format(
                     cfg.namespace, 'en', placeholder_name)
-                plugin = api.add_plugin(
+                api.add_plugin(
                     placeholder_instance, 'TextPlugin', 'en',
                     body=plugin_text)
                 # track other namespaces plugin content to check
@@ -572,7 +572,7 @@ class TestEventPastEventsPluginFallback(LanguageFallbackMixin,
     def test_a_event_upcoming_past_plugin_with_en(self, timezone_mock):
         timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
         root_page, app_page = self.setup_pages(multilang=False)
-        event_de = self.create_de_only_event()
+        self.create_de_only_event()
 
         ph = root_page.placeholders.get(slot='content')
         plugin_en = api.add_plugin(
@@ -590,7 +590,7 @@ class TestEventPastEventsPluginFallback(LanguageFallbackMixin,
     def test_b_event_upcoming_past_plugin_with_en_and_de(self, timezone_mock):
         timezone_mock.now.return_value = tz_datetime(2014, 2, 6, 12)
         root_page, app_page = self.setup_pages(multilang=True)
-        event_de = self.create_de_only_event()
+        self.create_de_only_event()
 
         ph = root_page.placeholders.get(slot='content')
         plugin_en = api.add_plugin(

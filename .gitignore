@@ -58,3 +58,4 @@ coverage-*.txt
 docs/env
 node_modules/
 aldryn_events/tests/frontend/coverage/
+requirements.txt

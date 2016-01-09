@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
 from django.template import RequestContext
 
 from aldryn_search.utils import get_index_base, strip_tags
