@@ -1,16 +1,34 @@
-Django>=1.7,<1.8
+Django>=1.6,<1.7
 
+# Not needed if using django CMS 3.2+
 aldryn-apphook-reload>=0.2.1
+
 # Testing requires 1.0.4+, running can use earlier versions of aldryn-reversion
 aldryn-reversion>=1.0.4
-coverage>=3.7.1
-django-mptt>=0.6,<0.8
+
+djangocms-admin-style
+
+# ==========================================
+# PLEASE NOTE:
+# django CMS v3.2 requires django-formtools.
+# Django-formtools was pulled out of Django
+# 1.6 and into its own repo for Django 1.7.
+# pip-compile doesn't like this, so, note
+# that once requirements.txt are set, just
+# change django CMS to version 3.2 or later
+# if you like.
+# ==========================================
+
+django-cms>=3.0,<3.2  # See note above!
+
+django-mptt>=0.6.0,<0.8.0
 django-polymorphic>=0.5.4
 django-reversion>=1.8.7,<1.9
-djangocms-admin-style
+django-treebeard>=3.0,<4.0
+
+coverage>=3.7.1
 djangocms-helper>=0.9.1
 flake8
-importlib
 mock
 pyquery
 tox
