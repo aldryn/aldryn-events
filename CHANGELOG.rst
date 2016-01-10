@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.0.7 (2015-01-09)
+------------------
+
+* Cleaned-up test configuration
+* Adds revision-support to wizards
+
 1.0.6 (2015-11-12)
 ------------------
 
