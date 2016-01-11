@@ -100,6 +100,8 @@ HELPER_SETTINGS = {
         }
     },
     'MIDDLEWARE_CLASSES': [
+        # NOTE: This will actually be removed below in CMS<3.2 installs.
+        'cms.middleware.utils.ApphookReloadMiddleware',
         'django.middleware.http.ConditionalGetMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -107,8 +109,6 @@ HELPER_SETTINGS = {
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
-        # NOTE: This will actually be removed below in CMS<3.2 installs.
-        'cms.middleware.utils.ApphookReloadMiddleware',
         'cms.middleware.language.LanguageCookieMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
