@@ -100,7 +100,6 @@ HELPER_SETTINGS = {
         }
     },
     'MIDDLEWARE_CLASSES': [
-        'aldryn_apphook_reload.middleware.ApphookReloadMiddleware',
         'django.middleware.http.ConditionalGetMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
