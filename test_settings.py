@@ -29,6 +29,7 @@ HELPER_SETTINGS = {
         'sortedm2m',
         'standard_form',
     ],
+    'CMS_PERMISSION': True,
     'LANGUAGES': (
         ('en', 'English'),
         ('de', 'German'),
