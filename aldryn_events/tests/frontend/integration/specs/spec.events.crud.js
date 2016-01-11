@@ -24,13 +24,9 @@ describe('Aldryn Events tests: ', function () {
             if (present === true) {
                 // go to the main page
                 browser.get(eventsPage.site + '?edit');
-            } else {
-                // click edit mode link
-                eventsPage.editModeLink.click();
+                browser.sleep(1000);
+                cmsProtractorHelper.waitForDisplayed(eventsPage.usernameInput);
             }
-
-            // wait for username input to appear
-            cmsProtractorHelper.waitFor(eventsPage.usernameInput);
 
             // login to the site
             eventsPage.cmsLogin();
@@ -38,6 +34,17 @@ describe('Aldryn Events tests: ', function () {
     });
 
     it('creates a new test page', function () {
+        // close the wizard if necessary
+        eventsPage.modalCloseButton.isDisplayed().then(function (displayed) {
+            if (displayed) {
+                eventsPage.modalCloseButton.click();
+            }
+        });
+
+        cmsProtractorHelper.waitForDisplayed(eventsPage.userMenus.first());
+        // have to wait till animation finished
+        browser.sleep(300);
+
         // click the example.com link in the top menu
         return eventsPage.userMenus.first().click().then(function () {
             // wait for top menu dropdown options to appear
@@ -50,7 +57,7 @@ describe('Aldryn Events tests: ', function () {
 
             // switch to sidebar menu iframe
             browser.switchTo().frame(browser.findElement(
-                By.css('.cms_sideframe-frame iframe')));
+                By.css('.cms-sideframe-frame iframe')));
 
             cmsProtractorHelper.waitFor(eventsPage.pagesLink);
 
@@ -108,13 +115,18 @@ describe('Aldryn Events tests: ', function () {
 
                 // switch to sidebar menu iframe
                 return browser.switchTo().frame(browser.findElement(By.css(
-                    '.cms_sideframe-frame iframe')));
+                    '.cms-sideframe-frame iframe')));
             }
         }).then(function () {
-            cmsProtractorHelper.waitFor(eventsPage.breadcrumbsLinks.first());
+            browser.sleep(1000);
 
-            // click the Home link in breadcrumbs
-            eventsPage.breadcrumbsLinks.first().click();
+            eventsPage.breadcrumbs.isPresent().then(function (present) {
+                if (present) {
+                    // click the Home link in breadcrumbs
+                    cmsProtractorHelper.waitFor(eventsPage.breadcrumbsLinks.first());
+                    eventsPage.breadcrumbsLinks.first().click();
+                }
+            });
 
             cmsProtractorHelper.waitFor(eventsPage.eventsConfigsLink);
 
@@ -131,7 +143,7 @@ describe('Aldryn Events tests: ', function () {
 
                 cmsProtractorHelper.waitFor(eventsPage.namespaceInput);
 
-                return eventsPage.namespaceInput.sendKeys('aldryn_events')
+                return eventsPage.namespaceInput.sendKeys('custom_aldryn_events')
                     .then(function () {
                     return eventsPage.applicationTitleInput.sendKeys('Test application');
                 }).then(function () {
@@ -204,7 +216,7 @@ describe('Aldryn Events tests: ', function () {
 
                     // switch to modal iframe
                     browser.switchTo().frame(browser.findElement(By.css(
-                        '.cms_modal-frame iframe')));
+                        '.cms-modal-frame iframe')));
 
                     cmsProtractorHelper.selectOption(eventsPage.applicationSelect,
                         'Events', eventsPage.eventsOption);
@@ -228,6 +240,16 @@ describe('Aldryn Events tests: ', function () {
                     expect(eventsPage.eventsCalendarBlock.isDisplayed())
                         .toBeTruthy();
 
+                    // wait till animation of sideframe opening finishes
+                    browser.sleep(300);
+
+                    // close sideframe (it covers the link)
+                    cmsProtractorHelper.waitFor(eventsPage.sideFrameClose);
+                    eventsPage.sideFrameClose.click();
+
+                    // wait till animation finishes
+                    browser.sleep(300);
+
                     // click the link to go to the event page
                     return eventsPage.eventLink.click();
                 }).then(function () {
@@ -248,18 +270,33 @@ describe('Aldryn Events tests: ', function () {
     });
 
     it('deletes event', function () {
-        // wait for modal iframe to appear
-        cmsProtractorHelper.waitFor(eventsPage.sideMenuIframe);
+        // have to wait till animation finished
+        browser.sleep(300);
+        // click the example.com link in the top menu
+        eventsPage.userMenus.first().click().then(function () {
+            // wait for top menu dropdown options to appear
+            cmsProtractorHelper.waitForDisplayed(eventsPage.userMenuDropdown);
+
+            return eventsPage.administrationOptions.first().click();
+        }).then(function () {
+            // wait for modal iframe to appear
+            cmsProtractorHelper.waitFor(eventsPage.sideMenuIframe);
+        });
 
         // switch to sidebar menu iframe
         browser.switchTo()
-            .frame(browser.findElement(By.css('.cms_sideframe-frame iframe')));
+            .frame(browser.findElement(By.css('.cms-sideframe-frame iframe')));
 
-        // wait for edit event link to appear
-        cmsProtractorHelper.waitFor(eventsPage.editEventLinks.first());
-
-        // validate edit event links texts to find proper event for deletion
-        return eventsPage.editEventLinks.first().getText().then(function (text) {
+        // browser.pause();
+        cmsProtractorHelper.waitFor(eventsPage.editEventLink);
+        browser.sleep(100);
+        eventsPage.editEventLink.click().then(function () {
+            // wait for edit event link to appear
+            return cmsProtractorHelper.waitFor(eventsPage.editEventLinksTable);
+        }).then(function () {
+            // validate edit event links texts to delete proper event
+            return eventsPage.editEventLinks.first().getText();
+        }).then(function (text) {
             if (text === eventName) {
                 return eventsPage.editEventLinks.first().click();
             } else {

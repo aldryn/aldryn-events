@@ -15,8 +15,7 @@ var browsers = baseConf.sauceLabsBrowsers;
 var config = {
     // Capabilities to be passed to the webdriver instance.
     capabilities: {
-        'browserName': 'phantomjs',
-        'phantomjs.binary.path': require('phantomjs').path
+        'browserName': 'chrome'
     },
 
     onPrepare: function () {
@@ -31,7 +30,8 @@ var config = {
 
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 3000000
+        defaultTimeoutInterval: 3000000,
+        realtimeFailure: true
     }
 
 };

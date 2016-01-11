@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from distutils.version import LooseVersion
+from cms import __version__ as cms_string_version
+
+cms_version = LooseVersion(cms_string_version)
+
 
 def noop_gettext(s):
     return s
@@ -29,6 +34,7 @@ HELPER_SETTINGS = {
         'sortedm2m',
         'standard_form',
     ],
+    'CMS_PERMISSION': True,
     'LANGUAGES': (
         ('en', 'English'),
         ('de', 'German'),
@@ -94,7 +100,8 @@ HELPER_SETTINGS = {
         }
     },
     'MIDDLEWARE_CLASSES': [
-        'aldryn_apphook_reload.middleware.ApphookReloadMiddleware',
+        # NOTE: This will actually be removed below in CMS<3.2 installs.
+        'cms.middleware.utils.ApphookReloadMiddleware',
         'django.middleware.http.ConditionalGetMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -117,6 +124,15 @@ try:
     HELPER_SETTINGS['INSTALLED_APPS'].append('django_tablib')
 except ImportError:
     pass
+
+
+# If using CMS 3.2+, use the CMS middleware for ApphookReloading, otherwise,
+# use aldryn_apphook_reload's.
+if cms_version < LooseVersion('3.2.0'):
+    HELPER_SETTINGS['MIDDLEWARE_CLASSES'].remove(
+        'cms.middleware.utils.ApphookReloadMiddleware')
+    HELPER_SETTINGS['MIDDLEWARE_CLASSES'].insert(
+        0, 'aldryn_apphook_reload.middleware.ApphookReloadMiddleware')
 
 
 def run():
