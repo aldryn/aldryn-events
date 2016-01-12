@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import reversion
-from reversion.revisions import RegistrationError
 from distutils.version import LooseVersion
 
 try:
@@ -37,6 +35,7 @@ from extended_choices import Choices
 from filer.fields.image import FilerImageField
 from parler.models import TranslatableModel, TranslatedFields
 from sortedm2m.fields import SortedManyToManyField
+from reversion.revisions import default_revision_manager, RegistrationError
 
 from .cms_appconfig import EventsConfig
 from .conf import settings
@@ -51,9 +50,8 @@ strict_version = LooseVersion(get_version())
 if strict_version < LooseVersion('1.7.0'):
     # Prior to 1.7 it is pretty straight forward
     user_model = get_user_model()
-    revision_manager = reversion.default_revision_manager
-    if user_model not in revision_manager.get_registered_models():
-        reversion.register(user_model)
+    if user_model not in default_revision_manager.get_registered_models():
+        default_revision_manager.register(user_model)
 else:
     # otherwise it is a pain, but thanks to solution of getting model from
     # https://github.com/django-oscar/django-oscar/commit/c479a1983f326a9b059e157f85c32d06a35728dd
@@ -99,8 +97,9 @@ else:
     user_model_object = get_model(model_app_name, model_model)
     # and try to register, if we have a registration error - that means that
     # it has been registered already
+
     try:
-        reversion.register(user_model_object)
+        default_revision_manager.register(user_model_object)
     except RegistrationError:
         pass
 
