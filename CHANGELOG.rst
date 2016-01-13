@@ -5,6 +5,7 @@ CHANGELOG
 ------------------
 
 * Improves compatibility with recent versions of django-reversion
+* Adds integration tests against CMS v3.2.x
 
 1.0.7 (2015-01-09)
 ------------------
