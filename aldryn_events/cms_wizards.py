@@ -5,8 +5,6 @@ from django import forms
 from django.db import transaction
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-import reversion
-
 from cms.api import add_plugin
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
@@ -119,7 +117,8 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
 
                 if self.user:
                     revision_context_manager.set_user(self.user)
-                revision_context_manager.set_comment(ugettext("Initial version."))
+                revision_context_manager.set_comment(
+                    ugettext("Initial version."))
         return event
 
 event_wizard = EventWizard(
