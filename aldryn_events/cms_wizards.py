@@ -17,6 +17,7 @@ from cms.wizards.forms import BaseFormMixin
 from djangocms_text_ckeditor.widgets import TextEditorWidget
 from djangocms_text_ckeditor.html import clean_html
 from parler.forms import TranslatableModelForm
+from reversion.revisions import revision_context_manager
 
 from .cms_appconfig import EventsConfig
 from .models import Event
@@ -113,12 +114,12 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                 add_plugin(**plugin_kwargs)
 
         with transaction.atomic():
-            with reversion.create_revision():
+            with revision_context_manager.create_revision():
                 event.save()
 
                 if self.user:
-                    reversion.set_user(self.user)
-                reversion.set_comment(ugettext("Initial version."))
+                    revision_context_manager.set_user(self.user)
+                revision_context_manager.set_comment(ugettext("Initial version."))
         return event
 
 event_wizard = EventWizard(
