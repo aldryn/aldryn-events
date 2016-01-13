@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
+
+import imp
 
 from distutils.version import LooseVersion
 from cms import __version__ as cms_string_version
@@ -118,7 +121,6 @@ HELPER_SETTINGS = {
 }
 
 # tablib does not supports py2.6/django1.6
-import imp
 try:
     imp.find_module('django_tablib')
     HELPER_SETTINGS['INSTALLED_APPS'].append('django_tablib')
