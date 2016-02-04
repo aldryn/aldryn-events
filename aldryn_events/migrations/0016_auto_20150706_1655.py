@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations, transaction
-from django.db.models import get_model
+from django.apps import apps as django_apps
 from django.db.utils import ProgrammingError
 
 
@@ -21,7 +21,7 @@ def create_missing_placeholders(apps, schema_editor):
             configs = list(configs_qs)
     except ProgrammingError:
         # most likely we also need the latest Placeholder model
-        NewEventsConfig = get_model('aldryn_events.{0}'.format(
+        NewEventsConfig = django_apps.get_model('aldryn_events.{0}'.format(
             EventsConfig.__name__))
         with transaction.atomic():
             configs = NewEventsConfig.objects.filter()
