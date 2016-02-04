@@ -40,7 +40,7 @@ if py26:
 
 if py27:
     REQUIREMENTS += [
-        'Django>=1.6,<1.9',
+        'Django>=1.6,<1.10',
     ]
 
 CLASSIFIERS = [
@@ -49,6 +49,8 @@ CLASSIFIERS = [
     'Framework :: Django',
     'Framework :: Django :: 1.6',
     'Framework :: Django :: 1.7',
+    'Framework :: Django :: 1.8',
+    'Framework :: Django :: 1.9',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
