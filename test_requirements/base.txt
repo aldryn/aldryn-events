@@ -8,4 +8,5 @@ flake8
 importlib
 mock
 pyquery
+pytz
 tox
