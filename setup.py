@@ -24,7 +24,7 @@ REQUIREMENTS = [
     'django-cms>=3.0.12',
     'django-extended-choices',
     'django-filer',
-    'django-parler',
+    'django-parler>=1.6.1',
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
     'djangocms-text-ckeditor',
