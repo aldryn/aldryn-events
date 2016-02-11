@@ -31,7 +31,7 @@ Requirements
 
 * Python 2.6 or 2.7
 * django CMS 3.0.12 or later
-* Django 1.6 or 1.7
+* Django 1.6 - 1.9
 
 
 Optional requirements

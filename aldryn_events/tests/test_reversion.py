@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import reversion
-import six
 from datetime import datetime, timedelta
+import six
 
 from django.db import transaction
+try:
+    from reversion.revisions import create_revision, get_for_object
+except ImportError:
+    from reversion import create_revision, get_for_object
 
 from cms import api
 from cms.utils.i18n import force_language
 from aldryn_events.models import Event
-from aldryn_reversion.core import create_revision
+from aldryn_reversion.core import create_revision as aldryn_create_revision
 
 from parler.utils.context import switch_language
 
@@ -37,9 +40,9 @@ class ReversionTestCase(EventBaseTestCase):
             'de': 'default german content'
         }
 
-    def create_revision(self, obj, content=None, **kwargs):
+    def create_event_revision(self, obj, content=None, **kwargs):
         with transaction.atomic():
-            with reversion.create_revision():
+            with create_revision():
                 # populate event with new values
                 for property, value in six.iteritems(kwargs):
                     setattr(obj, property, value)
@@ -60,7 +63,7 @@ class ReversionTestCase(EventBaseTestCase):
         """
         # get by position, since reversion_id is not reliable,
         version = list(reversed(
-            reversion.get_for_object(
+            get_for_object(
                 object_with_revision)))[revision_number - 1]
         version.revision.revert()
 
@@ -116,13 +119,15 @@ class ReversionTestCase(EventBaseTestCase):
         # revision 1
         revision_1_values = self.make_new_values(values_raw, 1)
         event.set_current_language('en')
-        self.create_revision(event, content=content1, **revision_1_values)
+        self.create_event_revision(event, content=content1,
+                                   **revision_1_values)
         # revision 2
         revision_2_values = self.make_new_values(values_raw, 2)
 
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('en')
-        self.create_revision(event, content=content2, **revision_2_values)
+        self.create_event_revision(event, content=content2,
+                                   **revision_2_values)
 
         # check that latest revision values are used
         with switch_language(event, 'en'):
@@ -190,13 +195,13 @@ class ReversionTestCase(EventBaseTestCase):
         revision_1_values_en = self.make_new_values(values_raw_en, 1)
         revision_1_values_de = self.make_new_values(values_raw_de, 1)
         event.set_current_language('en')
-        self.create_revision(event, content=content1_en,
-                             **revision_1_values_en)
+        self.create_event_revision(event, content=content1_en,
+                                   **revision_1_values_en)
         # revision 2 de
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
-        self.create_revision(event, content=content1_de,
-                             **revision_1_values_de)
+        self.create_event_revision(event, content=content1_de,
+                                   **revision_1_values_de)
 
         # test latest revision with respect to languages
         with switch_language(event, 'en'):
@@ -226,8 +231,8 @@ class ReversionTestCase(EventBaseTestCase):
         revision_2_values_de = self.make_new_values(values_raw_de, 2)
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('de')
-        self.create_revision(event, content=content2_de,
-                             **revision_2_values_de)
+        self.create_event_revision(event, content=content2_de,
+                                   **revision_2_values_de)
 
         event = Event.objects.get(pk=event.pk)
         # test latest (rev 2a atm) revision with respect to languages
@@ -286,8 +291,8 @@ class ReversionTestCase(EventBaseTestCase):
         revision_2_values_en = self.make_new_values(values_raw_en, 2)
         event = Event.objects.get(pk=event.pk)
         event.set_current_language('en')
-        self.create_revision(event, content=content2_en,
-                             **revision_2_values_en)
+        self.create_event_revision(event, content=content2_en,
+                                   **revision_2_values_en)
 
         event = Event.objects.get(pk=event.pk)
         # test latest (rev 2b atm) revision with respect to languages
@@ -464,9 +469,9 @@ class ReversionTestCase(EventBaseTestCase):
         with force_language('en'):
             event = self.create_default_event()
         # revision 1
-        self.create_revision(event, content1)
+        self.create_event_revision(event, content1)
 
-        self.assertEqual(len(reversion.get_for_object(event)), 1)
+        self.assertEqual(len(get_for_object(event)), 1)
 
         # revision 2
         with transaction.atomic():
@@ -475,9 +480,9 @@ class ReversionTestCase(EventBaseTestCase):
             plugin = plugins[0].get_plugin_instance()[0]
             plugin.body = content2
             plugin.save()
-            create_revision(event)
+            aldryn_create_revision(event)
 
-        self.assertEqual(len(reversion.get_for_object(event)), 2)
+        self.assertEqual(len(get_for_object(event)), 2)
 
         response = self.client.get(event.get_absolute_url())
         self.assertContains(response, content2)

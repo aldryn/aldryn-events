@@ -9,12 +9,16 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.datastructures import SortedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Python < 2.7
+    from django.utils.datastructures import SortedDict as OrderedDict
 from django.conf import settings
 
 
 def build_months(year, is_archive_view=False):
-    months = SortedDict()
+    months = OrderedDict()
     month_numbers = range(1, 12 + 1)
 
     if is_archive_view:
@@ -35,7 +39,7 @@ def group_events_by_year(events):
     Given a queryset of event objects,
     returns a sorted dictionary mapping years to event objects.
     """
-    years = SortedDict()
+    years = OrderedDict()
 
     for event in events:
         year = event.start_date.year
@@ -56,7 +60,7 @@ def build_events_by_year(events, **config):
     is_archive_view = config.get('is_archive_view', False)
     now = timezone.now()
 
-    events_by_year = SortedDict()
+    events_by_year = OrderedDict()
     for event in events:
         year = event.start_date.year
         if year not in events_by_year:
@@ -262,8 +266,8 @@ def build_calendar(year, month, language, namespace=None, site_id=None):
         """Return a copy of events list that should be present on each day"""
         return all_dates_events[:]
 
-    monthdates = SortedDict((date, all_dates_events_copy())
-                            for date in monthdates)
+    monthdates = OrderedDict((date, all_dates_events_copy())
+                             for date in monthdates)
 
     for event in events.exclude(pk__in=events_outside_ongoing):
         update_monthdates(monthdates, event, first_date, last_date)
