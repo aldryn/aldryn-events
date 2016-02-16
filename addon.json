@@ -5,6 +5,7 @@
         "aldryn_boilerplates",
         "aldryn_common",
         "aldryn_events",
+        "aldryn_reversion",
         "aldryn_translation_tools",
         "appconf",
         "bootstrap3",
