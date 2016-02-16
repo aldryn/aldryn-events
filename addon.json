@@ -9,7 +9,6 @@
         "aldryn_translation_tools",
         "appconf",
         "bootstrap3",
-        "django_tablib",
         "djangocms_text_ckeditor",
         "easy_thumbnails",
         "extended_choices",
