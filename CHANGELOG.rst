@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.0.10 (2016-02-16)
+------------------
+
+* Allow blank app_title
+* Create default app_config in migrations
+
 1.0.9 (2016-02-11)
 ------------------
 
