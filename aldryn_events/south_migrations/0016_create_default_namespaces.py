@@ -2,6 +2,7 @@
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
+from django.conf import settings
 from django.db import models, connection, transaction
 
 
@@ -23,11 +24,17 @@ class Migration(DataMigration):
         EventListPlugin = orm.EventListPlugin
         EventCalendarPlugin = orm.EventCalendarPlugin
 
-        ns, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+        app_config, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+
+        if created:
+            app_config_translation = app_config.translations.create()
+            app_config_translation.language_code = settings.LANGUAGES[0][0]
+            app_config_translation.app_title = 'Events'
+            app_config_translation.save()
 
         for model in [Event, EventListPlugin, UpcomingPluginItem, EventCalendarPlugin]:
             for entry in model.objects.filter(app_config__isnull=True):
-                entry.app_config = ns
+                entry.app_config = app_config
                 entry.save()
 
     def backwards(self, orm):

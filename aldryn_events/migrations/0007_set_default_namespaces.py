@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations, transaction
 from django.apps import apps as django_apps
+from django.conf import settings
 from django.db.utils import ProgrammingError, OperationalError
 
 
@@ -15,7 +16,14 @@ def create_default_namespaces(apps, schema_editor):
         apps.get_model('aldryn_events', 'EventCalendarPlugin'),
     ]
 
-    ns, created = EventsConfig.objects.get_or_create(namespace='aldryn_events')
+    app_config, created = EventsConfig.objects.get_or_create(
+        namespace='aldryn_events')
+
+    if created:
+        app_config_translation = app_config.translations.create()
+        app_config_translation.language_code = settings.LANGUAGES[0][0]
+        app_config_translation.app_title = 'Events'
+        app_config_translation.save()
 
     for model in models_to_fetch:
         # if cms migrations migrated to latest and after that we will try to
@@ -37,7 +45,7 @@ def create_default_namespaces(apps, schema_editor):
                 model_objects = new_model.objects.filter(
                     app_config__isnull=True)
         for entry in model_objects:
-            entry.app_config = ns
+            entry.app_config = app_config
             entry.save()
 
 

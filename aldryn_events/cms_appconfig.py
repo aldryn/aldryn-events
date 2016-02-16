@@ -18,7 +18,7 @@ class EventsConfig(TranslatableModel, AppHookConfig):
     """Adds some translatable, per-app-instance fields."""
     translations = TranslatedFields(
         app_title=models.CharField(
-            _('application title'), max_length=234, blank=True, default=''))
+            _('application title'), max_length=234, default=''))
 
     latest_first = models.BooleanField(
         _('Show latest events first?'), default=False,
