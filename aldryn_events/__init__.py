@@ -2,6 +2,7 @@
 
 __version__ = '1.0.10'
 
+default_app_config = 'aldryn_events.apps.AldrynEvents'
 
 # TODO: See if this can now be removed.
 request_events_event_identifier = 'aldryn_events_current_event'
