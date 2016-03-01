@@ -1,0 +1,24 @@
+{% load i18n cms_tags sekizai_tags apphooks_config_tags bootstrap3 %}
+
+{# INFO: shown when registration is closed #}
+{% if event.is_registration_deadline_passed %}
+    <p>{% trans "The registration deadline for this event has passed, registration is closed." %}</p>
+{% endif %}
+
+{# INFO: shown when successfully registered #}
+{% if already_registered and not event.is_registration_deadline_passed %}
+    <p>{% trans "Thank you for your registration!" %}</p>
+    <form action="{% namespace_url 'events_registration_reset' event.slug namespace=view.namespace %}" method="post">
+        {% csrf_token %}
+        <button type="submit">{% trans "Reset your registration" %}</button>
+    </form>
+{% endif %}
+
+{# INFO: shown when registration is open #}
+{% if not already_registered and not event.is_registration_deadline_passed %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% trans "Submit" %}</button>
+    </form>
+{% endif %}

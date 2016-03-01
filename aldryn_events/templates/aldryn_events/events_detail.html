@@ -1,0 +1,31 @@
+{% extends "aldryn_events/base.html" %}
+{% load i18n thumbnail cms_tags apphooks_config_tags %}
+
+{% block events_content %}
+    {% include "aldryn_events/includes/event.html" with detail_view="true" %}
+
+    {% if event.enable_registration %}
+        {% include "aldryn_events/includes/registration.html" %}
+    {% endif %}
+
+    <ul>
+        {% if prev_event %}
+            <li><a href="{{ prev_event.get_absolute_url }}">{% trans "Previous Event" %}</a></li>
+        {% endif %}
+        <li><a href="{% namespace_url 'events_list' namespace=view.namespace %}">{% trans "Back to Overview" %}</a></li>
+        {% if next_event %}
+            <li><a href="{{ next_event.get_absolute_url }}">{% trans "Next Event" %}</a></li>
+        {% endif %}
+    </ul>
+
+    {% if event.register_link %}
+        <p>
+            <a href="{{ event.register_link }}">{% trans "Register for this event" %}</a>
+        </p>
+    {% endif %}
+    {% if event.detail_link %}
+        <p>
+            <a href="{{ event.detail_link }}">{% trans "More information" %}</a>
+        </p>
+    {% endif %}
+{% endblock %}

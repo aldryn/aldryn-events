@@ -1,0 +1,34 @@
+{% load i18n aldryn_events %}
+
+{% spaceless %}
+    <table class="js-calendar-table"
+        data-month-numeric="{{ calendar_tag.current_date|date:'n' }}"
+        data-month="{{ calendar_tag.current_date|date:'F' }}"
+        data-year="{{ calendar_tag.current_date|date:'Y' }}">
+
+        <tr class="header">
+            <th>{% trans "Mo" %}</th>
+            <th>{% trans "Tu" %}</th>
+            <th>{% trans "We" %}</th>
+            <th>{% trans "Th" %}</th>
+            <th>{% trans "Fr" %}</th>
+            <th class="weekend">{% trans "Sa" %}</th>
+            <th class="weekend">{% trans "Su" %}</th>
+        </tr>
+        <tr>
+            {% for day, events, css_classes in calendar_tag.calendar %}
+            {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:'7' %}
+        </tr>
+        <tr>
+            {% endif %}
+                <td{% if css_classes %} class="{{ css_classes }}"{% endif %}>
+                {% if events %}
+                    <a href="{% fallback_aware_namespace_url 'events_list-by-day' calendar_tag.namespace year=day|date:'Y' month=day|date:'n' day=day|date:'j'  %}">{{ day|date:'d' }}</a>
+                {% else %}
+                    <span>{{ day|date:'d' }}</span>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+{% endspaceless %}

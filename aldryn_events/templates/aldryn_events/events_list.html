@@ -1,0 +1,34 @@
+{% extends "aldryn_events/base.html" %}
+{% load i18n aldryn_events cms_tags %}
+
+{% block events_content %}
+    {% block calendar %}
+        {% calendar event_year event_month namespace=view.namespace %}
+    {% endblock %}
+
+    {# INFO: if configuration is set, show ongoing events first #}
+    {% if view.config.app_data.config.show_ongoing_first %}
+        {% regroup ongoing_objects by start_date as ongoing_objects_grouped %}
+        {% for event in ongoing_objects_grouped %}
+            <h2>{{ event.start_date|date:"l, j F o" }}</h2>
+            {% include "aldryn_events/includes/event.html" with is_ongoing_events="true" %}
+        {% empty %}
+            <p>{% trans "No items available" %}</p>
+        {% endfor %}
+    {% endif %}
+
+    {# INFO: show upcoming events #}
+    {% regroup page_obj.object_list|default:object_list by start_date as event_list_grouped %}
+    {% for ev_group in event_list_grouped %}
+        <h2>{{ ev_group.grouper|date:"l, j F o" }}</h2>
+        {% for event in ev_group.list %}
+            {% include "aldryn_events/includes/event.html" with is_upcoming_events="true" %}
+        {% endfor %}
+    {% empty %}
+        <p>{% trans "No items available" %}</p>
+    {% endfor %}
+
+    {% include "aldryn_events/includes/pagination.html" %}
+
+    {% get_current_language as language %}
+{% endblock %}
