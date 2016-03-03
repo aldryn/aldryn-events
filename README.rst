@@ -34,28 +34,6 @@ Requirements
 * Django 1.6 - 1.9
 
 
-Optional requirements
-=====================
-
-* django-tablib
-
-Package should be installed manually. Also take in account ``django-tablib``
-limitations which are listed below.
-
-Python 2.6
-----------
-
-If you are planning to use ``aldryn-events`` with ``Python 2.6``
-be aware that event registrations export functions will not work because
-``django-tablib`` package has ``Python 2.6``/``Django 1.6+`` compatibility issues.
-
-Django 1.8
-----------
-
-Unfortunately ``django-tablib`` does not supports ``Django 1.8`` which means
-that event registrations export functions will not work.
-
-
 .. |PyPI Version| image:: http://img.shields.io/pypi/v/aldryn-events.svg
    :target: https://pypi.python.org/pypi/aldryn-events
 .. |Build Status| image:: http://img.shields.io/travis/aldryn/aldryn-events/master.svg
