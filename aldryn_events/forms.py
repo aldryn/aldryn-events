@@ -159,7 +159,7 @@ class AppConfigPluginFormMixin(object):
 
         # pre select app config if there is only one option
         if self.fields['app_config'].queryset.count() == 1:
-                self.fields['app_config'].empty_label = None
+            self.fields['app_config'].empty_label = None
 
     def clean(self):
         # since namespace is not a unique thing we need to validate it
@@ -171,7 +171,8 @@ class AppConfigPluginFormMixin(object):
         data = super(AppConfigPluginFormMixin, self).clean()
         app_config = data.get('app_config', None)
         namespace = getattr(app_config, 'namespace', None)
-        if not is_valid_namespace(namespace):
+
+        if namespace and not is_valid_namespace(namespace):
             raise ValidationError(
                 _('Seems that selected Event config is not plugged to any '
                   'page, or maybe that page is not published.'
