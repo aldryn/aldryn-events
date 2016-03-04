@@ -287,7 +287,6 @@ describe('Aldryn Events tests: ', function () {
         browser.switchTo()
             .frame(browser.findElement(By.css('.cms-sideframe-frame iframe')));
 
-        // browser.pause();
         cmsProtractorHelper.waitFor(eventsPage.editEventLink);
         browser.sleep(100);
         eventsPage.editEventLink.click().then(function () {

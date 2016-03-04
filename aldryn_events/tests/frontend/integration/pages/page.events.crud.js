@@ -65,10 +65,10 @@ var page = {
     applicationSelect: element(by.id('application_urls')),
     eventsOption: element(by.css('option[value="EventListAppHook"]')),
     saveModalButton: element(by.css('.cms-modal-buttons .cms-btn-action')),
-    eventMetaBlock: element(by.css('.aldryn-events-meta')),
-    eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),
-    eventLink: element(by.css('.aldryn-events-list h2 > a')),
-    backToOverviewLink: element(by.css('.pager-back a')),
+    eventMetaBlock: element(by.css('.article .date')),
+    eventsCalendarBlock: element(by.css('.js-calendar-table')),
+    eventLink: element(by.css('h2 > a')),
+    backToOverviewLink: element(by.xpath('//a[contains(text(), "Back to Overview")]')),
 
     // deleting event
     deleteButton: element(by.css('.deletelink-box a')),
