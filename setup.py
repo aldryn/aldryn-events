@@ -27,6 +27,7 @@ REQUIREMENTS = [
     'django-parler>=1.6.1',
     'django-sortedm2m',
     'django-standard-form>=1.1.1',
+    'django-tablib',
     'djangocms-text-ckeditor',
     'python-dateutil',
 ]
