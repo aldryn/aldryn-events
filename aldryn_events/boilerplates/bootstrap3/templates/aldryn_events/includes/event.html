@@ -29,9 +29,9 @@
         {% if event.location %}
             <p class="location">
                 {% if event.location_lat and event.location_lng %}
-                <a href="http://maps.google.com?q={{ event.location_lat }},{{ event.location_lng }}" target="_blank">
+                    <a href="http://maps.google.com?q={{ event.location_lat }},{{ event.location_lng }}" target="_blank">
                 {% else %}
-                <a href="http://maps.google.com?q={{ event.location|slugify }}" target="_blank">
+                    <a href="http://maps.google.com?q={{ event.location|slugify }}" target="_blank">
                 {% endif %}
                     {{ event.location }}
                 </a>
