@@ -28,11 +28,11 @@ var page = {
     sideMenuIframe: element(by.css('.cms-sideframe-frame iframe')),
     pagesLink: element(by.css('.model-page > th > a')),
     addConfigsButton: element(by.css('.object-tools .addlink')),
-    addPageLink: element(by.css('.sitemap-noentry .addlink')),
+    addPageLink: element(by.css('.object-tools .addlink')),
     titleInput: element(by.id('id_title')),
     slugErrorNotification: element(by.css('.errors.slug')),
     saveButton: element(by.css('.submit-row [name="_save"]')),
-    editPageLink: element(by.css('.col-preview [href*="preview/"]')),
+    editPageLink: element(by.css('.cms-tree-item-preview [href*="preview/"]')),
     testLink: element(by.cssContainingText('a', 'Test')),
     sideFrameClose: element(by.css('.cms-sideframe-close')),
 
@@ -65,10 +65,10 @@ var page = {
     applicationSelect: element(by.id('application_urls')),
     eventsOption: element(by.css('option[value="EventListAppHook"]')),
     saveModalButton: element(by.css('.cms-modal-buttons .cms-btn-action')),
-    eventMetaBlock: element(by.css('.aldryn-events-meta')),
-    eventsCalendarBlock: element(by.css('.aldryn-events-calendar')),
-    eventLink: element(by.css('.aldryn-events-list h2 > a')),
-    backToOverviewLink: element(by.css('.pager-back a')),
+    eventMetaBlock: element(by.css('.article .date')),
+    eventsCalendarBlock: element(by.css('.js-calendar-table')),
+    eventLink: element(by.css('h2 > a')),
+    backToOverviewLink: element(by.xpath('//a[contains(text(), "Back to Overview")]')),
 
     // deleting event
     deleteButton: element(by.css('.deletelink-box a')),

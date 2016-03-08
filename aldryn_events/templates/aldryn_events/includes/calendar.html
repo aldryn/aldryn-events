@@ -1,0 +1,78 @@
+{% load i18n static aldryn_events sekizai_tags %}
+
+{% block events_calendar %}
+    {% if namespace_error %}
+        {% if request.user.is_staff or request.user.is_superuser %}
+            <p>{{ namespace_error }}</p>
+        {% endif %}
+    {% else %}
+        <div id="js-calendar-{{ plugin.instance.pk }}"
+            data-url="{% fallback_aware_namespace_url 'get-calendar-dates' calendar_tag.namespace %}"
+            data-pk="{{ plugin.instance.pk }}"
+            data-error="{% trans 'There was a problem accessing the calendar, please try again.'|escapejs %}">
+
+            <h3>{{ calendar_tag.label }}</h3>
+            <p>
+                <a href="#" class="js-calendar-trigger" data-direction="previous">{% trans "Previous month" %}</a>
+                <a href="{% fallback_aware_namespace_url 'events_list' calendar_tag.namespace %}">{% trans "Today" %}</a>
+                <a href="#" class="js-calendar-trigger" data-direction="next">{% trans "Next month" %}</a>
+            </p>
+
+            {% include "aldryn_events/includes/calendar_table.html" %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% addtoblock "js" %}
+<script>
+jQuery(document).ready(function ($) {
+    $('#js-calendar-{{ plugin.instance.pk }}').on('click', '.js-calendar-trigger', function (e) {
+        e.preventDefault();
+
+        var calendar = $(e.delegateTarget);
+        var settings = calendar.data();
+        var direction = $(this).data('direction');
+        var table = calendar.find('.js-calendar-table');
+        var month = parseInt(table.data('month-numeric'));
+        var year = parseInt(table.data('year'));
+        var title = calendar.find('h3');
+
+        // cancel if no direction is provided
+        if (!direction) {
+            return false;
+        }
+
+        // handle first and last bound
+        if (direction === 'next') {
+            if (month === 12) {
+                month = 1;
+                year += 1;
+            } else {
+                month += 1;
+            }
+        }
+        if (direction === 'previous') {
+            if (month === 1) {
+                month = 12;
+                year -= 1;
+            } else {
+                month -= 1;
+            }
+        }
+
+        // send proper ajax request
+        $.ajax({
+            type: 'get',
+            url: settings.url + year + '/' + month + '/?plugin_pk=' + settings.pk,
+            success: function (data) {
+                table.replaceWith(data);
+                title.html($(data).data('month') + ' ' + $(data).data('year'));
+            },
+            error: function () {
+                alert(settings.error);
+            }
+        });
+    });
+});
+</script>
+{% endaddtoblock %}

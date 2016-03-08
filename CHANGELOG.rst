@@ -2,6 +2,15 @@ CHANGELOG
 =========
 
 
+1.1.0 (UNRELEASED)
+-------------------
+
+* Add stripped default django templates to `/aldryn_events/templates`
+* Remove unused render_placeholder configs
+* Add static_placeholders where necessary
+* Simplify templates
+
+
 1.0.12 (2016-03-03)
 -------------------
 
@@ -9,17 +18,20 @@ CHANGELOG
   version is now available on pypi. Fixes circular import issues with previous
   conditional setup of tablib on aldryn.
 
+
 1.0.11 (2016-02-17)
 -------------------
 
 * don't install django_tablib if it is not installed (aldryn)
 * pretty name in admin ("Aldryn Events" instead of "Aldryn_events")
 
+
 1.0.10 (2016-02-16)
 -------------------
 
 * Allow blank app_title
 * Create default app_config in migrations
+
 
 1.0.9 (2016-02-11)
 ------------------

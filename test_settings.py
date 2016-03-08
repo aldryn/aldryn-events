@@ -116,8 +116,7 @@ HELPER_SETTINGS = {
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware'
-    ],
-    'ALDRYN_BOILERPLATE_NAME': 'bootstrap3',
+    ]
 }
 
 # tablib does not supports py2.6/django1.6
@@ -139,7 +138,7 @@ if cms_version < LooseVersion('3.2.0'):
 
 def run():
     from djangocms_helper import runner
-    runner.cms('aldryn_events', extra_args=['--boilerplate'])
+    runner.cms('aldryn_events', extra_args=[])
 
 if __name__ == "__main__":
     run()

@@ -1,0 +1,61 @@
+{% load i18n cms_tags sekizai_tags thumbnail tz %}
+
+<article class="article
+    {% if is_ongoing_events %} events-ongoing{% endif %}
+    {% if is_upcoming_events %} events-upcoming{% endif %}
+    {% if event.is_outdated %} events-outdated{% endif %}">
+
+    {% if event.image %}
+        <p>
+            {% if not detail_view %}
+                <a href="{{ event.get_absolute_url }}">
+            {% endif %}
+            <img src="{% thumbnail event.image 800x250 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}">
+            {% if not detail_view %}
+                </a>
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <h2>
+        {% if not detail_view %}
+            <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+        {% else %}
+            {{ event.title }}
+        {% endif %}
+    </h2>
+
+    {% if event.location %}
+        <p>
+            {% if event.location_lat and event.location_lng %}
+                <a href="http://maps.google.com?q={{ event.location_lat }},{{ event.location_lng }}" target="_blank">
+            {% else %}
+                <a href="http://maps.google.com?q={{ event.location|slugify }}" target="_blank">
+            {% endif %}
+                {{ event.location }}
+            </a>
+        </p>
+    {% endif %}
+
+    <p class="date">
+        {% if not detail_view %}
+            {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
+            {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
+        {% else %}
+            {{ event.start_date|date }}
+            {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+            {% if event.end_date %}
+                 – {{ event.end_date|date }}
+                {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+            {% endif %}
+        {% endif %}
+    </p>
+
+    {% if event.short_description %}
+        {% render_model event "short_description" "short_description" "" "truncatewords:'25'" %}
+    {% endif %}
+
+    {% if detail_view %}
+        {% render_placeholder event.description %}
+    {% endif %}
+</article>

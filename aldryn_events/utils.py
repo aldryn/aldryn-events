@@ -115,7 +115,7 @@ def send_user_confirmation_email(registration, language):
     subject = render_to_string(
         template_name='aldryn_events/emails/registrant_confirmation.subject.txt',  # NOQA
         dictionary=ctx
-    )
+    ).strip()
     body = render_to_string(
         template_name='aldryn_events/emails/registrant_confirmation.body.txt',
         dictionary=ctx
@@ -141,7 +141,7 @@ def send_manager_confirmation_email(registration, language, emails):
     subject = render_to_string(
         template_name='aldryn_events/emails/manager_confirmation.subject.txt',
         dictionary=ctx
-    )
+    ).strip()
     body = render_to_string(
         template_name='aldryn_events/emails/manager_confirmation.body.txt',
         dictionary=ctx

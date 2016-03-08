@@ -1,16 +1,16 @@
 {% extends "aldryn_events/fullwidth.html" %}
 {% load i18n thumbnail cms_tags apphooks_config_tags %}
 
+{% block breadcrumb %}{% endblock %}
+
 {% block events_content %}
-    {% render_placeholder view.config.placeholder_events_detail_top %}
     <div class="aldryn-events-detail">
         {% include "aldryn_events/includes/event.html" with detail_view="true" %}
     </div>
     {% if event.enable_registration %}
         {% include "aldryn_events/includes/registration.html" %}
     {% endif %}
-    {% render_placeholder view.config.placeholder_events_detail_bottom %}
-{% endblock events_content %}
+{% endblock %}
 
 {% block events_footer %}
     <div class="aldryn-events-pager">
@@ -54,7 +54,6 @@
             {% endif %}
         </ul>
     </div>
-    {% render_placeholder view.config.placeholder_events_detail_footer %}
 
     <div class="row">
         <div class="col-md-16 col-md-push-4">
@@ -70,4 +69,4 @@
             {% endif %}
         </div>
     </div>
-{% endblock events_footer %}
+{% endblock %}

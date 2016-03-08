@@ -4,73 +4,69 @@
     {% if is_ongoing_events %} events-ongoing{% endif %}
     {% if is_upcoming_events %} events-upcoming{% endif %}
     {% if event.is_outdated %} events-outdated{% endif %}">
-    {% block event_visual %}
-        {% if event.image %}
-            <p class="visual">
-                {% if not detail_view %}
-                    <a href="{{ event.get_absolute_url }}">
-                {% endif %}
-                <img src="{% thumbnail event.image 800x250 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
-                {% if not detail_view %}
-                    </a>
-                {% endif %}
-            </p>
-        {% endif %}
-    {% endblock %}
 
-    {% block events_title %}
-        <h2>
+    {% if event.image %}
+        <p class="visual">
             {% if not detail_view %}
-                <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
-            {% else %}
-                {{ event.title }}
+                <a href="{{ event.get_absolute_url }}">
             {% endif %}
-        </h2>
-    {% endblock events_title %}
+            <img src="{% thumbnail event.image 800x250 crop subject_location=event.image.subject_location %}" alt="{{ event.image.alt }}" class="img-responsive">
+            {% if not detail_view %}
+                </a>
+            {% endif %}
+        </p>
+    {% endif %}
 
-    {% block events_meta %}
-        <div class="aldryn-events-meta">
-            {% if event.location %}
-                <p class="location">
-                    {% if event.location_lat and event.location_lng %}
+    <h2>
+        {% if not detail_view %}
+            <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+        {% else %}
+            {{ event.title }}
+        {% endif %}
+    </h2>
+
+    <div class="aldryn-events-meta">
+        {% if event.location %}
+            <p class="location">
+                {% if event.location_lat and event.location_lng %}
                     <a href="http://maps.google.com?q={{ event.location_lat }},{{ event.location_lng }}" target="_blank">
-                    {% else %}
+                {% else %}
                     <a href="http://maps.google.com?q={{ event.location|slugify }}" target="_blank">
-                    {% endif %}
-                        {{ event.location }}
-                    </a>
-                </p>
-            {% endif %}
-            <p class="date">
-                <a href="#" class="addthisevent" title="{% trans 'Create Calendar Event' %}">
-                    {% if not detail_view %}
-                        {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
-                        {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
-                        {% if not event.start_time and not event.end_time %}{% trans "Add to Calendar" %}{% endif %}
-                    {% else %}
-                        {{ event.start_date|date }}
-                        {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
-                        {% if event.end_date %}
-                             – {{ event.end_date|date }}
-                            {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
-                        {% endif %}
-                    {% endif %}
-                    <span class="start">{{ event.start_date|date:"m/d/o" }} {{ event.start_at|date:"H:i" }}</span>
-                    <span class="end">{{ event.end_date|date:"m/d/o" }} {{ event.end_at|date:"H:i" }}</span>
-                    {% get_current_timezone as TIME_ZONE %}
-                    <span class="timezone">{{ TIME_ZONE }}</span>
-                    <span class="title">{{ event.title }}</span>
-                    <span class="location">{{ event.location }}</span>
-                    <span class="date_format">MM/DD/YYYY</span>
+                {% endif %}
+                    {{ event.location }}
                 </a>
             </p>
-        </div>
-        {% if event.short_description %}
-            <div class="lead">
-                {% render_model event "short_description" "short_description" "" "truncatewords:'25'" %}
-            </div>
         {% endif %}
-    {% endblock events_meta %}
+        <p class="date">
+            <a href="#" class="addthisevent" title="{% trans 'Create Calendar Event' %}">
+                {% if not detail_view %}
+                    {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
+                    {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
+                    {% if not event.start_time and not event.end_time %}{% trans "Add to Calendar" %}{% endif %}
+                {% else %}
+                    {{ event.start_date|date }}
+                    {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+                    {% if event.end_date %}
+                         – {{ event.end_date|date }}
+                        {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+                    {% endif %}
+                {% endif %}
+                <span class="start">{{ event.start_date|date:"m/d/o" }} {{ event.start_at|date:"H:i" }}</span>
+                <span class="end">{{ event.end_date|date:"m/d/o" }} {{ event.end_at|date:"H:i" }}</span>
+                {% get_current_timezone as TIME_ZONE %}
+                <span class="timezone">{{ TIME_ZONE }}</span>
+                <span class="title">{{ event.title }}</span>
+                <span class="location">{{ event.location }}</span>
+                <span class="date_format">MM/DD/YYYY</span>
+            </a>
+        </p>
+    </div>
+
+    {% if event.short_description %}
+        <div class="lead">
+            {% render_model event "short_description" "short_description" "" "truncatewords:'25'" %}
+        </div>
+    {% endif %}
 
     {% if detail_view %}
         <div class="content">

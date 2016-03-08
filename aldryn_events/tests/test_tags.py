@@ -81,7 +81,7 @@ class TagsTestCase(EventBaseTestCase):
         context = self.get_context(page_with_apphook)
         with override('en'):
             html = t.render(SekizaiContext(context))
-            table = PyQuery(html)('table.table-calendar')
+            table = PyQuery(html)('table.js-calendar-table')
             page_url_en = page_with_apphook.get_absolute_url()
         links = table.find('td.events, td.multiday-events').find('a')
         # test if tag rendered important elements
@@ -104,7 +104,7 @@ class TagsTestCase(EventBaseTestCase):
         context = self.get_context(page_with_apphook)
         with override('en'):
             html = t.render(SekizaiContext(context))
-            table = PyQuery(html)('table.table-calendar')
+            table = PyQuery(html)('table.js-calendar-table')
             page_with_apphook.get_absolute_url()
         links = table.find('td.events, td.multiday-events').find('a')
         # test if tag rendered important elements

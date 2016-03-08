@@ -271,7 +271,7 @@ describe('Aldryn Events tests: ', function () {
 
     it('deletes event', function () {
         // have to wait till animation finished
-        browser.sleep(300);
+        browser.sleep(1000);
         // click the example.com link in the top menu
         eventsPage.userMenus.first().click().then(function () {
             // wait for top menu dropdown options to appear
@@ -287,7 +287,6 @@ describe('Aldryn Events tests: ', function () {
         browser.switchTo()
             .frame(browser.findElement(By.css('.cms-sideframe-frame iframe')));
 
-        // browser.pause();
         cmsProtractorHelper.waitFor(eventsPage.editEventLink);
         browser.sleep(100);
         eventsPage.editEventLink.click().then(function () {

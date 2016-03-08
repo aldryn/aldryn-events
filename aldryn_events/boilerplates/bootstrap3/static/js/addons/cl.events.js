@@ -58,13 +58,13 @@ var Cl = window.Cl || {};
 
             // send proper ajax request
             $.ajax({
-                'type': 'get',
-                'url': settings.url + year + '/' + month + '/?plugin_pk=' + settings.pk,
-                'success': function (data) {
+                type: 'get',
+                url: settings.url + year + '/' + month + '/?plugin_pk=' + settings.pk,
+                success: function (data) {
                     table.replaceWith(data);
                     title.html($(data).data('month') + ' ' + $(data).data('year'));
                 },
-                'error': function () {
+                error: function () {
                     alert(settings.error);
                 }
             });
