@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 
-1.1.0 (UNRELEASED)
+1.1.0 (2016-03-10)
 -------------------
 
 * Add stripped default django templates to `/aldryn_events/templates`
