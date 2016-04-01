@@ -14,6 +14,7 @@ except ImportError:
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
+from .conf import settings
 from .utils import (
     build_calendar, is_valid_namespace_for_language,
     get_valid_languages,
@@ -33,6 +34,14 @@ NO_APPHOOK_ERROR_MESSAGE = _(
     'change plugin app_config settings to use valid config. '
     'Also note that aldryn-events should be used at least once '
     'as an apphook for that config.')
+
+
+class CacheMixin(object):
+    cache = False
+
+    # this method is used in CMS 3.3+ before falling back to 'cache' attribute
+    def get_cache_expiration(self, request, instance, placeholder):
+        return settings.ALDRYN_EVENTS_PLUGIN_CACHE_TIMEOUT
 
 
 class NameSpaceCheckMixin(object):
@@ -64,7 +73,7 @@ class NameSpaceCheckMixin(object):
             context, instance, placeholder)
 
 
-class UpcomingPlugin(NameSpaceCheckMixin, CMSPluginBase):
+class UpcomingPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
     render_template = False
     name = _('Upcoming or Past Events')
     module = _('Events')
@@ -98,7 +107,7 @@ class UpcomingPlugin(NameSpaceCheckMixin, CMSPluginBase):
 plugin_pool.register_plugin(UpcomingPlugin)
 
 
-class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
+class EventListCMSPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
     render_template = False
     module = _('Events')
     name = _('List')
@@ -127,11 +136,10 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
 plugin_pool.register_plugin(EventListCMSPlugin)
 
 
-class CalendarPlugin(NameSpaceCheckMixin, CMSPluginBase):
+class CalendarPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
     render_template = 'aldryn_events/plugins/calendar.html'
     name = _('Calendar')
     module = _('Events')
-    cache = False
     model = EventCalendarPlugin
     form = EventCalendarPluginForm
 
