@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventtranslation',
             name='description_new',
-            field=cms.models.fields.PlaceholderField(slotname=b'aldryn_events_event_description', editable=False, to='cms.Placeholder', null=True, verbose_name='description'),
+            field=cms.models.fields.PlaceholderField(slotname='aldryn_events_event_description', editable=False, to='cms.Placeholder', null=True, verbose_name='description'),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -72,13 +72,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='eventtranslation',
             name='language_code',
-            field=models.CharField(db_index=True, max_length=15, verbose_name='Language', choices=[(b'en', b'en'), (b'de', b'de')]),
+            field=models.CharField(db_index=True, max_length=15, verbose_name='Language', choices=[('en', 'en'), ('de', 'de')]),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='registration',
             name='address',
-            field=models.TextField(default=b'', verbose_name='Address', blank=True),
+            field=models.TextField(default='', verbose_name='Address', blank=True),
             preserve_default=True,
         ),
         migrations.AlterField(
@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='registration',
             name='language_code',
-            field=models.CharField(default=b'en', max_length=32, choices=[(b'en', b'en'), (b'de', b'de')]),
+            field=models.CharField(default='en', max_length=32, choices=[('en', 'en'), ('de', 'de')]),
             preserve_default=True,
         ),
         migrations.AlterField(
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='registration',
             name='salutation',
-            field=models.CharField(default=b'mrs', max_length=5, verbose_name='Salutation', choices=[(b'mrs', 'Frau'), (b'mr', 'Herr')]),
+            field=models.CharField(default='mrs', max_length=5, verbose_name='Salutation', choices=[('mrs', 'Frau'), ('mr', 'Herr')]),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(

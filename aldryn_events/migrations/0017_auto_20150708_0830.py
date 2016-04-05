@@ -14,13 +14,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='registration',
             name='language_code',
-            field=models.CharField(default=b'en', max_length=32, choices=[(b'en', b'English'), (b'de', b'German')]),
+            field=models.CharField(default='en', max_length=32, choices=[('en', 'English'), ('de', 'German')]),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='registration',
             name='salutation',
-            field=models.CharField(default=b'mrs', max_length=5, verbose_name='Salutation', choices=[(b'mrs', 'Ms.'), (b'mr', 'Mr.')]),
+            field=models.CharField(default='mrs', max_length=5, verbose_name='Salutation', choices=[('mrs', 'Ms.'), ('mr', 'Mr.')]),
             preserve_default=True,
         ),
     ]
