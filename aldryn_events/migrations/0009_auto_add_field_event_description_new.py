@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='description_new',
-            field=cms.models.fields.PlaceholderField(slotname=b'aldryn_events_event_description', editable=False, to='cms.Placeholder', null=True, verbose_name='description'),
+            field=cms.models.fields.PlaceholderField(slotname='aldryn_events_event_description', editable=False, to='cms.Placeholder', null=True, verbose_name='description'),
             preserve_default=True,
         ),
     ]

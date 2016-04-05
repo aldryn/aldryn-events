@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='registration',
             name='language_code',
-            field=models.CharField(default=b'en', max_length=32, choices=[(b'en', b'English')]),
+            field=models.CharField(default='en', max_length=32, choices=[('en', 'English')]),
         ),
     ]

@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('type', models.CharField(max_length=100, verbose_name='type')),
                 ('namespace', models.CharField(default=None, max_length=100, verbose_name='instance namespace')),
-                ('app_data', app_data.fields.AppDataField(default=b'{}', editable=False)),
+                ('app_data', app_data.fields.AppDataField(default='{}', editable=False)),
             ],
             options={
                 'abstract': False,
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             name='EventsConfigTranslation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language', choices=[(b'en', b'en'), (b'de', b'de')])),
+                ('language_code', models.CharField(db_index=True, max_length=15, verbose_name='Language', choices=[('en', 'en'), ('de', 'de')])),
                 ('app_title', models.CharField(max_length=234, verbose_name='application title')),
                 ('master', models.ForeignKey(related_name='translations', editable=False, to='aldryn_events.EventsConfig', null=True)),
             ],
