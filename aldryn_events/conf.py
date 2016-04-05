@@ -14,6 +14,7 @@ class EventsAppConf(AppConf):
     MANAGER_REGISTRATION_EMAIL = False
     MANAGERS = None
     DEFAULT_FROM_EMAIL = None
+    PLUGIN_CACHE_TIMEOUT = 900
 
     def configure_managers(self, value):
         if value is None:
