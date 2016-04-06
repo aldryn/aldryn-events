@@ -228,10 +228,10 @@ class EventPluginsTestCase(EventBaseTestCase):
         rendered = {}
         with force_language('en'):
             response = self.client.get(page.get_absolute_url('en'))
-            rendered['en'] = response.content
+            rendered['en'] = response.content.decode('utf-8')
         with force_language('de'):
             response = self.client.get(page.get_absolute_url('de'))
-            rendered['de'] = response.content
+            rendered['de'] = response.content.decode('utf-8')
 
         for i in range(1, 6):
             for lang in ['en', 'de']:
@@ -383,10 +383,10 @@ class EventPluginsTestCase(EventBaseTestCase):
         rendered = {}
         with force_language('en'):
             response = self.client.get(page.get_absolute_url('en'))
-            rendered['en'] = response.content
+            rendered['en'] = response.content.decode('utf-8')
         with force_language('de'):
             response = self.client.get(page.get_absolute_url('de'))
-            rendered['de'] = response.content
+            rendered['de'] = response.content.decode('utf-8')
 
         for i in range(1, 6):
             for lang in ['en', 'de']:

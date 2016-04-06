@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from dateutil.relativedelta import relativedelta
+from itertools import chain
 
 from django import forms
 from django.conf import settings
@@ -138,8 +139,8 @@ class EventListView(AppConfigMixin, NavigationMixin, ListView):
         def make_outdated(obj):
             obj.is_outdated = True
             return obj
-
-        object_list = list(object_list) + map(make_outdated, self.archive_qs)
+        object_list = list(chain(object_list, map(make_outdated,
+                                                  self.archive_qs)))
         kwargs['object_list'] = object_list
 
         return super(EventListView, self).get_context_data(**kwargs)
