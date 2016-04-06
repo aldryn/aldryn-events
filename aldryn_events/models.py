@@ -191,9 +191,9 @@ class Event(TranslatedAutoSlugifyMixin,
 
     def __str__(self):
         # since we now have app configs, it is pretty handy to display them
-        return unicode('{0} ({1})'.format(
+        return '{0} ({1})'.format(
             self.get_title(),
-            getattr(self.app_config, 'app_title', self.app_config.namespace)))
+            getattr(self.app_config, 'app_title', self.app_config.namespace))
 
     @property
     def start_at(self):

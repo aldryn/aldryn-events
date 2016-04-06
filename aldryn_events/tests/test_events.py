@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 from collections import namedtuple
+import six
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
@@ -83,7 +85,7 @@ class EventTestCase(EventBaseTestCase):
 
     def test_clean_with_allowed_dates_do_not_fail(self):
         failures = []
-        for key, dates in self.dates.iteritems():
+        for key, dates in self.dates.items():
             if not key.should_pass:
                 continue
             event_data = self.make_default_values_with_new_dates(dates)
@@ -105,7 +107,7 @@ class EventTestCase(EventBaseTestCase):
 
     def test_clean_with_not_allowed_dates_raises_validation_error(self):
         failures = []
-        for key, dates in self.dates.iteritems():
+        for key, dates in self.dates.items():
             if key.should_pass:
                 continue
             event_data = self.make_default_values_with_new_dates(dates)
@@ -200,7 +202,7 @@ class EventTestCase(EventBaseTestCase):
             )
         self.assertEqual(Event.objects.translated('de').count(), 1)
         self.assertEqual(test_title, event.title)
-        self.assertIn(test_title, unicode(event))
+        self.assertIn(test_title, six.text_type(event))
 
     def test_behaviour_of_active_translations_and_hide_untranslated(self):
         self.create_event(title='test event', start_date='2015-01-01')

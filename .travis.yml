@@ -1,5 +1,5 @@
 language: python
-
+python: 3.5
 sudo: false
 
 addons:
@@ -22,11 +22,20 @@ env:
     #                different Python ENVs if possible.
     - TOXENV=flake8
 
+    - TOXENV=py35-dj19-cms32
+    - TOXENV=py34-dj19-cms32
     - TOXENV=py27-dj19-cms32
 
+    - TOXENV=py35-dj18-cms32
+    - TOXENV=py35-dj18-cms31
+    - TOXENV=py34-dj18-cms32
+    - TOXENV=py34-dj18-cms31
     - TOXENV=py27-dj18-cms32
     - TOXENV=py27-dj18-cms31
 
+    - TOXENV=py34-dj17-cms32
+    - TOXENV=py34-dj17-cms31
+    - TOXENV=py34-dj17-cms30
     - TOXENV=py27-dj17-cms32
     - TOXENV=py27-dj17-cms31
     - TOXENV=py27-dj17-cms30
@@ -37,23 +46,21 @@ env:
     - TOXENV=py26-dj16-cms31
     - TOXENV=py26-dj16-cms30
 
-    - TOXENV=py27-dj19-cms32-fe
-    - TOXENV=py27-dj18-cms32-fe
-    - TOXENV=py27-dj17-cms32-fe
-    - TOXENV=py26-dj16-cms32-fe
+    - FRONTEND=1 TOXENV=py35-dj19-cms32-fe
+    - FRONTEND=1 TOXENV=py34-dj18-cms32-fe
+    - FRONTEND=1 TOXENV=py27-dj17-cms32-fe
+    - FRONTEND=1 TOXENV=py26-dj16-cms32-fe
 
     - TOXENV=doctest
 
 before_install:
-  - npm install -g npm
+  - if [ "$FRONTEND" == 1 ]; then npm install -g npm; fi
 
 install:
   - pip install tox coveralls
 
 before_script:
-  - npm install -g gulp
-  - npm install -g codeclimate-test-reporter
-  - npm install
+  - if [ "$FRONTEND" == 1 ]; then npm install -g gulp; npm install -g codeclimate-test-reporter;  npm install; fi
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info

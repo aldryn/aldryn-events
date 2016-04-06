@@ -2,10 +2,6 @@
 from __future__ import unicode_literals
 
 from django.utils.translation import override
-try:
-    from django.utils.translation import force_text
-except:
-    from django.utils.translation import force_unicode as force_text
 from aldryn_events.models import Event
 from cms import api
 
@@ -164,11 +160,11 @@ class TestEventsAppConfigManager(EventManagerAppConfigTestCase,
         for app-configs.
         """
         page_url = self.page.get_absolute_url()
-        response = force_text(self.client.get(page_url).render())
+        content = self.client.get(page_url).content.decode('utf-8')
         # NOTE: This list should be ordered in the events natural order
         for e in range(0, len(self.oldest_first) - 1):
-            self.assertLess(response.find(self.oldest_first[e].title),
-                            response.find(self.oldest_first[e + 1].title))
+            self.assertLess(content.find(self.oldest_first[e].title),
+                            content.find(self.oldest_first[e + 1].title))
 
     def test_latest_first_ordering(self):
         """
@@ -176,10 +172,10 @@ class TestEventsAppConfigManager(EventManagerAppConfigTestCase,
         to do so.
         """
         page_url = self.page.get_absolute_url()
-        response = force_text(self.client.get(page_url).render())
+        content = self.client.get(page_url).content.decode('utf-8')
         latest_first = reversed(self.oldest_first)
         self.app_config.latest_first = True
         # NOTE: This list should be ordered in the events natural order
         for e in range(0, len([latest_first]) - 1):
-            self.assertLess(response.find(latest_first[e].title),
-                            response.find(latest_first[e + 1].title))
+            self.assertLess(content.find(latest_first[e].title),
+                            content.find(latest_first[e + 1].title))

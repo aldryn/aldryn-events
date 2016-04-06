@@ -279,10 +279,8 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         with force_language('en'):
             response = self.client.get(url)
-            self.assertQuerysetEqual(
-                response.context_data['object_list'],
-                map(repr, [ev5, ev2, ev3, ev1]),
-            )
+            self.assertSequenceEqual(response.context_data['object_list'],
+                                     [ev5, ev2, ev3, ev1])
             self.assertContains(response, ev5.get_absolute_url())
             self.assertContains(response, ev2.get_absolute_url())
             self.assertContains(response, ev3.get_absolute_url())
@@ -297,10 +295,8 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         with force_language('en'):
             response = self.client.get(url)
-            self.assertQuerysetEqual(
-                response.context_data['object_list'],
-                map(repr, [ev5, ev2, ev3, ev1, ev6]),
-            )
+            self.assertSequenceEqual(response.context_data['object_list'],
+                                     [ev5, ev2, ev3, ev1, ev6])
             self.assertContains(response, ev5.get_absolute_url())
             self.assertContains(response, ev2.get_absolute_url())
             self.assertContains(response, ev3.get_absolute_url())
@@ -316,10 +312,8 @@ class EventPagesTestCase(EventBaseTestCase):
         )
         with force_language('en'):
             response = self.client.get(url)
-            self.assertQuerysetEqual(
-                response.context_data['object_list'],
-                map(repr, [ev5, ev2, ev3, ev1, ev6]),
-            )
+            self.assertSequenceEqual(response.context_data['object_list'],
+                                     [ev5, ev2, ev3, ev1, ev6])
             self.assertContains(response, ev5.get_absolute_url())
             self.assertContains(response, ev2.get_absolute_url())
             self.assertContains(response, ev3.get_absolute_url())
