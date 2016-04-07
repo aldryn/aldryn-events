@@ -92,15 +92,17 @@ class UpcomingPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
         context['instance'] = instance
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
-        events = (Event.objects.namespace(namespace)
-                               .active_translations(language)
-                               .language(language))
-        events = events.translated(*self.valid_languages)
-        if instance.past_events:
-            events = events.past(count=instance.latest_entries)
+        if instance.language not in self.valid_languages:
+            events = Event.objects.none()
         else:
-            events = events.upcoming(count=instance.latest_entries)
-
+            events = (Event.objects.namespace(namespace)
+                                   .active_translations(language)
+                                   .language(language))
+            events = events.translated(*self.valid_languages)
+            if instance.past_events:
+                events = events.past(count=instance.latest_entries)
+            else:
+                events = events.upcoming(count=instance.latest_entries)
         context['events'] = events
         return context
 
@@ -125,11 +127,13 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
         language = self.get_language(context['request'])
         namespace = self.get_namespace(instance)
         context['instance'] = instance
-
-        events = (instance.events.namespace(namespace)
-                                 .active_translations(language)
-                                 .language(language))
-        events = events.translated(*self.valid_languages)
+        if instance.language not in self.valid_languages:
+            events = Event.objects.none()
+        else:
+            events = (instance.events.namespace(namespace)
+                                     .active_translations(language)
+                                     .language(language))
+            events = events.translated(*self.valid_languages)
         context['events'] = events
         return context
 
