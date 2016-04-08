@@ -5,7 +5,8 @@ import datetime
 from cms import api
 from cms.models import Placeholder
 from cms.utils.i18n import force_language
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.cache import cache
 from django.utils.encoding import force_text
 
 import mock
@@ -23,6 +24,48 @@ def calendar_url(year, month, language, namespace):
             kwargs={'year': year, 'month': month}
         )
     return url
+
+
+class TestPluginLanguageHelperMixin(object):
+
+    def create_obj_with_translation(self, **kwargs):
+        data = dict(
+            title='Event Foo',
+            slug='event-foo',
+            start_date=tz_datetime(2014, 1, 1),
+            publish_at=tz_datetime(2000, 1, 1),
+            de={'title': 'Event Foo DE', 'slug': 'event-foo-de'}
+        )
+        data.update(kwargs)
+        return self.create_event(**data)
+
+    def _test_plugin_languages(self, plugin_type, populate_func):
+        """Test plugins for rendering objects in unpublished app language"""
+        app_page = self.create_base_pages(multilang=True)
+        # 'en' is the default language for our tests
+        language_code = 'en'
+        plugin_page = api.create_page(
+            'Events plugins page {0}'.format(language_code), self.template,
+            language_code, parent=self.root_page,
+        )
+        ph = plugin_page.placeholders.get(slot='content')
+        plugin = api.add_plugin(
+            ph, plugin_type, language_code, app_config=self.app_config,
+        )
+        populate_func(plugin)
+        plugin_page.publish(language_code)
+
+        # Unpublish page with the apphook
+        app_page.unpublish(language_code)
+        cache.clear()
+
+        try:
+            with force_language(language_code):
+                response = self.client.get(plugin_page.get_absolute_url())
+                # check we've received non-empty response
+                self.assertTrue(response.status_code, 200)
+        except NoReverseMatch:
+            self.fail("NoReverseMatch was raised during plugin page rendering")
 
 
 class EventConfigPlaceholdersTestCase(EventBaseTestCase):
@@ -108,7 +151,7 @@ class EventConfigPlaceholdersTestCase(EventBaseTestCase):
         self.assertNotEqual(configs.count(), len(skipped))
 
 
-class EventPluginsTestCase(EventBaseTestCase):
+class EventPluginsTestCase(TestPluginLanguageHelperMixin, EventBaseTestCase):
 
     def new_event_from_num(self, num, start_date, end_date, publish_at):
         """ create event based on a num in both languages """
@@ -185,6 +228,31 @@ class EventPluginsTestCase(EventBaseTestCase):
             self.assertContains(response, event1.get_absolute_url())
             self.assertContains(response, event2.title)
             self.assertContains(response, event2.get_absolute_url())
+
+    def test_event_list_plugin_languages(self):
+        def populate_event_list_plugin(plugin):
+            plugin.events = [self.create_obj_with_translation()]
+            plugin.save()
+            return plugin
+
+        self._test_plugin_languages(
+            plugin_type='EventListCMSPlugin',
+            populate_func=populate_event_list_plugin)
+
+    @mock.patch('aldryn_events.managers.timezone')
+    def test_upcoming_events_plugin_languages(self, timezone_mock):
+        timezone_mock.now.return_value = tz_datetime(2012, 1, 1)
+
+        def populate_upcoming_events_plugin(plugin):
+            self.create_obj_with_translation(
+                start_date=tz_datetime(2017, 1, 1),
+                publish_at=tz_datetime(2000, 1, 1),
+            )
+            return plugin
+
+        self._test_plugin_languages(
+            plugin_type='UpcomingPlugin',
+            populate_func=populate_upcoming_events_plugin)
 
     @mock.patch('aldryn_events.managers.timezone')
     def test_upcoming_plugin_for_future(self, timezone_mock):
