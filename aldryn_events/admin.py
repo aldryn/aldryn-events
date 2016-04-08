@@ -46,7 +46,8 @@ class EventAdmin(
 
     _fieldsets = (
         (None, {'fields': (
-            ('title', 'slug'),
+            'title',
+            'slug',
             'short_description',
             'image',
             'location',
@@ -57,11 +58,13 @@ class EventAdmin(
             'classes': ('collapse',),
             'fields': (
                 ('location_lat', 'location_lng'),
-                ('enable_registration', 'registration_deadline_at'),
+                'enable_registration',
+                'registration_deadline_at',
                 'register_link',
                 'event_coordinators',
                 'detail_link',
-                ('is_published', 'publish_at',),
+                'is_published',
+                'publish_at',
                 'app_config'
             )
         })
