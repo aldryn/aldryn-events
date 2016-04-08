@@ -95,9 +95,7 @@ class UpcomingPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
         if instance.language not in self.valid_languages:
             events = Event.objects.none()
         else:
-            events = (Event.objects.namespace(namespace)
-                                   .active_translations(language)
-                                   .language(language))
+            events = Event.objects.namespace(namespace).language(language)
             events = events.translated(*self.valid_languages)
             if instance.past_events:
                 events = events.past(count=instance.latest_entries)
@@ -130,9 +128,7 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CacheMixin, CMSPluginBase):
         if instance.language not in self.valid_languages:
             events = Event.objects.none()
         else:
-            events = (instance.events.namespace(namespace)
-                                     .active_translations(language)
-                                     .language(language))
+            events = instance.events.namespace(namespace).language(language)
             events = events.translated(*self.valid_languages)
         context['events'] = events
         return context
