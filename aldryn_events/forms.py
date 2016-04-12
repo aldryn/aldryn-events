@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.conf import settings
+from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.exceptions import ValidationError
 from django.forms import DateTimeField, TimeField, DateField
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils import timezone
+from django.utils.html import format_html
 from django.template import TemplateDoesNotExist
 from django.template.loader import select_template
 
@@ -23,6 +25,16 @@ from .utils import (
 )
 
 
+class CustomAdminSplitDateTime(AdminSplitDateTime):
+    def format_output(self, rendered_widgets):
+        return format_html(
+            '<div class="field-box">{0} {1}</div>'
+            '<div class="field-box">{2} {3}</div>',
+            ugettext('Date:'), rendered_widgets[0],
+            ugettext('Time:'), rendered_widgets[1],
+        )
+
+
 class EventAdminForm(TranslatableModelForm):
 
     class Meta:
@@ -30,6 +42,10 @@ class EventAdminForm(TranslatableModelForm):
         # since form is intended to be only for internal use we can allow all
         # fields
         fields = '__all__'
+        widgets = {
+            'registration_deadline_at': CustomAdminSplitDateTime,
+            'publish_at': CustomAdminSplitDateTime,
+        }
 
     def __init__(self, *args, **kwargs):
         super(EventAdminForm, self).__init__(*args, **kwargs)
