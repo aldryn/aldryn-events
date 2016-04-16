@@ -28,10 +28,10 @@ from .utils import (
 class CustomAdminSplitDateTime(AdminSplitDateTime):
     def format_output(self, rendered_widgets):
         return format_html(
-            '<div class="field-box">{0} {1}</div>'
-            '<div class="field-box">{2} {3}</div>',
-            ugettext('Date:'), rendered_widgets[0],
-            ugettext('Time:'), rendered_widgets[1],
+            '<div class="field-box"><label>{date}</label> {date_widget}</div>'
+            '<div class="field-box"><label>{time}</label> {time_widget}</div>',
+            date=ugettext('Date:'), date_widget=rendered_widgets[0],
+            time=ugettext('Time:'), time_widget=rendered_widgets[1],
         )
 
 
