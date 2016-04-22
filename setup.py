@@ -18,7 +18,7 @@ REQUIREMENTS = [
     'django-extended-choices',
     'django-filer',
     'django-parler>=1.6.1',
-    'django-sortedm2m',
+    'django-sortedm2m>=1.2.2',
     'django-standard-form>=1.1.1',
     'django-tablib',
     'djangocms-text-ckeditor',
