@@ -14,7 +14,7 @@ REQUIREMENTS = [
     'django-appconf',
     'django-appdata<0.2',
     'django-bootstrap3',
-    'django-cms>=3.0.12',
+    'django-cms>=3.0.12,<3.4',
     'django-extended-choices',
     'django-filer',
     'django-parler>=1.6.1',

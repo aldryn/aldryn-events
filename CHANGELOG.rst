@@ -1,13 +1,16 @@
 CHANGELOG
 =========
 
-1.1.1 (2016-xx-xx)
--------------------
+1.1.1 (2016-05-20)
+------------------
 
-* Changes form field width in admin
+* Changed form field width in admin
+* Updated tests to include Python 3.5, Django 1.9 and CMS 3.3 combinations
+* Improved documentation regarding appconfig during upgrades.
+
 
 1.1.0 (2016-03-10)
--------------------
+------------------
 
 * Add stripped default django templates to `/aldryn_events/templates`
 * Remove unused render_placeholder configs
