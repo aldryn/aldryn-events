@@ -91,7 +91,21 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
         # it to the PlaceholderField
         description = clean_html(
             self.cleaned_data.get('description', ''), False)
-        content_plugin = get_cms_setting('WIZARD_CONTENT_PLUGIN')
+
+        try:
+            # CMS >= 3.3.x
+            content_plugin = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN')
+        except KeyError:
+            # CMS <= 3.2.x
+            content_plugin = get_cms_setting('WIZARD_CONTENT_PLUGIN')
+
+        try:
+            # CMS >= 3.3.x
+            content_field = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN_BODY')
+        except KeyError:
+            # CMS <= 3.2.x
+            content_field = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
+
         if description and permissions.has_plugin_permission(
                 self.user, content_plugin, 'add'):
             # If the event has not been saved, then there will be no
@@ -107,7 +121,7 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                     'placeholder': event.description,
                     'plugin_type': content_plugin,
                     'language': self.language_code,
-                    get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY'): description,
+                    content_field: description,
                 }
                 add_plugin(**plugin_kwargs)
 
