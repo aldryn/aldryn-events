@@ -29,9 +29,11 @@ class TestEventsWizard(EventBaseTestCase):
             password=self.super_user_password,
         )
 
-    def test_job_opening_wizard(self):
+    def test_event_opening_wizard(self):
         # Import here to avoid logic wizard machinery
         from aldryn_events.cms_wizards import CreateEventForm
+
+        self.create_base_pages(multilang=False)
 
         data = {
             'title': 'Yoga retreat',
@@ -48,12 +50,19 @@ class TestEventsWizard(EventBaseTestCase):
             wizard_user=self.super_user,
         )
 
-        print form.errors
         self.assertTrue(form.is_valid())
-        question = form.save()
+        event = form.save()
 
-        url = question.get_absolute_url('en')
+        url = event.get_absolute_url('en')
         response = self.client.get(url)
         self.assertContains(response, data['title'], status_code=200)
-        self.assertContains(response, data['short_description'], status_code=200)
-        self.assertContains(response, data['description'], status_code=200)
+        self.assertContains(
+            response,
+            data['short_description'],
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            data['description'],
+            status_code=200,
+        )
