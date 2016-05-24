@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import calendar
+import six
 
 from cms.utils.i18n import force_language, get_language_object
 from django.contrib.sites.models import Site
@@ -159,7 +160,7 @@ def get_additional_styles():
     raw = getattr(settings, 'ALDRYN_EVENTS_PLUGIN_STYLES', False)
 
     if raw:
-        if isinstance(raw, basestring):
+        if isinstance(raw, six.string_types):
             raw = raw.split(',')
         for choice in raw:
             try:
