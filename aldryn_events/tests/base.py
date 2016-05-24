@@ -22,6 +22,8 @@ from cms.exceptions import AppAlreadyRegistered
 from cms.utils import get_cms_setting
 from datetime import datetime
 
+from djangocms_helper.utils import create_user
+
 from aldryn_events.cms_app import EventListAppHook
 from aldryn_events.models import EventsConfig, Event
 
@@ -146,6 +148,16 @@ class EventTestCaseSetupMixin(object):
         for module in url_modules:
             if module in sys.modules:
                 del sys.modules[module]
+
+    def create_super_user(self, user_name, user_password):
+
+        super_user = create_user(
+            username=user_name,
+            email='test@example.com',
+            password=user_password,
+            is_superuser=True,
+        )
+        return super_user
 
 
 class EventBaseTestCase(EventTestCaseSetupMixin, TransactionTestCase):
