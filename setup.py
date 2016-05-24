@@ -23,6 +23,7 @@ REQUIREMENTS = [
     'django-tablib',
     'djangocms-text-ckeditor',
     'python-dateutil',
+    'six',
 ]
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -51,6 +52,9 @@ CLASSIFIERS = [
     'Programming Language :: Python',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
