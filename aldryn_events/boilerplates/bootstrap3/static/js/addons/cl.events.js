@@ -3,14 +3,11 @@
  * @copyright: http://www.divio.ch
  */
 
-//######################################################################################################################
-// #NAMESPACES#
 var Cl = window.Cl || {};
 
-//######################################################################################################################
-// #UTILS#
 (function ($) {
     'use strict';
+    var MONTHS_IN_YEAR = 12;
 
     Cl.events = {
 
@@ -29,8 +26,8 @@ var Cl = window.Cl || {};
             var settings = calendar.data();
             var direction = $(this).data('direction');
             var table = calendar.find('.table-calendar');
-            var month = parseInt(table.data('month-numeric'));
-            var year = parseInt(table.data('year'));
+            var month = parseInt(table.data('month-numeric'), 10);
+            var year = parseInt(table.data('year'), 10);
             var title = calendar.find('h3');
 
             // cancel if no direction is provided
@@ -40,7 +37,7 @@ var Cl = window.Cl || {};
 
             // handle first and last bound
             if (direction === 'next') {
-                if (month === 12) {
+                if (month === MONTHS_IN_YEAR) {
                     month = 1;
                     year += 1;
                 } else {
@@ -49,7 +46,7 @@ var Cl = window.Cl || {};
             }
             if (direction === 'previous') {
                 if (month === 1) {
-                    month = 12;
+                    month = MONTHS_IN_YEAR;
                     year -= 1;
                 } else {
                     month -= 1;
@@ -65,6 +62,7 @@ var Cl = window.Cl || {};
                     title.html($(data).data('month') + ' ' + $(data).data('year'));
                 },
                 error: function () {
+                    // eslint-disable-next-line
                     alert(settings.error);
                 }
             });
