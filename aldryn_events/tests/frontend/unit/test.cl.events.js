@@ -45,12 +45,14 @@ describe('cl.events.js:', function () {
 
     describe('Cl.events._handler: ', function () {
         it('returns false if direction is not specified', function () {
+            spyOn($, 'ajax');
             expect(Cl.events._handler.call(
                 $('.js-trigger')[0], this.preventEvent))
                     .toEqual(false);
         });
 
         it('returns undefined if direction is specified', function () {
+            spyOn($, 'ajax');
             // validate the return of undefined if direction is "next"
             expect(Cl.events._handler.call(
                 $('.js-trigger')[1], this.preventEvent))
