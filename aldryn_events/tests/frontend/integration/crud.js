@@ -86,7 +86,7 @@ casper.test.begin('Creation / deletion of the event', function (test) {
             page: 'Events'
         }))
         .thenOpen(globals.editUrl, function () {
-            test.assertSelectorHasText('p', 'No items available', 'No articles yet');
+            test.assertSelectorHasText('p', 'No items available', 'No events yet');
         })
         .thenOpen(globals.adminUrl)
         .waitUntilVisible('#content', function () {
@@ -102,7 +102,7 @@ casper.test.begin('Creation / deletion of the event', function (test) {
         .waitForUrl(/add/)
         .waitUntilVisible('#event_form')
         .then(function () {
-            test.assertVisible('#event_form', 'Article creation form loaded');
+            test.assertVisible('#event_form', 'Event creation form loaded');
 
             this.fill('#event_form', {
                 title: 'Test event',
@@ -186,11 +186,11 @@ casper.test.begin('Upcoming events plugin', function (test) {
             test.assertSelectorHasText(
                 '.cms-plugin li',
                 'No items available',
-                'No articles yet'
+                'No events yet'
             );
         })
         .then(cms.openSideframe())
-        // add articles
+        // add events
         .withFrame(0, function () {
             this.waitForSelector('.cms-pagetree-breadcrumbs')
                 .then(function () {
@@ -242,7 +242,7 @@ casper.test.begin('Upcoming events plugin', function (test) {
                 'Only one event is visible on the page'
             );
         })
-        // remove articles
+        // remove events
         .then(cms.openSideframe())
         .withFrame(0, function () {
             this.waitForSelector('.cms-pagetree-breadcrumbs')
