@@ -18,11 +18,11 @@ env:
   matrix:
     # Matrix-size reduction strategies:
     #   PY strategy: do not test 3.3 at all.
-    #   FE strategy: only test on Django/CMS3.2 combinations, but place tests on
+    #   FE strategy: only test on Django/CMS3.3 combinations, but place tests on
     #                different Python ENVs if possible.
     - TOXENV=flake8
 
-    - TOXENV=py35-dj19-cms33
+    - TOXENV=py35-dj19-cms33-fe FE=1
     - TOXENV=py35-dj19-cms32
     - TOXENV=py34-dj19-cms33
     - TOXENV=py34-dj19-cms32
@@ -35,7 +35,7 @@ env:
     - TOXENV=py34-dj18-cms33
     - TOXENV=py34-dj18-cms32
     - TOXENV=py34-dj18-cms31
-    - TOXENV=py27-dj18-cms33
+    - TOXENV=py27-dj18-cms33-fe FE=1
     - TOXENV=py27-dj18-cms32
     - TOXENV=py27-dj18-cms31
 
@@ -53,21 +53,18 @@ env:
     - TOXENV=py26-dj16-cms31
     - TOXENV=py26-dj16-cms30
 
-#    - FRONTEND=1 TOXENV=py35-dj19-cms32-fe
-#    - FRONTEND=1 TOXENV=py34-dj18-cms32-fe
-#    - FRONTEND=1 TOXENV=py27-dj17-cms32-fe
-#    - FRONTEND=1 TOXENV=py26-dj16-cms32-fe
-
     - TOXENV=doctest
-
-before_install:
-  - if [ "$FRONTEND" == 1 ]; then npm install -g npm; fi
 
 install:
   - pip install tox coveralls
 
 before_script:
-  - if [ "$FRONTEND" == 1 ]; then npm install -g gulp; npm install -g codeclimate-test-reporter;  npm install; fi
+  - if [ "$FE" == 1 ]; then nvm install 0.12.7 && nvm use 0.12.7; fi
+  - if [ "$FE" == 1 ]; then npm config set spin false; fi
+  - if [ "$FE" == 1 ]; then npm install -g npm@2; fi
+  - if [ "$FE" == 1 ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FE" == 1 ]; then npm install -g codeclimate-test-reporter; fi
+  - if [ "$FE" == 1 ]; then npm install; fi
 
 after_script:
   - codeclimate < tests/coverage/**/lcov.info
