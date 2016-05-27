@@ -1,3 +1,4 @@
+django-parler<1.6.3
 aldryn-apphook-reload>=0.2.1
 aldryn-boilerplates>=0.6.0
 coverage>3.7.1

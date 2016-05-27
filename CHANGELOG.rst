@@ -1,18 +1,18 @@
 CHANGELOG
 =========
 
-1.1.2 (2016-05-24)
-------------------
-
-* Add support for Python 3.5
-
-
-1.1.1 (2016-05-20)
+1.1.3 (2016-05-26)
 ------------------
 
 * Changed form field width in admin
 * Updated tests to include Python 3.5, Django 1.9 and CMS 3.3 combinations
 * Improved documentation regarding appconfig during upgrades.
+
+
+1.1.2 (2016-05-24)
+------------------
+
+* Add support for Python 3.5
 
 
 1.1.0 (2016-03-10)

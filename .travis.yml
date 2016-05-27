@@ -17,7 +17,7 @@ env:
     - secure: rD+5DrqBv5NTkzbjmmh1ihs2lPnHlvdom6wU3m/tORYsn0eQvTS8zESGrTl72sP05g9z2y2+PbFQNaYtAkgTJn9Zw88pH0fvOdwN44ORA3L5hpsWRs2pYejTyKTsw+rQTQt1V3rODPhG23kBAKVDzT/3eruVBoBS4uusUA5h5W+cVvEkyZvvkqzhD/WYPtUYalq01DdUBn7FTxzycTfDOCFRVT5RW8cckIWiGJO1zcTorgN8uAlWYY5BV09VQ4Wdmxfa8+9UMrHqogJNI6KI2yVEXr+C9jFlMIvDQO18djLfXn6RuCINnWgJZitFY7Sf4F/IQmILBnOsPgfr+u1i9eR58LOYIS/JcxXkhASzeNsIHUSNzhY6m44Yk7b8P3X4bEXERw0jYAfonywaK6Pk1J4Yo9wFqZM00ueL8ym2hM48ijDPg7AyHviG6tdn7lRzT+yvk8Zmv1+5OWLsIu4MyqXqiN8/ZC7b2Qeio+yIStjfHZvychSLmdt8DbuNVuKHYh7auni5U3Rz1OcHFJ+rzordhp7X0Iq2O0UjMpRfev59bYGwRZMBwoNH43gHsWfHEAAPt7My49kUC66JTZOkFD+fZXBJh/0AjsMRJtahrbd9GQ7TP7MMqzUOiDsauB1rlyvcYPU+0esN8QKthZDedgcGLtzbmu7Y7Ujhc6RUw9g=
   matrix:
     # Matrix-size reduction strategies:
-    #   PY strategy: do not test 3.3 at all.
+    #   PY strategy: do not test 3.3 on Travis at all. (keep in tox.ini though)
     #   FE strategy: only test on Django/CMS3.3 combinations, but place tests on
     #                different Python ENVs if possible.
     - TOXENV=flake8

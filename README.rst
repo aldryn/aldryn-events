@@ -29,7 +29,7 @@ request, please review our `guidelines for Aldryn addons <http://docs.aldryn.com
 Requirements
 ************
 
-* Python 2.6 or 2.7
+* Python 2.6, 2.7, 3.3, 3.4, 3.5
 * django CMS 3.0.12 or later
 * Django 1.6 - 1.9
 
