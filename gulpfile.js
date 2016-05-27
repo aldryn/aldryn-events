@@ -1,3 +1,4 @@
+/* eslint strict: [2, "global"] */
 /*!
  * @author:    Divio AG
  * @copyright: http://www.divio.ch
@@ -9,25 +10,22 @@
 // IMPORTS
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var karma = require('karma').server;
-var protractor = require('gulp-protractor').protractor;
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
-var webdriverUpdate = require('gulp-protractor').webdriver_update;
-var SauceTunnel = require('sauce-tunnel');
-var tunnel;
-var isTunnelCreated;
+var KarmaServer = require('karma').Server;
+var eslint = require('gulp-eslint');
+var integrationTests = require('djangocms-casper-helpers/gulp');
+
+var argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
 
 // #############################################################################
 // SETTINGS
 var PROJECT_ROOT = __dirname;
 var PROJECT_PATH = {
-    'js': PROJECT_ROOT + '/aldryn_events/boilerplates/bootstrap3/static/js/',
-    'tests': PROJECT_ROOT + '/aldryn_events/tests/frontend'
+    js: PROJECT_ROOT + '/aldryn_events/boilerplates/bootstrap3/static/js/',
+    tests: PROJECT_ROOT + '/aldryn_events/tests/frontend'
 };
 
 var PROJECT_PATTERNS = {
-    'lint': [
+    lint: [
         PROJECT_PATH.js + '/addons/*.js',
         PROJECT_PATH.tests + '/**/*.js',
         '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
@@ -35,22 +33,20 @@ var PROJECT_PATTERNS = {
     ]
 };
 
-var PORT = parseInt(process.env.PORT, 10) || 8000;
+var INTEGRATION_TESTS = [
+    [
+        'crud'
+    ]
+];
 
 // #############################################################################
 // LINTING
 gulp.task('lint', function () {
+    // DOCS: http://eslint.org
     return gulp.src(PROJECT_PATTERNS.lint)
-        .pipe(jshint())
-        .pipe(jscs())
-        .on('error', function (error) {
-            gutil.log('\n' + error.message);
-            if (process.env.CI) {
-                // Force the process to exit with error code
-                process.exit(1);
-            }
-        })
-        .pipe(jshint.reporter('jshint-stylish'));
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
 });
 
 // #########################################################
@@ -58,77 +54,30 @@ gulp.task('lint', function () {
 gulp.task('tests', ['tests:unit', 'tests:lint', 'tests:integration']);
 gulp.task('tests:lint', ['lint']);
 gulp.task('tests:unit', function (done) {
-    // run javascript tests
-    karma.start({
+    var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js',
         singleRun: true
     }, done);
+
+    server.start();
 });
 
-gulp.task('tests:sauce:start', function (done) {
-    if (!process.env.CI) {
-        done();
-        return;
-    }
-    tunnel = new SauceTunnel(
-        process.env.SAUCE_USERNAME,
-        process.env.SAUCE_ACCESS_KEY,
-        process.env.TRAVIS_JOB_NUMBER
-    );
-
-    tunnel.start(function (isCreated) {
-        isTunnelCreated = isCreated;
-        if (!isCreated) {
-            console.log('Failed to create Sauce tunnel, returning error code');
-            // Force the process to exit with error code if couldn't create the tunnel
-            process.exit(1);
-            return false;
-        }
-        console.log('Connected to Sauce Labs.');
-        done();
-    });
-});
-
-gulp.task('tests:sauce:end', function (done) {
-    if (!process.env.CI) {
-        done();
-        return;
-    }
-    tunnel.stop(function () {
-        console.log('Stopping the server.');
-        done();
-    });
-});
-
-gulp.task('tests:webdriver', webdriverUpdate);
-gulp.task('tests:integration', ['tests:webdriver', 'tests:sauce:start'], function () {
-    if (process.env.CI && !isTunnelCreated) {
-        // Force the process to exit with error code if couldn't create the tunnel
-        process.exit(1);
-        return false;
-    }
-    return gulp.src([PROJECT_PATH.tests + '/integration/specs/*.js'])
-        .pipe(protractor({
-            configFile: PROJECT_PATH.tests + '/protractor.conf.js',
-            args: ['--baseUrl', 'http://127.0.0.1:' + PORT]
-        }))
-        .on('error', function (error) {
-            gutil.log(gutil.colors.red(
-                'Error (' + error.plugin + '): ' + error.message
-            ));
-            // Force the process to exit with error code
-            process.exit(1);
-        })
-        .on('end', function () {
-            gulp.run('tests:sauce:end');
-        });
-});
+// gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
+gulp.task('tests:integration', integrationTests({
+    tests: INTEGRATION_TESTS,
+    pathToTests: PROJECT_PATH.tests,
+    argv: argv,
+    dbPath: 'local.sqlite',
+    serverCommand: 'test_settings.py server',
+    logger: gutil.log.bind(gutil)
+}));
 
 gulp.task('tests:watch', function () {
-    // run javascript tests
-    karma.start({
+    var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
+
+    server.start();
 });
 
 // #############################################################################
