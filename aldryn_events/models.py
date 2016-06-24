@@ -402,42 +402,6 @@ class BaseEventPlugin(CMSPlugin):
 
 
 @python_2_unicode_compatible
-class UpcomingPluginItem(BaseEventPlugin):
-    STYLE_CHOICES = [
-        (STANDARD, _('Standard')),
-    ]
-
-    FUTURE_EVENTS = _('future events')
-    PAST_EVENTS = _('past events')
-    BOOL_CHOICES = (
-        (False, FUTURE_EVENTS),
-        (True, PAST_EVENTS),
-    )
-
-    past_events = models.BooleanField(
-        verbose_name=_('selection'),
-        choices=BOOL_CHOICES,
-        default=False,
-    )
-    style = models.CharField(
-        verbose_name=_('Style'),
-        choices=STYLE_CHOICES + get_additional_styles(),
-        default=STANDARD,
-        max_length=50
-    )
-    latest_entries = models.PositiveSmallIntegerField(
-        verbose_name=_('latest entries'),
-        default=5,
-        help_text=_('The number of latests events to be displayed.')
-    )
-
-    def __str__(self):
-        return force_text(
-            self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
-        )
-
-
-@python_2_unicode_compatible
 class EventListPlugin(BaseEventPlugin):
     STYLE_CHOICES = [
         (STANDARD, _('Standard')),
@@ -464,7 +428,59 @@ class EventListPlugin(BaseEventPlugin):
 
 
 @python_2_unicode_compatible
+class UpcomingPluginItem(BaseEventPlugin):
+    STYLE_CHOICES = [
+        (STANDARD, _('Standard')),
+    ]
+
+    FUTURE_EVENTS = _('future events')
+    PAST_EVENTS = _('past events')
+    BOOL_CHOICES = (
+        (False, FUTURE_EVENTS),
+        (True, PAST_EVENTS),
+    )
+
+    past_events = models.BooleanField(
+        verbose_name=_('selection'),
+        choices=BOOL_CHOICES,
+        default=False,
+    )
+    style = models.CharField(
+        verbose_name=_('Style'),
+        choices=STYLE_CHOICES + get_additional_styles(),
+        default=STANDARD,
+        max_length=50
+    )
+    latest_entries = models.PositiveSmallIntegerField(
+        verbose_name=_('latest entries'),
+        default=5,
+        help_text=_('The number of latest events to be displayed.')
+    )
+
+    cache_duration = models.PositiveSmallIntegerField(
+        default=0,  # not the most sensible, but consistent with older versions
+        blank=False,
+        help_text=_(
+            "The maximum duration (in seconds) that this plugin's content "
+            "should be cached.")
+    )
+
+    def __str__(self):
+        return force_text(
+            self.PAST_EVENTS if self.past_events else self.FUTURE_EVENTS
+        )
+
+
+@python_2_unicode_compatible
 class EventCalendarPlugin(BaseEventPlugin):
+
+    cache_duration = models.PositiveSmallIntegerField(
+        default=0,  # not the most sensible, but consistent with older versions
+        blank=False,
+        help_text=_(
+            "The maximum duration (in seconds) that this plugin's content "
+            "should be cached.")
+    )
 
     def __str__(self):
         return force_text(self.pk)

@@ -198,7 +198,11 @@ class AppConfigPluginFormMixin(object):
 
 
 class UpcomingPluginForm(AppConfigPluginFormMixin, forms.ModelForm):
-    model = UpcomingPluginItem
+
+    class Meta:
+        model = UpcomingPluginItem
+        fields = ['app_config', 'past_events', 'latest_entries', 'style',
+                  'cache_duration']
 
     def clean_style(self):
         style = self.cleaned_data.get('style')

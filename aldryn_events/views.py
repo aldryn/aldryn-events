@@ -12,6 +12,7 @@ except ImportError:
     from django.contrib.sites.models import get_current_site
 from django.http import Http404
 from django.utils import timezone
+from django.utils.cache import add_never_cache_headers
 from django.utils.translation import get_language_from_request
 from django.views.generic import (
     CreateView,
@@ -226,6 +227,17 @@ class EventDetailView(AppConfigMixin, NavigationMixin, CreateView):
             get_language_from_request(self.request, check_path=True)
         )
         return kwargs
+
+    def render_to_response(self, context, **response_kwargs):
+        """
+        Conditionally adds never-cache headers to the response.
+        """
+        response = super(EventDetailView, self).render_to_response(
+            context, **response_kwargs)
+        if self.event.enable_registration:
+            # If we're emitting a form, we shouldn't allow caching anywhere...
+            add_never_cache_headers(response)
+        return response
 
 
 class ResetEventRegistration(AppConfigMixin, FormView):
