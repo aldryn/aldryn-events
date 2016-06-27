@@ -1,24 +1,24 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
+# Translators:
+# Gentian Mazrekaj <gentian.mazrekaj@divio.ch>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: 0\n"
+"Project-Id-Version: Aldryn Events\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-16 18:39+0200\n"
-"PO-Revision-Date: 2015-06-18 21:11+0100\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: \n"
-"Language: de\n"
+"POT-Creation-Date: 2016-06-21 10:06+0200\n"
+"PO-Revision-Date: 2016-06-21 08:45+0000\n"
+"Last-Translator: Gentian Mazrekaj <gentian.mazrekaj@divio.ch>\n"
+"Language-Team: German (http://www.transifex.com/divio/aldryn-events/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.7.6\n"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Advanced"
 msgstr "Erweitert"
 
@@ -30,10 +30,7 @@ msgid ""
 "There is a new registration for \"%(event_name)s\" (%(event_url)s).\n"
 "\n"
 "Details: %(registration_admin_url)s\n"
-msgstr ""
-"Eine neue Registration für \"%(event_name)s\" (%(event_url)s).\n"
-"\n"
-"Details: %(registration_admin_url)s\n"
+msgstr "Eine neue Registration für \"%(event_name)s\" (%(event_url)s).\n\nDetails: %(registration_admin_url)s\n"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/emails/manager_confirmation.subject.txt:1
 #: templates/aldryn_events/emails/manager_confirmation.subject.txt:1
@@ -49,10 +46,7 @@ msgid ""
 "Hi %(first_name)s\n"
 "\n"
 "You have registered for \"%(event_name)s\" (%(event_url)s).\n"
-msgstr ""
-"Hi %(first_name)s\n"
-"\n"
-"Du hast dich für \"%(event_name)s\" (%(event_url)s) angemeldet.\n"
+msgstr "Hi %(first_name)s\n\nDu hast dich für \"%(event_name)s\" (%(event_url)s) angemeldet.\n"
 
 #: boilerplates/bootstrap3/templates/aldryn_events/emails/registrant_confirmation.subject.txt:1
 #: boilerplates/legacy/templates/aldryn_events/emails/registrant_confirmation.subject.txt:1
@@ -103,8 +97,7 @@ msgstr "Keine vorhandenen Artikel"
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:14
 #: templates/aldryn_events/includes/calendar.html:12
 msgid "There was a problem accessing the calendar, please try again."
-msgstr ""
-"Es gab ein Problem beim Zugriff auf den Kalender, versuchen Sie es erneut."
+msgstr "Es gab ein Problem beim Zugriff auf den Kalender, versuchen Sie es erneut."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/calendar.html:18
 #: boilerplates/legacy/templates/aldryn_events/includes/calendar.html:41
@@ -194,9 +187,7 @@ msgstr "Nächst"
 #: templates/aldryn_events/includes/registration.html:5
 msgid ""
 "The registration deadline for this event has passed, registration is closed."
-msgstr ""
-"Die deadline für diesen Event ist bereits vorbei. Die Registration ist "
-"geschlossen."
+msgstr "Die deadline für diesen Event ist bereits vorbei. Die Registration ist geschlossen."
 
 #: boilerplates/bootstrap3/templates/aldryn_events/includes/registration.html:13
 #: boilerplates/legacy/templates/aldryn_events/includes/event_registration.html:9
@@ -239,7 +230,7 @@ msgid "Ongoing events"
 msgstr "Laufende Veranstaltungen"
 
 #: boilerplates/legacy/templates/aldryn_events/events_list.html:9
-#: cms_app.py:13 cms_plugins.py:70 cms_plugins.py:103 cms_plugins.py:133
+#: cms_app.py:13 cms_plugins.py:79 cms_plugins.py:112 cms_plugins.py:142
 #: cms_toolbar.py:71 menu.py:20 models.py:180
 msgid "Events"
 msgstr "Events"
@@ -272,39 +263,39 @@ msgstr "Anwendungstitel"
 
 #: cms_appconfig.py:24
 msgid "Show latest events first?"
-msgstr ""
+msgstr "Neuste Veranstaltungen zuerst anzeigen?"
 
 #: cms_appconfig.py:25
 msgid "(Changes here may require a restart.)"
-msgstr ""
+msgstr "(Änderungen verlangen allenfalls einen Neustart.)"
 
-#: cms_plugins.py:31
+#: cms_plugins.py:32
 msgid ""
 "There is an error in plugin configuration: selected Events config is not "
 "available. Please switch to edit mode and change plugin app_config settings "
 "to use valid config. Also note that aldryn-events should be used at least "
 "once as an apphook for that config."
-msgstr ""
+msgstr "Ein Fehler ist aufgetreten bei der Plugin konfiguration: die ausgewählte Veranstaltungskonfiguration ist nicht vorhanden. Bitte wechsle in den \"edit mode\" und ändere bei \"plugin app_config\" die Einstellungen, dass diese Validiert werden. Beachte auch dass \"aldryn-events\" bei einer Seite mindestends einmal als \"apphook\" konfiguriert werden muss."
 
-#: cms_plugins.py:69
+#: cms_plugins.py:78
 msgid "Upcoming or Past Events"
 msgstr "Bevorstehende oder vergangene Veranstaltungen"
 
-#: cms_plugins.py:104
+#: cms_plugins.py:113
 msgid "List"
 msgstr "Liste"
 
-#: cms_plugins.py:132
+#: cms_plugins.py:141
 msgid "Calendar"
 msgstr "Kalender"
 
 #: cms_toolbar.py:76
 msgid "Edit App Configuration"
-msgstr ""
+msgstr "Bearbeite Applikations konfiguration"
 
 #: cms_toolbar.py:83
 msgid "Events list"
-msgstr ""
+msgstr "Veranstaltungsliste"
 
 #: cms_toolbar.py:89
 msgid "Add event"
@@ -312,68 +303,71 @@ msgstr "Einen Event hinzufügen"
 
 #: cms_toolbar.py:94
 msgid "Edit event"
-msgstr ""
+msgstr "Bearbeite Veranstaltung"
 
 #: cms_toolbar.py:100
 msgid "Delete event"
-msgstr ""
+msgstr "Lösche Veranstaltung"
 
 #: cms_wizards.py:55
 msgid "Optional. If provided, will be added to the main body of the Event."
-msgstr ""
+msgstr "Optional. Falls vorhanden, wird es zum \"main-body\" vom Event hinzugefügt."
 
 #: cms_wizards.py:78 cms_wizards.py:81
 msgid "Date Acceptable Formats: 2015-11-30, 11/30/2015, 11/30/15"
-msgstr ""
+msgstr "Akzeptable Datenformate: 2015-11-30, 11/30/2015, 11/30/15"
 
-#: cms_wizards.py:121
+#: cms_wizards.py:135
 msgid "Initial version."
-msgstr ""
+msgstr "Erste Version."
 
-#: cms_wizards.py:125
+#: cms_wizards.py:139
 msgid "New Event"
-msgstr ""
+msgstr "Neue Veranstaltung"
 
-#: cms_wizards.py:128
+#: cms_wizards.py:142
 msgid "Create a new Event."
-msgstr ""
+msgstr "Erstelle eine neue Veranstaltung"
 
 #: conf.py:11
 msgid "default"
 msgstr "standart"
 
-#: forms.py:37
+#: forms.py:33
+msgid "Date:"
+msgstr "Datum:"
+
+#: forms.py:34
+msgid "Time:"
+msgstr "Zeit:"
+
+#: forms.py:53
 #, python-format
 msgid "Acceptable Formats: %(format_list)s"
 msgstr "Akzeptierte Formate: %(format_list)s"
 
-#: forms.py:71
+#: forms.py:87
 msgid "the registration deadline for this event has already passed"
 msgstr "die deadline für dieses Event ist bereits vorbei "
 
-#: forms.py:148
+#: forms.py:164
 msgid ""
-"Following app_configs is app hooked but pages are not published, to use them "
-"- publish pages to which they are attached."
-msgstr ""
+"Following app_configs is app hooked but pages are not published, to use them"
+" - publish pages to which they are attached."
+msgstr "\"app_conifgs\" ist hat einen Apphook, jedoch sind die Seiten nicht publiziert. Publiziere die Seiten, die einen Apphook haben."
 
-#: forms.py:177
+#: forms.py:193
 msgid ""
 "Seems that selected Event config is not plugged to any page, or maybe that "
 "page is not published.Please select Event config that is being used."
-msgstr ""
+msgstr "Die selektierte Eventkonfiguration ist nicht verbunden mit einer Seite. Vielleicht ist die Page nicht publiziert. Bitte wähle eine Eventkonfiguration, die schon in Verwendung ist."
 
-#: forms.py:223
+#: forms.py:239
 msgid ""
 "When flagged will add an ongoing_objects to the context and exclude these "
 "objects from the normal list. If you are using the default template it's "
 "rendered as 'Current events'. Note: ongoing objects are not paginated."
-msgstr ""
-"Wenn es markiert wird, denn wird es ein aktueller_Artikel dem Kontext "
-"hinzufügen und solche diese Objekte aus der normalen Liste  ausschließen. "
-"Wenn Sie beim Verwenden der Standardvorlage sind, denn wird es als "
-"\"Aktuelle Ereignisse\" wiedergegeben. Hinweise: laufenden Objekte werden "
-"nicht paginiert."
+msgstr "Wenn es markiert wird, denn wird es ein aktueller_Artikel dem Kontext hinzufügen und solche diese Objekte aus der normalen Liste  ausschließen. Wenn Sie beim Verwenden der Standardvorlage sind, denn wird es als \"Aktuelle Ereignisse\" wiedergegeben. Hinweise: laufenden Objekte werden nicht paginiert."
 
 #: models.py:115
 msgid "start date"
@@ -485,21 +479,19 @@ msgstr "Start-Datum sollte vor dem Ende-Datum sein."
 
 #: models.py:218
 msgid ""
-"When specifying identical start and end dates, please also provide the start "
-"and end time."
-msgstr ""
+"When specifying identical start and end dates, please also provide the start"
+" and end time."
+msgstr "Wenn identische Start- und Enddatum angegeben werden, dann geben Sie bitte auch die Start- und Endzeit."
 
 #: models.py:225
 msgid "For same start and end dates start time should be before end time."
-msgstr ""
+msgstr "Für das gleichen Start- und Enddatum sollte die Startzeit vor der Endzeit sein."
 
 #: models.py:230
 msgid ""
-"the registration system can't be active if there is an external registration "
-"link. please remove at least one of the two."
-msgstr ""
-"Das Registrationssystem kann nicht aktiv sein wenn ein externer "
-"Registrationslink vorhanden ist. Bitte entfernen Sie diesen Link."
+"the registration system can't be active if there is an external registration"
+" link. please remove at least one of the two."
+msgstr "Das Registrationssystem kann nicht aktiv sein wenn ein externer Registrationslink vorhanden ist. Bitte entfernen Sie diesen Link."
 
 #: models.py:236
 msgid "please select a registration deadline."
@@ -523,11 +515,11 @@ msgstr "Name"
 
 #: models.py:352
 msgid "Ms."
-msgstr ""
+msgstr "Frau"
 
 #: models.py:353
 msgid "Mr."
-msgstr ""
+msgstr "Herr"
 
 #: models.py:366
 msgid "Salutation"
@@ -607,4 +599,4 @@ msgid ""
 "Seems that EventsConfig for this page is missing. Tried to look for {0}. To "
 "be able to see calendar and events againg - you need to create or select "
 "another EventsConfig for this page."
-msgstr ""
+msgstr "Sieht aus als würde \"EventsConfig\" fehlen auf de Seite.  Versuche nach {0} ausschau zu halten. Um den Kalender und die Änderungen zu sehen, muss ein neuer EventConfig erstellt werden oder ein bestehender neu selektiert werden."
