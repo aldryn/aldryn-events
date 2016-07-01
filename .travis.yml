@@ -53,7 +53,7 @@ env:
     - TOXENV=py26-dj16-cms31
     - TOXENV=py26-dj16-cms30
 
-    - TOXENV=doctest
+    # - TOXENV=doctest -- Re-enable once sphinxcontrib-spelling is https capable.
 
 install:
   - pip install tox coveralls
