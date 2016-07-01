@@ -2,4 +2,5 @@ pyenchant>=1.6.6
 Sphinx>=1.3.1
 sphinx-autobuild==0.5.2
 sphinx-rtd-theme
-sphinxcontrib-spelling>=2.1.2
+# sphinxcontrib-spelling>=2.1.2
+https://bitbucket.org/dhellmann/sphinxcontrib-spelling.git
