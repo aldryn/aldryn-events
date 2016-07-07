@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-1.1.4 (2016-07-05)
+1.1.4 (2016-07-07)
 ------------------
 
 * Updated translations
 * Enable configurable plugin caching for CMS 3.3.0+ installations
+* Disable spelling test until sphinxcontrib-spelling is updated
 
 
 1.1.3 (2016-05-26)
