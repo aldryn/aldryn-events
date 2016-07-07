@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-24 14:35+0200\n"
+"POT-Creation-Date: 2016-07-07 16:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,7 +229,7 @@ msgid "Ongoing events"
 msgstr ""
 
 #: boilerplates/legacy/templates/aldryn_events/events_list.html:9 cms_app.py:13
-#: cms_plugins.py:79 cms_plugins.py:112 cms_plugins.py:142 cms_toolbar.py:71
+#: cms_plugins.py:109 cms_plugins.py:142 cms_plugins.py:173 cms_toolbar.py:71
 #: menu.py:20 models.py:180
 msgid "Events"
 msgstr ""
@@ -268,7 +268,7 @@ msgstr ""
 msgid "(Changes here may require a restart.)"
 msgstr ""
 
-#: cms_plugins.py:32
+#: cms_plugins.py:39
 msgid ""
 "There is an error in plugin configuration: selected Events config is not "
 "available. Please switch to edit mode and change plugin app_config settings "
@@ -276,15 +276,15 @@ msgid ""
 "once as an apphook for that config."
 msgstr ""
 
-#: cms_plugins.py:78
+#: cms_plugins.py:108
 msgid "Upcoming or Past Events"
 msgstr ""
 
-#: cms_plugins.py:113
+#: cms_plugins.py:143
 msgid "List"
 msgstr ""
 
-#: cms_plugins.py:141
+#: cms_plugins.py:172
 msgid "Calendar"
 msgstr ""
 
@@ -361,7 +361,7 @@ msgid ""
 "page is not published.Please select Event config that is being used."
 msgstr ""
 
-#: forms.py:239
+#: forms.py:243
 msgid ""
 "When flagged will add an ongoing_objects to the context and exclude these "
 "objects from the normal list. If you are using the default template it's "
@@ -564,32 +564,38 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: models.py:407 models.py:443
+#: models.py:407 models.py:433
 msgid "Standard"
 msgstr ""
 
-#: models.py:410
-msgid "future events"
-msgstr ""
-
-#: models.py:411
-msgid "past events"
-msgstr ""
-
-#: models.py:418
-msgid "selection"
-msgstr ""
-
-#: models.py:423 models.py:447
+#: models.py:411 models.py:449
 msgid "Style"
 msgstr ""
 
-#: models.py:429
+#: models.py:436
+msgid "future events"
+msgstr ""
+
+#: models.py:437
+msgid "past events"
+msgstr ""
+
+#: models.py:444
+msgid "selection"
+msgstr ""
+
+#: models.py:455
 msgid "latest entries"
 msgstr ""
 
-#: models.py:431
-msgid "The number of latests events to be displayed."
+#: models.py:457
+msgid "The number of latest events to be displayed."
+msgstr ""
+
+#: models.py:464 models.py:481
+msgid ""
+"The maximum duration (in seconds) that this plugin's content should be "
+"cached."
 msgstr ""
 
 #: templatetags/aldryn_events.py:24

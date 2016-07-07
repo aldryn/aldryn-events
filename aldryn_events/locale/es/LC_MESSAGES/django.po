@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Aldryn Events\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-16 18:39+0200\n"
-"PO-Revision-Date: 2016-03-17 08:42+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2016-07-07 16:35-0400\n"
+"PO-Revision-Date: 2016-07-07 20:36+0000\n"
+"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/aldryn-events/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:56
+#: admin.py:57
 msgid "Advanced"
 msgstr ""
 
@@ -229,7 +229,7 @@ msgid "Ongoing events"
 msgstr ""
 
 #: boilerplates/legacy/templates/aldryn_events/events_list.html:9
-#: cms_app.py:13 cms_plugins.py:70 cms_plugins.py:103 cms_plugins.py:133
+#: cms_app.py:13 cms_plugins.py:109 cms_plugins.py:142 cms_plugins.py:173
 #: cms_toolbar.py:71 menu.py:20 models.py:180
 msgid "Events"
 msgstr ""
@@ -268,7 +268,7 @@ msgstr ""
 msgid "(Changes here may require a restart.)"
 msgstr ""
 
-#: cms_plugins.py:31
+#: cms_plugins.py:39
 msgid ""
 "There is an error in plugin configuration: selected Events config is not "
 "available. Please switch to edit mode and change plugin app_config settings "
@@ -276,15 +276,15 @@ msgid ""
 "once as an apphook for that config."
 msgstr ""
 
-#: cms_plugins.py:69
+#: cms_plugins.py:108
 msgid "Upcoming or Past Events"
 msgstr ""
 
-#: cms_plugins.py:104
+#: cms_plugins.py:143
 msgid "List"
 msgstr ""
 
-#: cms_plugins.py:132
+#: cms_plugins.py:172
 msgid "Calendar"
 msgstr ""
 
@@ -316,15 +316,15 @@ msgstr ""
 msgid "Date Acceptable Formats: 2015-11-30, 11/30/2015, 11/30/15"
 msgstr ""
 
-#: cms_wizards.py:121
+#: cms_wizards.py:135
 msgid "Initial version."
 msgstr ""
 
-#: cms_wizards.py:125
+#: cms_wizards.py:139
 msgid "New Event"
 msgstr ""
 
-#: cms_wizards.py:128
+#: cms_wizards.py:142
 msgid "Create a new Event."
 msgstr ""
 
@@ -332,28 +332,36 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: forms.py:37
+#: forms.py:33
+msgid "Date:"
+msgstr ""
+
+#: forms.py:34
+msgid "Time:"
+msgstr ""
+
+#: forms.py:53
 #, python-format
 msgid "Acceptable Formats: %(format_list)s"
 msgstr ""
 
-#: forms.py:71
+#: forms.py:87
 msgid "the registration deadline for this event has already passed"
 msgstr ""
 
-#: forms.py:148
+#: forms.py:164
 msgid ""
 "Following app_configs is app hooked but pages are not published, to use them"
 " - publish pages to which they are attached."
 msgstr ""
 
-#: forms.py:177
+#: forms.py:193
 msgid ""
 "Seems that selected Event config is not plugged to any page, or maybe that "
 "page is not published.Please select Event config that is being used."
 msgstr ""
 
-#: forms.py:223
+#: forms.py:243
 msgid ""
 "When flagged will add an ongoing_objects to the context and exclude these "
 "objects from the normal list. If you are using the default template it's "
@@ -556,32 +564,38 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: models.py:407 models.py:443
+#: models.py:407 models.py:433
 msgid "Standard"
 msgstr ""
 
-#: models.py:410
-msgid "future events"
-msgstr ""
-
-#: models.py:411
-msgid "past events"
-msgstr ""
-
-#: models.py:418
-msgid "selection"
-msgstr ""
-
-#: models.py:423 models.py:447
+#: models.py:411 models.py:449
 msgid "Style"
 msgstr ""
 
-#: models.py:429
+#: models.py:436
+msgid "future events"
+msgstr ""
+
+#: models.py:437
+msgid "past events"
+msgstr ""
+
+#: models.py:444
+msgid "selection"
+msgstr ""
+
+#: models.py:455
 msgid "latest entries"
 msgstr ""
 
-#: models.py:431
-msgid "The number of latests events to be displayed."
+#: models.py:457
+msgid "The number of latest events to be displayed."
+msgstr ""
+
+#: models.py:464 models.py:481
+msgid ""
+"The maximum duration (in seconds) that this plugin's content should be "
+"cached."
 msgstr ""
 
 #: templatetags/aldryn_events.py:24
