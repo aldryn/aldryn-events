@@ -1,10 +1,10 @@
 CHANGELOG
 =========
 
-1.1.5 (unreleased)
+1.1.5 (2016-07-14)
 ------------------
 
-* Fix migrations for blank projects
+* Fixed an issue where under some circumstances, an earlier migration would fail
 
 
 1.1.4 (2016-07-07)
