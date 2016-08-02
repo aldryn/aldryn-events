@@ -48,6 +48,7 @@ strict_version = LooseVersion(get_version())
 # NOTE: We're using LooseVersion instead of StrictVersion because Aldryn
 # sometimes uses patched versions of Django in the form X.Y.Z.postN.
 if strict_version < LooseVersion('1.7.0'):
+    LTE_DJANGO_1_6 = True
     # Prior to 1.7 it is pretty straight forward
     user_model = get_user_model()
     if user_model not in default_revision_manager.get_registered_models():
@@ -59,6 +60,8 @@ else:
     from django.apps import apps
     from django.apps.config import MODELS_MODULE_NAME
     from django.core.exceptions import AppRegistryNotReady
+
+    LTE_DJANGO_1_6 = False
 
     def get_model(app_label, model_name):
         """
@@ -393,6 +396,24 @@ class Registration(models.Model):
 
 class BaseEventPlugin(CMSPlugin):
     app_config = models.ForeignKey(EventsConfig, verbose_name=_('app_config'))
+
+    # Add an app namespace to related_name to avoid field name clashes
+    # with any other plugins that have a field with the same name as the
+    # lowercase of the class name of this model.
+    # https://github.com/divio/django-cms/issues/5030
+    if LTE_DJANGO_1_6:
+        # related_name='%(app_label)s_%(class)s' does not work on  Django 1.6
+        cmsplugin_ptr = models.OneToOneField(
+            CMSPlugin,
+            related_name='+',
+            parent_link=True,
+        )
+    else:
+        cmsplugin_ptr = models.OneToOneField(
+            CMSPlugin,
+            related_name='%(app_label)s_%(class)s',
+            parent_link=True,
+        )
 
     def copy_relations(self, old_instance):
         self.app_config = old_instance.app_config

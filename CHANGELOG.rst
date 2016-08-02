@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+1.1.6 (UNRELEASED)
+------------------
+
+* Fixed related_name inconsistency with django CMS 3.3.1
+
+
 1.1.5 (2016-07-14)
 ------------------
 
