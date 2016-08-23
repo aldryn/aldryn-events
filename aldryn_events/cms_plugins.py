@@ -111,9 +111,6 @@ class UpcomingPlugin(NameSpaceCheckMixin, AdjustableCacheMixin,
     form = UpcomingPluginForm
 
     def render(self, context, instance, placeholder):
-        self.render_template = (
-            'aldryn_events/plugins/upcoming/%s/upcoming.html' % instance.style
-        )
         context = super(UpcomingPlugin, self).render(context, instance,
                                                      placeholder)
         if context.get('plugin_configuration_error') is not None:
@@ -134,7 +131,9 @@ class UpcomingPlugin(NameSpaceCheckMixin, AdjustableCacheMixin,
         context['events'] = events
         return context
 
-plugin_pool.register_plugin(UpcomingPlugin)
+    def get_render_template(self, context, instance, placeholder):
+        name = '%s/upcoming.html' % instance.style
+        return 'aldryn_events/plugins/upcoming/%s' % name
 
 
 class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
@@ -145,9 +144,6 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
     form = EventListPluginForm
 
     def render(self, context, instance, placeholder):
-        self.render_template = (
-            'aldryn_events/plugins/list/%s/list.html' % instance.style
-        )
         context = super(EventListCMSPlugin, self).render(context, instance,
                                                          placeholder)
         if context.get('plugin_configuration_error') is not None:
@@ -163,7 +159,8 @@ class EventListCMSPlugin(NameSpaceCheckMixin, CMSPluginBase):
         context['events'] = events
         return context
 
-plugin_pool.register_plugin(EventListCMSPlugin)
+    def get_render_template(self, context, instance, placeholder):
+        return 'aldryn_events/plugins/list/%s/list.html' % instance.style
 
 
 class CalendarPlugin(NameSpaceCheckMixin, AdjustableCacheMixin,
@@ -202,4 +199,7 @@ class CalendarPlugin(NameSpaceCheckMixin, AdjustableCacheMixin,
         context['calendar_namespace'] = namespace
         return context
 
+
 plugin_pool.register_plugin(CalendarPlugin)
+plugin_pool.register_plugin(EventListCMSPlugin)
+plugin_pool.register_plugin(UpcomingPlugin)
