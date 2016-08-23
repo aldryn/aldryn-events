@@ -24,11 +24,11 @@ from datetime import datetime
 
 from djangocms_helper.utils import create_user
 
-from aldryn_events.cms_app import EventListAppHook
+from aldryn_events.cms_apps import EventListAppHook
 from aldryn_events.models import EventsConfig, Event
 
 
-APP_MODULE = 'aldryn_events.cms_app'
+APP_MODULE = 'aldryn_events.cms_apps'
 
 
 def tz_datetime(*args, **kwargs):
@@ -121,7 +121,7 @@ class EventTestCaseSetupMixin(object):
         except AppAlreadyRegistered:
             # there is an issue with discover apps, or i'm using it wrong.
             # setting discovered to True solves it. Maybe that is due to import
-            # from aldryn_events.cms_app which registers EventListAppHook
+            # from aldryn_events.cms_apps which registers EventListAppHook
             apphook_pool.discovered = True
             apphooks = apphook_pool.get_apphooks()
 

@@ -22,36 +22,31 @@ env:
     #                different Python ENVs if possible.
     - TOXENV=flake8
 
+    - TOXENV=py35-dj19-cms34
     - TOXENV=py35-dj19-cms33-fe FE=1
     - TOXENV=py35-dj19-cms32
+    - TOXENV=py34-dj19-cms34
     - TOXENV=py34-dj19-cms33
     - TOXENV=py34-dj19-cms32
+    - TOXENV=py27-dj19-cms34
     - TOXENV=py27-dj19-cms33
     - TOXENV=py27-dj19-cms32
 
+    - TOXENV=py35-dj18-cms34
     - TOXENV=py35-dj18-cms33
     - TOXENV=py35-dj18-cms32
-    - TOXENV=py35-dj18-cms31
+    - TOXENV=py34-dj18-cms34
     - TOXENV=py34-dj18-cms33
     - TOXENV=py34-dj18-cms32
-    - TOXENV=py34-dj18-cms31
+    - TOXENV=py27-dj18-cms34
     - TOXENV=py27-dj18-cms33-fe FE=1
     - TOXENV=py27-dj18-cms32
-    - TOXENV=py27-dj18-cms31
 
     - TOXENV=py34-dj17-cms32
-    - TOXENV=py34-dj17-cms31
-    - TOXENV=py34-dj17-cms30
     - TOXENV=py27-dj17-cms32
-    - TOXENV=py27-dj17-cms31
-    - TOXENV=py27-dj17-cms30
 
     - TOXENV=py27-dj16-cms32
-    - TOXENV=py27-dj16-cms31
-    - TOXENV=py27-dj16-cms30
     - TOXENV=py26-dj16-cms32
-    - TOXENV=py26-dj16-cms31
-    - TOXENV=py26-dj16-cms30
 
     # - TOXENV=doctest -- Re-enable once sphinxcontrib-spelling is https capable.
 
