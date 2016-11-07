@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+1.1.7 (unreleased)
+------------------
+
+* Fixed a unicode error when editing an event in the admin
+* Fixed an AttributeError raised from the deprecated CHOICES attribute in
+  django-extended-choices
+
+
 1.1.6 (2016-09-05)
 ------------------
 
