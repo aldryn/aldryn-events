@@ -366,7 +366,7 @@ class Registration(models.Model):
 
     event = models.ForeignKey(Event)
     salutation = models.CharField(
-        _('Salutation'), max_length=5, choices=SALUTATIONS.CHOICES,
+        _('Salutation'), max_length=5, choices=SALUTATIONS,
         default=SALUTATIONS.SALUTATION_FEMALE
     )
     company = models.CharField(
