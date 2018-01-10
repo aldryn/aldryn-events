@@ -249,4 +249,5 @@ class EventOptionForm(AppDataForm):
         )
     )
 
+
 setup_config(EventOptionForm, EventsConfig)

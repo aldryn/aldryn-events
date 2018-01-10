@@ -1,9 +1,0 @@
-Django>=1.6,<1.7
-South
-django-reversion<1.8.3
-# Special fork of django-formtools that doesn't force Django 1.7
---extra-index-url https://devpi.divio.ch/aldryn/extras/+simple/
-django-formtools==1.0.0.1
-django-mptt>0.6, <0.8
-
--r base.txt

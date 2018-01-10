@@ -6,9 +6,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from aldryn_apphooks_config.admin import BaseAppHookConfig
-from aldryn_reversion.admin import VersionedPlaceholderAdminMixin
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
-from cms.admin.placeholderadmin import FrontendEditableAdminMixin
+from cms.admin.placeholderadmin import PlaceholderAdminMixin, FrontendEditableAdminMixin
 
 try:
     from django_tablib.admin import TablibAdmin
@@ -23,13 +21,7 @@ from .models import Event, EventCoordinator, Registration
 from .forms import EventAdminForm
 
 
-class EventAdmin(
-    AllTranslationsMixin,
-    VersionedPlaceholderAdminMixin,
-    FrontendEditableAdminMixin,
-    PlaceholderAdminMixin,
-    TranslatableAdmin
-):
+class EventAdmin(AllTranslationsMixin, FrontendEditableAdminMixin, PlaceholderAdminMixin, TranslatableAdmin):
     form = EventAdminForm
     search_fields = ('translations__title', )
     list_display = (
@@ -77,7 +69,7 @@ class EventAdmin(
         return self._fieldsets
 
 
-class EventCoordinatorAdmin(VersionedPlaceholderAdminMixin, admin.ModelAdmin):
+class EventCoordinatorAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     list_display = ['full_name', 'email_address']
 
 
@@ -92,10 +84,7 @@ class RegistrationAdmin(TablibAdmin if TablibAdmin is not None
     date_hierarchy = 'created_at'
 
 
-class EventConfigAdmin(VersionedPlaceholderAdminMixin,
-                       AllTranslationsMixin,
-                       BaseAppHookConfig,
-                       TranslatableAdmin):
+class EventConfigAdmin(PlaceholderAdminMixin, AllTranslationsMixin, BaseAppHookConfig, TranslatableAdmin):
     def get_config_fields(self):
         return ('app_title', 'latest_first', 'config.show_ongoing_first', )
 

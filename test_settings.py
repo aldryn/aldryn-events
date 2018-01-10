@@ -14,6 +14,7 @@ cms_version = LooseVersion(cms_string_version)
 def noop_gettext(s):
     return s
 
+
 gettext = noop_gettext
 
 
@@ -23,9 +24,7 @@ HELPER_SETTINGS = {
         'aldryn_apphook_reload',  # for tests
         'aldryn_apphooks_config',
         'aldryn_common',
-        'aldryn_reversion',
         'aldryn_translation_tools',
-        'reversion',
         'appconf',
         'bootstrap3',
         'djangocms_text_ckeditor',
@@ -139,6 +138,7 @@ if cms_version < LooseVersion('3.2.0'):
 def run():
     from djangocms_helper import runner
     runner.cms('aldryn_events', extra_args=[])
+
 
 if __name__ == "__main__":
     run()

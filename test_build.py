@@ -60,6 +60,7 @@ def cleanup(dirname):
     if _exists(dirname):
         _rmtree(dirname)
 
+
 if __name__ == '__main__':
     args = {}
     if has_no_internet():

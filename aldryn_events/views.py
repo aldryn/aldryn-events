@@ -301,6 +301,7 @@ class EventDatesView(AppConfigMixin, TemplateView):
         )
         return ctx
 
+
 event_dates = EventDatesView.as_view()
 event_detail = EventDetailView.as_view()
 event_list = EventListView.as_view()

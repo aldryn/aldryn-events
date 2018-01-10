@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 import datetime
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from aldryn_events.models import EventsConfig
 from aldryn_events.utils import build_calendar
@@ -15,6 +15,9 @@ NUM_WEEKS_DISPLAYED = 6
 
 
 class UtilsTestCase(EventBaseTestCase):
+    def setUp(self):
+        super(UtilsTestCase, self).setUp()
+        translation.activate('en')
 
     def test_build_calendar(self):
         other_config = EventsConfig.objects.create(namespace='other')
@@ -67,6 +70,7 @@ class UtilsTestCase(EventBaseTestCase):
             """
             date = datetime.date(*args)
             return sorted(dates[date], key=attrgetter('pk'))
+
         # (start less, end in) and (start in, end in)
         # + out of calendar events (active)
         self.assertEqual(sorted_events_for_date(2015, 2, 1), [ev1, ev3])

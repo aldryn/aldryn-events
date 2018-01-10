@@ -2,8 +2,7 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.db import transaction
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 from cms.api import add_plugin
 from cms.utils import permissions
@@ -15,7 +14,6 @@ from cms.wizards.forms import BaseFormMixin
 from djangocms_text_ckeditor.widgets import TextEditorWidget
 from djangocms_text_ckeditor.html import clean_html
 from parler.forms import TranslatableModelForm
-from reversion.revisions import revision_context_manager
 
 from .cms_appconfig import EventsConfig
 from .models import Event
@@ -125,15 +123,10 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                 }
                 add_plugin(**plugin_kwargs)
 
-        with transaction.atomic():
-            with revision_context_manager.create_revision():
-                event.save()
+        event.save()
 
-                if self.user:
-                    revision_context_manager.set_user(self.user)
-                revision_context_manager.set_comment(
-                    ugettext("Initial version."))
         return event
+
 
 event_wizard = EventWizard(
     title=_(u"New Event"),
