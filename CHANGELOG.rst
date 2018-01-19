@@ -1,10 +1,11 @@
 CHANGELOG
 =========
 
-2.0.0 (2018-01-10)
+2.0.0 (unreleased)
 ------------------
 
 * Introduced django CMS 3.5 support
+* Added Django 1.10 support
 * Dropped aldryn-reversion/django-reversion support
 * Dropped Django 1.6 and 1.7 support
 

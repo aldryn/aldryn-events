@@ -1,22 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
-
-from distutils.version import LooseVersion
-
-import cms
-
 from .base import EventBaseTestCase
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest
-else:
-    import unittest
 
-# The CMS wizard system was introduced in 3.2.0
-CMS_3_2 = LooseVersion(cms.__version__) >= LooseVersion('3.2.0')
-
-
-@unittest.skipUnless(CMS_3_2, "No wizard support in CMS < 3.2")
 class TestEventsWizard(EventBaseTestCase):
 
     def setUp(self):
@@ -39,7 +24,7 @@ class TestEventsWizard(EventBaseTestCase):
             'title': 'Yoga retreat',
             'slug': 'yoga-retreat',
             'short_description': '<p>3 day Yoga retreat.</p>',
-            'description': '<p>Any experience welcome.</p>',
+            'event_content': '<p>Any experience welcome.</p>',
             'start_date': '2015-01-01',
             'is_published': True,
             'app_config': self.app_config.pk,
@@ -63,6 +48,6 @@ class TestEventsWizard(EventBaseTestCase):
         )
         self.assertContains(
             response,
-            data['description'],
+            data['event_content'],
             status_code=200,
         )

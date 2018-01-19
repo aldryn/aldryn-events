@@ -115,11 +115,11 @@ def send_user_confirmation_email(registration, language):
     }
     subject = render_to_string(
         template_name='aldryn_events/emails/registrant_confirmation.subject.txt',  # NOQA
-        dictionary=ctx
+        context=ctx
     ).strip()
     body = render_to_string(
         template_name='aldryn_events/emails/registrant_confirmation.body.txt',
-        dictionary=ctx
+        context=ctx
     )
     send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
               recipient_list=[registration.email])
@@ -141,11 +141,11 @@ def send_manager_confirmation_email(registration, language, emails):
     }
     subject = render_to_string(
         template_name='aldryn_events/emails/manager_confirmation.subject.txt',
-        dictionary=ctx
+        context=ctx
     ).strip()
     body = render_to_string(
         template_name='aldryn_events/emails/manager_confirmation.body.txt',
-        dictionary=ctx
+        context=ctx
     )
 
     if emails:  # don't try to send if the list is empty
@@ -280,7 +280,7 @@ def date_or_datetime(d, t):
     # either a date or a datetime
     if d and t:
         # TODO: not timezone aware!
-        return datetime.datetime(d.year, d.month, d.day, t.hour, t.minute)
+        return datetime.datetime.combine(d, t)
     elif d:
         return d
     else:

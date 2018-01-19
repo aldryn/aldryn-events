@@ -6,16 +6,10 @@ import datetime
 
 from distutils.version import LooseVersion
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 from django.utils.dates import MONTHS
-from django.utils.translation import (
-    ugettext_lazy as _, get_language_from_request
-)
-try:
-    from django.contrib.sites.shortcuts import get_current_site
-except ImportError:
-    # Django 1.6
-    from django.contrib.sites.models import get_current_site
+from django.utils.translation import ugettext_lazy as _, get_language_from_request
 
 from cms import __version__ as cms_version
 from cms.plugin_base import CMSPluginBase

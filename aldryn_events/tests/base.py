@@ -19,7 +19,7 @@ from cms.appresolver import clear_app_resolvers
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.utils.i18n import force_language
 from cms.exceptions import AppAlreadyRegistered
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 from datetime import datetime
 
 from djangocms_helper.utils import create_user

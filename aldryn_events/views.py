@@ -4,12 +4,8 @@ from itertools import chain
 
 from django import forms
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.urlresolvers import reverse
-try:
-    from django.contrib.sites.shortcuts import get_current_site
-except ImportError:
-    # Django 1.6
-    from django.contrib.sites.models import get_current_site
 from django.http import Http404
 from django.utils import timezone
 from django.utils.cache import add_never_cache_headers

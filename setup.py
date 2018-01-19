@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-import sys
 from setuptools import setup, find_packages
 from aldryn_events import __version__
-
-py26 = sys.version_info < (2, 7, 0) and sys.version_info >= (2, 6, 0)
 
 REQUIREMENTS = [
     'aldryn-apphooks-config>=0.1.4',
@@ -23,33 +20,21 @@ REQUIREMENTS = [
     'djangocms-text-ckeditor',
     'python-dateutil',
     'six',
+    'Django>=1.8,<1.11',
 ]
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
-if py26:
-    REQUIREMENTS += [
-        'Django>=1.6,<1.7',
-        'South>=1.0.2,<1.1',
-    ]
-
-else:
-    REQUIREMENTS += [
-        'Django>=1.6,<1.10',
-    ]
-
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
     'Framework :: Django',
-    'Framework :: Django :: 1.6',
-    'Framework :: Django :: 1.7',
     'Framework :: Django :: 1.8',
     'Framework :: Django :: 1.9',
+    'Framework :: Django :: 1.10',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',

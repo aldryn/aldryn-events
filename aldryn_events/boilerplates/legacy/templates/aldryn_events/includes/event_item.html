@@ -5,10 +5,10 @@
 
     <p class="events-date">
         <strong>{% trans "Start:" %}</strong> {{ event.start_date|date:"l, d.m.y" }}
-        {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+        {% if event.start_time %} {% trans "at" %} {{ event.start_at|time:"H:i" }}{% endif %}
         {% if event.end_date %}
             <br /><strong>{% trans "End:" %}</strong> {{ event.end_date|date:"l, d.m.y" }}
-            {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+            {% if event.end_time %} {% trans "at" %} {{ event.end_at|time:"H:i" }}{% endif %}
         {% endif %}
     </p>
     {% if event.location %}

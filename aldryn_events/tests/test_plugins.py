@@ -212,7 +212,7 @@ class EventPluginsTestCase(TestPluginLanguageHelperMixin, EventBaseTestCase):
 
         # EN: test plugin rendering
         with force_language('en'):
-            response = self.client.get('/en/events-en/')
+            response = self.client.get(reverse('aldryn_events:events_list'))
             event1.set_current_language('en')
             self.assertContains(response, event1.title)
             self.assertContains(response, event1.get_absolute_url())
@@ -222,7 +222,7 @@ class EventPluginsTestCase(TestPluginLanguageHelperMixin, EventBaseTestCase):
 
         # DE: test plugin rendering
         with force_language('de'):
-            response = self.client.get('/de/events-de/')
+            response = self.client.get(reverse('aldryn_events:events_list'))
             event1.set_current_language('de')
             self.assertContains(response, event1.title)
             self.assertContains(response, event1.get_absolute_url())

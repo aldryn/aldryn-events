@@ -40,19 +40,19 @@
         <p class="date">
             <a href="#" class="addthisevent" title="{% trans 'Create Calendar Event' %}">
                 {% if not detail_view %}
-                    {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
-                    {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
+                    {% if event.start_time %} {{ event.start_at|time:"H:i" }}{% endif %}
+                    {% if event.end_time %} – {{ event.end_at|time:"H:i" }}{% endif %}
                     {% if not event.start_time and not event.end_time %}{% trans "Add to Calendar" %}{% endif %}
                 {% else %}
                     {{ event.start_date|date }}
-                    {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+                    {% if event.start_time %} {% trans "at" %} {{ event.start_at|time:"H:i" }}{% endif %}
                     {% if event.end_date %}
                          – {{ event.end_date|date }}
-                        {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+                        {% if event.end_time %} {% trans "at" %} {{ event.end_at|time:"H:i" }}{% endif %}
                     {% endif %}
                 {% endif %}
-                <span class="start">{{ event.start_date|date:"m/d/o" }} {{ event.start_at|date:"H:i" }}</span>
-                <span class="end">{{ event.end_date|date:"m/d/o" }} {{ event.end_at|date:"H:i" }}</span>
+                <span class="start">{{ event.start_date|date:"m/d/o" }} {{ event.start_at|time:"H:i" }}</span>
+                <span class="end">{{ event.end_date|date:"m/d/o" }} {{ event.end_at|time:"H:i" }}</span>
                 {% get_current_timezone as TIME_ZONE %}
                 <span class="timezone">{{ TIME_ZONE }}</span>
                 <span class="title">{{ event.title }}</span>

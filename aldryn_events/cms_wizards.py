@@ -47,18 +47,15 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
     The ModelForm for the Event wizard. Note that Event has few
     translated fields that we need to access, so, we use TranslatableModelForm
     """
-
-    description = forms.CharField(
+    event_content = forms.CharField(
         label="description", required=False, widget=TextEditorWidget,
-        help_text=_("Optional. If provided, will be added to the main body of "
-                    "the Event.")
+        help_text=_("Optional. If provided, will be added to the main body of the Event.")
     )
 
     class Meta:
         model = Event
         fields = ['title', 'slug', 'short_description', 'location',
-                  'app_config', 'is_published', 'start_date', 'end_date',
-                  'description']
+                  'app_config', 'is_published', 'start_date', 'end_date', 'event_content']
 
     def __init__(self, **kwargs):
         super(CreateEventForm, self).__init__(**kwargs)
@@ -87,24 +84,24 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
 
         # If 'content' field has value, create a TextPlugin with same and add
         # it to the PlaceholderField
-        description = clean_html(
-            self.cleaned_data.get('description', ''), False)
+        event_content = clean_html(
+            self.cleaned_data.get('event_content', ''), False)
 
         try:
             # CMS >= 3.3.x
             content_plugin = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN')
         except KeyError:
-            # CMS <= 3.2.x
+            # COMPAT: CMS3.2
             content_plugin = get_cms_setting('WIZARD_CONTENT_PLUGIN')
 
         try:
             # CMS >= 3.3.x
             content_field = get_cms_setting('PAGE_WIZARD_CONTENT_PLUGIN_BODY')
         except KeyError:
-            # CMS <= 3.2.x
+            # COMPAT: CMS3.2
             content_field = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
 
-        if description and permissions.has_plugin_permission(
+        if event_content and permissions.has_plugin_permission(
                 self.user, content_plugin, 'add'):
             # If the event has not been saved, then there will be no
             # Placeholder set-up for this event yet, so, ensure we have saved
@@ -119,7 +116,7 @@ class CreateEventForm(BaseFormMixin, TranslatableModelForm):
                     'placeholder': event.description,
                     'plugin_type': content_plugin,
                     'language': self.language_code,
-                    content_field: description,
+                    content_field: event_content,
                 }
                 add_plugin(**plugin_kwargs)
 

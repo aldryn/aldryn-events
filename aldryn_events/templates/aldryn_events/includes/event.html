@@ -39,14 +39,14 @@
 
     <p class="date">
         {% if not detail_view %}
-            {% if event.start_time %} {{ event.start_at|date:"H:i" }}{% endif %}
-            {% if event.end_time %} – {{ event.end_at|date:"H:i" }}{% endif %}
+            {% if event.start_time %} {{ event.start_at|time:"H:i" }}{% endif %}
+            {% if event.end_time %} – {{ event.end_at|time:"H:i" }}{% endif %}
         {% else %}
             {{ event.start_date|date }}
-            {% if event.start_time %} {% trans "at" %} {{ event.start_at|date:"H:i" }}{% endif %}
+            {% if event.start_time %} {% trans "at" %} {{ event.start_at|time:"H:i" }}{% endif %}
             {% if event.end_date %}
                  – {{ event.end_date|date }}
-                {% if event.end_time %} {% trans "at" %} {{ event.end_at|date:"H:i" }}{% endif %}
+                {% if event.end_time %} {% trans "at" %} {{ event.end_at|time:"H:i" }}{% endif %}
             {% endif %}
         {% endif %}
     </p>

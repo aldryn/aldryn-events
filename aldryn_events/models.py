@@ -68,7 +68,7 @@ class Event(TranslatedAutoSlugifyMixin,
         'EventCoordinator', verbose_name=_('event coordinators'), blank=True
     )
     description = PlaceholderField(
-        'aldryn_events_event_description', verbose_name=_('description')
+        'aldryn_events_event_description', verbose_name=_('description'),
     )
 
     translations = TranslatedFields(
@@ -178,8 +178,8 @@ class Event(TranslatedAutoSlugifyMixin,
         # Need to normalize values to date objects cuz it can be strings
         # and Django does not normalize in some situations, like when
         # using 'Event.objects.create'
-        start_date_field = self._meta.get_field_by_name('start_date')[0]
-        end_date_field = self._meta.get_field_by_name('end_date')[0]
+        start_date_field = self._meta.get_field('start_date')
+        end_date_field = self._meta.get_field('end_date')
         self.start_date = start_date_field.to_python(self.start_date)
         if self.end_date:
             self.end_date = end_date_field.to_python(self.end_date)
