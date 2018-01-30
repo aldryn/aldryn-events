@@ -68,7 +68,7 @@ def calendar(context, year, month, language=None, namespace=None):
     else:
         context['calendar_tag'] = build_calendar_context(
             year, month, language, namespace)
-    rendered = t.render(context)
+    rendered = t.render(context.flatten())
     return rendered
 
 

@@ -195,10 +195,8 @@ class EventPagesTestCase(EventBaseTestCase):
         )
 
         # setUp app config
-        original_show_ongoing_first = (
-            self.app_config.app_data.config.show_ongoing_first
-        )
-        self.app_config.app_data.config.show_ongoing_first = True
+        original_app_data = self.app_config.app_data.copy()
+        self.app_config.app_data = {'config': {'show_ongoing_first': True}}
         self.app_config.save()
 
         with force_language('en'):
@@ -206,9 +204,7 @@ class EventPagesTestCase(EventBaseTestCase):
             context = response.context_data
 
         # tearDown app config
-        self.app_config.app_data.config.show_ongoing_first = (
-            original_show_ongoing_first
-        )
+        self.app_config.app_data = original_app_data
         self.app_config.save()
 
         actual_ongoing = [event.pk for event in context['ongoing_objects']]
