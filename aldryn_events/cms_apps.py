@@ -11,10 +11,9 @@ class EventListAppHook(CMSConfigApp):
     name = _('Events')
     app_name = 'aldryn_events'
     app_config = EventsConfig
-    urls = ['aldryn_events.urls']  # COMPAT: CMS3.2
 
     def get_urls(self, *args, **kwargs):
-        return self.urls
+        return ['aldryn_events.urls']
 
 
 apphook_pool.register(EventListAppHook)

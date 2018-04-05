@@ -3,14 +3,14 @@ from setuptools import setup, find_packages
 from aldryn_events import __version__
 
 REQUIREMENTS = [
-    'aldryn-apphooks-config>=0.1.4',
+    'aldryn-apphooks-config>=0.4.0',
     'aldryn-boilerplates',
     'aldryn-common>=0.0.6',
     'aldryn-translation-tools>=0.2.1',
     'django-appconf',
     'django-appdata<0.2',
     'django-bootstrap3',
-    'django-cms>=3.2',
+    'django-cms>=3.4',
     'django-extended-choices',
     'django-filer',
     'django-parler>=1.6.1',

@@ -27,9 +27,9 @@ request, please review our `guidelines for Aldryn addons <http://docs.aldryn.com
 Requirements
 ************
 
-* Python 2.7, 3.3, 3.4, 3.5
-* django CMS 3.2 or later
-* Django 1.8 - 1.10
+* Python 2.7, 3.4, 3.5
+* django CMS 3.4 or later
+* Django 1.8 - 1.11
 
 
 .. |PyPI Version| image:: http://img.shields.io/pypi/v/aldryn-events.svg
