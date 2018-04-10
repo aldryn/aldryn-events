@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '3.0.0'
+__version__ = '3.0.1'
 
 default_app_config = 'aldryn_events.apps.AldrynEvents'
 
