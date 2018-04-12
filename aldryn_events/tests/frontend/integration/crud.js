@@ -189,6 +189,7 @@ casper.test.begin('Upcoming events plugin', function (test) {
                 'No events yet'
             );
         })
+        .wait(1000)
         .then(cms.openSideframe())
         // add events
         .withFrame(0, function () {
@@ -204,6 +205,7 @@ casper.test.begin('Upcoming events plugin', function (test) {
                         link: 'Add'
                     })));
                 })
+                .wait(1000)
                 .waitForSelector('#event_form', function () {
                     this.fill('#event_form', {
                         title: 'Test event 2100',
@@ -212,6 +214,7 @@ casper.test.begin('Upcoming events plugin', function (test) {
 
                     this.click('input[value="Save and add another"]');
                 })
+                .wait(1000)
                 .waitForSelector('.success', function () {
                     test.assertSelectorHasText(
                         '.success',
@@ -224,7 +227,8 @@ casper.test.begin('Upcoming events plugin', function (test) {
                         start_date: '2500-07-09'
                     }, true);
                 })
-                .waitForSelector('.success');
+                .waitForSelector('.success')
+                .wait(1000);
         })
         .thenOpen(globals.editUrl, function () {
             test.assertDoesntExist(
