@@ -12,7 +12,3 @@ pyquery
 pytz
 six
 tox
-
-# Needed to prevent djangocms-text-ckeditor
-# from installing latest html5lib
-html5lib<0.99999999
